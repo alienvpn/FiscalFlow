@@ -43,6 +43,11 @@ const menuItems = [
     label: "Budget Forecasting",
     icon: Icons.Forecasting,
   },
+  {
+    href: "/master-data/company-profile",
+    label: "Master Data",
+    icon: Icons.MasterData,
+  },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -61,23 +66,23 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z" />
             </svg>
-            <h1 className="text-sm font-semibold">FiscalFlow</h1>
+            <h1 className="text-[14px] font-semibold">FiscalFlow</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={{ children: item.label }}
-                >
-                  <Link href={item.href}>
+                <Link href={item.href} passHref>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={{ children: item.label }}
+                    className="text-[14px]"
+                  >
                     <item.icon />
                     <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -93,8 +98,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-semibold">Admin User</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-[14px] font-semibold">Admin User</span>
+              <span className="text-[14px] text-muted-foreground">
                 admin@fiscalflow.com
               </span>
             </div>
