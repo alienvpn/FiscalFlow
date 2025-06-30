@@ -35,6 +35,11 @@ const menuItems = [
     icon: Icons.Opex,
   },
   {
+    href: "/opex-registry",
+    label: "OPEX Registry",
+    icon: Icons.OpexRegistry,
+  },
+  {
     href: "/contracts",
     label: "Contracts",
     icon: Icons.Contracts,
