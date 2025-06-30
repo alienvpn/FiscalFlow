@@ -11,18 +11,8 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { menuItems } from "@/lib/navigation";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import React, { useState, useEffect } from "react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -46,10 +36,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {/* Home Link */}
               <Link
                 href="/"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none",
-                  isMounted && pathname === "/" && "bg-accent"
-                )}
+                className="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none"
               >
                 Home
               </Link>
@@ -57,10 +44,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {/* Executive Dashboard Link */}
               <Link
                 href="/dashboard"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none",
-                  isMounted && pathname === "/dashboard" && "bg-accent"
-                )}
+                className="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none"
               >
                 Executive Dashboard
               </Link>
