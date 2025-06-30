@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -157,7 +156,7 @@ export default function CreateUserPage() {
                       <FormLabel className="text-[12px]">Organization</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger className="text-[11px]">
@@ -289,7 +288,7 @@ export default function CreateUserPage() {
                           <p className="text-[11px] font-normal text-muted-foreground mt-1">{allModules.find(m => m.href === field.moduleId)?.description}</p>
                         </TableCell>
                         <TableCell>
-                          <FormField
+                           <FormField
                             control={form.control}
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
@@ -297,7 +296,8 @@ export default function CreateUserPage() {
                                 <FormControl>
                                   <RadioGroup
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value}
+                                    value={field.value}
+                                    ref={field.ref}
                                     className="flex flex-col space-y-2"
                                   >
                                     {accessLevels.map((level) => (
