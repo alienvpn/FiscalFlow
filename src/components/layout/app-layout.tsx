@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -79,9 +78,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </Menubar>
             </div>
-            <Link href="/" passHref>
-              <Button variant="outline">Login</Button>
-            </Link>
           </div>
         </div>
       </header>
