@@ -23,7 +23,7 @@ export default function HomePage() {
 
               <div className="relative z-10 w-full px-4">
                 <div className="w-full h-px bg-white/50 mb-2" />
-                <h2 className="py-2 text-xl font-bold tracking-wide uppercase">
+                <h2 className="py-2 text-[12px] font-bold tracking-wide uppercase">
                   {item.title}
                 </h2>
                 <div className="w-full h-px bg-white/50 mt-2" />
