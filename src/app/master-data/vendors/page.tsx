@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -37,6 +38,7 @@ import { Icons } from "@/components/icons";
 const vendorSchema = z.object({
   companyName: z.string().min(1, "Company Name is required."),
   address: z.string().min(1, "Address is required."),
+  country: z.string().min(1, "Country is required."),
   email: z.string().email("Invalid email address."),
   telephone: z.string().min(1, "Telephone is required."),
   fax: z.string().optional(),
@@ -79,6 +81,7 @@ const initialVendors: VendorFormValues[] = [
         id: "vendor-1",
         companyName: "Global Tech Supplies",
         address: "123 Tech Avenue, Silicon Valley, CA",
+        country: "USA",
         email: "contact@globaltech.com",
         telephone: "1-800-555-1234",
         fax: "",
@@ -100,6 +103,7 @@ const initialVendors: VendorFormValues[] = [
         id: "vendor-2",
         companyName: "Creative Solutions LLC",
         address: "456 Marketing Blvd, New York, NY",
+        country: "USA",
         email: "hello@creativesolutions.com",
         telephone: "1-212-555-5678",
         fax: "",
@@ -122,6 +126,7 @@ const initialVendors: VendorFormValues[] = [
 const defaultValues: Partial<VendorFormValues> = {
     companyName: "",
     address: "",
+    country: "",
     email: "",
     telephone: "",
     fax: "",
@@ -276,6 +281,7 @@ export default function VendorsPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Company Name</TableHead>
+                        <TableHead>Country</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Account Manager</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -286,6 +292,9 @@ export default function VendorsPage() {
                         <TableRow key={vendor.id}>
                           <TableCell className="font-medium text-[11px]">
                             {vendor.companyName}
+                          </TableCell>
+                          <TableCell className="text-[11px]">
+                            {vendor.country}
                           </TableCell>
                           <TableCell className="text-[11px]">
                             {vendor.email}
@@ -350,23 +359,42 @@ export default function VendorsPage() {
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">Address</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="PO.Box, Street Name, Zone, City, Country"
-                              className="text-[11px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid md:grid-cols-2 gap-4">
+                         <FormField
+                          control={form.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-[12px]">Address</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="PO.Box, Street Name, Zone, City"
+                                  className="text-[11px]"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-[12px]">Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="e.g. USA"
+                                  className="text-[11px]"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <FormField
                         control={form.control}
