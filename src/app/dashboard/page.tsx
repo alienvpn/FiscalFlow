@@ -86,7 +86,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6">
-      <h2 className="text-lg font-bold tracking-tight">Executive Dashboard</h2>
+      <h2 className="text-lg font-bold tracking-tight print:text-[12px]">Executive Dashboard</h2>
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
@@ -94,8 +94,8 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold">41,500 QAR</div>
-            <p className="text-[10px] text-muted-foreground">
+            <div className="text-base font-bold print:text-[10px]">41,500 QAR</div>
+            <p className="text-[10px] text-muted-foreground print:text-[10px]">
               Total allocated for this period
             </p>
           </CardContent>
@@ -108,8 +108,8 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold">31,000 QAR</div>
-            <p className="text-[10px] text-muted-foreground">
+            <div className="text-base font-bold print:text-[10px]">31,000 QAR</div>
+            <p className="text-[10px] text-muted-foreground print:text-[10px]">
               <span className="text-primary flex items-center">
                 <ArrowDown className="h-3 w-3 mr-1" />
                 74.7% of total budget
@@ -125,8 +125,8 @@ export default function Dashboard() {
             <FileWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold">{activeContracts.length}</div>
-            <p className="text-[10px] text-muted-foreground">
+            <div className="text-base font-bold print:text-[10px]">{activeContracts.length}</div>
+            <p className="text-[10px] text-muted-foreground print:text-[10px]">
               {expiringSoonContracts.length} contracts expiring soon
             </p>
           </CardContent>
@@ -139,8 +139,8 @@ export default function Dashboard() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold">Low</div>
-            <p className="text-[10px] text-muted-foreground">
+            <div className="text-base font-bold print:text-[10px]">Low</div>
+            <p className="text-[10px] text-muted-foreground print:text-[10px]">
               <span className="text-destructive flex items-center">
                 <ArrowUp className="h-3 w-3 mr-1" />1 department near limit
               </span>

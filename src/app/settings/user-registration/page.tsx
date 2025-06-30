@@ -133,10 +133,10 @@ export default function UserRegistrationPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h2 className="text-[14px] font-bold tracking-tight mb-2">
+      <h2 className="text-[14px] font-bold tracking-tight mb-2 print:text-[12px]">
         User Registration
       </h2>
-      <p className="text-muted-foreground mb-6 text-[12px]">
+      <p className="text-muted-foreground mb-6 text-[12px] print:text-[10px]">
         Create a new user account and set their permissions.
       </p>
       <Form {...form}>
@@ -263,7 +263,7 @@ export default function UserRegistrationPage() {
               </CardHeader>
               <CardContent className="text-[12px] text-muted-foreground space-y-4">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Minimum Requirements</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Minimum Requirements</h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Minimum Length: 8 characters</li>
                     <li>Must include at least 3 of the following 4:
@@ -277,7 +277,7 @@ export default function UserRegistrationPage() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Password Change Policy</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Password Change Policy</h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Optional: Change every 180 days (configurable)</li>
                     <li>Cannot reuse the last 5 passwords</li>
@@ -285,7 +285,7 @@ export default function UserRegistrationPage() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Account Lockout & Throttling</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Account Lockout & Throttling</h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Lock account after 5 failed attempts</li>
                     <li>Unlock after 15 minutes or via email/MFA verification</li>

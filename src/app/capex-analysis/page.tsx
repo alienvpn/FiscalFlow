@@ -79,10 +79,10 @@ export default function CapexAnalysisPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-sm font-bold tracking-tight mb-2">
+        <h2 className="text-sm font-bold tracking-tight mb-2 print:text-[12px]">
           CAPEX Analysis Tool
         </h2>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground mb-6 print:text-[10px]">
           Compare capital expenditure quotes using AI to make informed
           decisions.
         </p>
@@ -239,7 +239,7 @@ export default function CapexAnalysisPage() {
 
         {analysisResult && (
           <div className="mt-8 space-y-6">
-            <h3 className="text-base font-bold">Analysis Result</h3>
+            <h3 className="text-base font-bold print:text-[12px]">Analysis Result</h3>
             <Card>
               <CardHeader>
                 <CardTitle>Summary</CardTitle>

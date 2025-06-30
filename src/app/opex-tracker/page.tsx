@@ -82,8 +82,8 @@ export default function OpexTrackerPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h2 className="text-sm font-bold tracking-tight mb-2">OPEX Tracker</h2>
-      <p className="text-muted-foreground mb-6">
+      <h2 className="text-sm font-bold tracking-tight mb-2 print:text-[12px]">OPEX Tracker</h2>
+      <p className="text-muted-foreground mb-6 print:text-[10px]">
         Log and categorize operational expenses for real-time budget tracking.
       </p>
 

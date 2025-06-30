@@ -74,10 +74,10 @@ export default function BudgetForecastingPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-sm font-bold tracking-tight mb-2">
+        <h2 className="text-sm font-bold tracking-tight mb-2 print:text-[12px]">
           Budget Forecasting Tool
         </h2>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground mb-6 print:text-[10px]">
           Predict future budgetary needs based on historical data and
           contractual obligations.
         </p>

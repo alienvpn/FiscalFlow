@@ -236,10 +236,10 @@ export default function ContractsPage() {
 
     return (
         <div className="container mx-auto p-4 md:p-8">
-            <h2 className="text-[14px] font-bold tracking-tight mb-2">
+            <h2 className="text-[14px] font-bold tracking-tight mb-2 print:text-[12px]">
                 Contract Management
             </h2>
-            <p className="text-muted-foreground mb-6 text-[12px]">
+            <p className="text-muted-foreground mb-6 text-[12px] print:text-[10px]">
                 Create, manage, and track all organizational contracts, SLAs, and AMCs.
             </p>
 
@@ -356,12 +356,12 @@ export default function ContractsPage() {
                                         <FormItem>
                                             <FormLabel className="text-[12px]">Service Next Renewal Date</FormLabel>
                                             <Input readOnly disabled value={watch("nextRenewalDate") ? format(watch("nextRenewalDate")!, "PPP") : "---"} className="text-[11px]" />
-                                            <p className="text-[10px] text-muted-foreground">Auto-calculated: 30 days before service end date.</p>
+                                            <p className="text-[10px] text-muted-foreground print:text-[10px]">Auto-calculated: 30 days before service end date.</p>
                                         </FormItem>
                                          <FormItem>
                                             <FormLabel className="text-[12px]">Contract Status</FormLabel>
                                             <Input readOnly disabled value={watch("contractStatus") || "---"} className="text-[11px]"/>
-                                            <p className="text-[10px] text-muted-foreground">Auto-updated based on the current and end dates.</p>
+                                            <p className="text-[10px] text-muted-foreground print:text-[10px]">Auto-updated based on the current and end dates.</p>
                                         </FormItem>
                                     </div>
                                  </CardContent>

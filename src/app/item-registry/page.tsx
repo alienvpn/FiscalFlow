@@ -159,10 +159,10 @@ export default function ItemRegistryPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h2 className="text-[14px] font-bold tracking-tight mb-2">
+      <h2 className="text-[14px] font-bold tracking-tight mb-2 print:text-[12px]">
         Device/Item/Service Registry
       </h2>
-      <p className="text-muted-foreground mb-6 text-[12px]">
+      <p className="text-muted-foreground mb-6 text-[12px] print:text-[10px]">
         Manage your devices, items, and services.
       </p>
 
@@ -380,7 +380,7 @@ export default function ItemRegistryPage() {
                     <Separator />
                     
                     <div>
-                      <h3 className="text-[12px] font-medium mb-4">Specifications</h3>
+                      <h3 className="text-[12px] font-medium mb-4 print:text-[12px]">Specifications</h3>
                       <div className="grid md:grid-cols-3 gap-4">
                           <FormField control={form.control} name="model" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Model</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
                           <FormField control={form.control} name="make" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Make</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -394,7 +394,7 @@ export default function ItemRegistryPage() {
                     <Separator />
 
                     <div>
-                      <h3 className="text-[12px] font-medium mb-4">Lifecycle Dates</h3>
+                      <h3 className="text-[12px] font-medium mb-4 print:text-[12px]">Lifecycle Dates</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                           <FormField control={form.control} name="manufactureDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Manufacture Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
                           <FormField control={form.control} name="expireDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Expire Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
@@ -407,7 +407,7 @@ export default function ItemRegistryPage() {
                     <Separator />
 
                     <div>
-                        <h3 className="text-[12px] font-medium mb-4">Warranty</h3>
+                        <h3 className="text-[12px] font-medium mb-4 print:text-[12px]">Warranty</h3>
                        <div className="grid md:grid-cols-2 gap-4">
                            <FormField control={form.control} name="warrantyStartDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty Start Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
                           <FormField control={form.control} name="warrantyEndDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty End Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />

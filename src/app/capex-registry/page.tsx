@@ -179,10 +179,10 @@ export default function CapexRegistryPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h2 className="text-[14px] font-bold tracking-tight mb-2">
+      <h2 className="text-[14px] font-bold tracking-tight mb-2 print:text-[12px]">
         CAPEX Items Sheet
       </h2>
-      <p className="text-muted-foreground mb-6 text-[12px]">
+      <p className="text-muted-foreground mb-6 text-[12px] print:text-[10px]">
         Create a CAPEX sheet for a specific organization, department, and year.
       </p>
 
