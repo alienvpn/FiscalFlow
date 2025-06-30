@@ -22,6 +22,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -81,7 +88,7 @@ const initialVendors: VendorFormValues[] = [
         id: "vendor-1",
         companyName: "Global Tech Supplies",
         address: "123 Tech Avenue, Silicon Valley, CA",
-        country: "USA",
+        country: "United States",
         email: "contact@globaltech.com",
         telephone: "1-800-555-1234",
         fax: "",
@@ -103,7 +110,7 @@ const initialVendors: VendorFormValues[] = [
         id: "vendor-2",
         companyName: "Creative Solutions LLC",
         address: "456 Marketing Blvd, New York, NY",
-        country: "USA",
+        country: "United States",
         email: "hello@creativesolutions.com",
         telephone: "1-212-555-5678",
         fax: "",
@@ -144,6 +151,33 @@ const defaultValues: Partial<VendorFormValues> = {
     techSupport2: { name: "", email: "", telephone: "", mobile: "" },
     techSupport3: { name: "", email: "", telephone: "", mobile: "" },
 };
+
+const countries = [
+  "Afghanistan", "Algeria", "Angola", "Argentina", "Australia", "Austria",
+  "Bahrain", "Bangladesh", "Belarus", "Belgium", "Benin", "Bolivia", "Botswana", "Brazil", "Bulgaria",
+  "Cambodia", "Cameroon", "Canada", "Chad", "Chile", "China", "Colombia", "Congo, Democratic Republic of the", "Croatia", "Cyprus", "Czech Republic",
+  "Denmark",
+  "Ecuador", "Egypt", "Estonia", "Ethiopia",
+  "Fiji", "Finland", "France",
+  "Gabon", "Germany", "Ghana", "Greece", "Guinea",
+  "Hungary",
+  "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast",
+  "Japan", "Jordan",
+  "Kazakhstan", "Kenya", "Kuwait",
+  "Laos", "Latvia", "Lebanon", "Libya", "Lithuania", "Luxembourg",
+  "Madagascar", "Malaysia", "Mali", "Mexico", "Mongolia", "Morocco", "Mozambique", "Myanmar",
+  "Namibia", "Nepal", "Netherlands", "New Zealand", "Niger", "Nigeria", "Norway",
+  "Oman",
+  "Pakistan", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+  "Qatar",
+  "Romania", "Russia",
+  "Saudi Arabia", "Senegal", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria",
+  "Tanzania", "Thailand", "Tunisia", "Turkey",
+  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+  "Venezuela", "Vietnam",
+  "Yemen",
+  "Zambia", "Zimbabwe",
+].sort();
 
 export default function VendorsPage() {
   const [vendors, setVendors] = React.useState<VendorFormValues[]>(initialVendors);
@@ -383,13 +417,27 @@ export default function VendorsPage() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-[12px]">Country</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g. USA"
-                                  className="text-[11px]"
-                                  {...field}
-                                />
-                              </FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="text-[11px]">
+                                    <SelectValue placeholder="Select a country" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {countries.map((country) => (
+                                    <SelectItem
+                                      key={country}
+                                      value={country}
+                                      className="text-[11px]"
+                                    >
+                                      {country}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
