@@ -23,7 +23,7 @@ export const Icons = {
   Opex: Coins,
   Contracts: FileText,
   Forecasting: Lightbulb,
-  MasterData: Database,
+  Enterprise: Database,
   Vendors: Building2,
   Registry: ClipboardList,
   CapexRegistry: ClipboardPlus,

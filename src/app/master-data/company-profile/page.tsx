@@ -37,7 +37,7 @@ export default function CompanyProfilePage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h2 className="text-[14px] font-bold tracking-tight mb-2">
-        Master Data
+        Create Enterprise
       </h2>
       <p className="text-muted-foreground mb-6 text-[12px]">
         Select a category to manage your master data.

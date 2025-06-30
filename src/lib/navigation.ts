@@ -12,16 +12,22 @@ export const menuItems: {
   links: NavLink[];
 }[] = [
   {
-    title: "File",
+    title: "Master",
     links: [
       {
-        title: "Master Data",
+        title: "Create Enterprise",
         href: "/master-data/company-profile",
-        icon: Icons.MasterData,
+        icon: Icons.Enterprise,
         description: "Manage core company, vendor, and organizational data.",
       },
       {
-        title: "Vendors",
+        title: "Create Items/Devices/Services",
+        href: "/item-registry",
+        icon: Icons.Registry,
+        description: "Register new devices, items, or services.",
+      },
+      {
+        title: "Vendor",
         href: "/master-data/vendors",
         icon: Icons.Vendors,
         description: "Manage supplier and service provider information.",
@@ -29,7 +35,7 @@ export const menuItems: {
     ],
   },
   {
-    title: "Folder",
+    title: "Budgeting",
     links: [
       {
         title: "CAPEX Registry",
@@ -43,55 +49,41 @@ export const menuItems: {
         icon: Icons.OpexRegistry,
         description: "Create and manage yearly OPEX sheets.",
       },
-      {
-        title: "Device/Item/Service Registry",
-        href: "/item-registry",
-        icon: Icons.Registry,
-        description: "Register new devices, items, or services.",
-      },
-    ],
-  },
-  {
-    title: "View",
-    links: [
-      {
-        title: "Executive Dashboard",
-        href: "/dashboard",
-        icon: Icons.Dashboard,
-        description: "View key metrics, charts, and financial summaries.",
-      },
-      {
-        title: "CAPEX Analysis",
-        href: "/capex-analysis",
-        icon: Icons.Capex,
-        description: "Compare capital expenditure quotes using AI.",
-      },
-      {
-        title: "OPEX Tracker",
-        href: "/opex-tracker",
-        icon: Icons.Opex,
-        description: "Log and categorize operational expenses for tracking.",
-      },
-      {
-        title: "Budget Forecasting",
-        href: "/budget-forecasting",
-        icon: Icons.Forecasting,
-        description: "Predict future budgetary needs with AI.",
-      },
-    ],
-  },
-  {
-    title: "Attachments",
-    links: [
-      {
-        title: "Contracts",
-        href: "/contracts",
-        icon: Icons.Contracts,
-        description: "Store and manage contracts, SLAs, and AMCs.",
-      },
     ],
   },
 ];
 
 // Helper to get all modules for the home page
-export const allModules: NavLink[] = menuItems.flatMap((item) => item.links);
+export const allModules: NavLink[] = [
+  {
+    title: "Executive Dashboard",
+    href: "/dashboard",
+    icon: Icons.Dashboard,
+    description: "View key metrics, charts, and financial summaries.",
+  },
+  ...menuItems.flatMap((item) => item.links),
+  {
+    title: "CAPEX Analysis",
+    href: "/capex-analysis",
+    icon: Icons.Capex,
+    description: "Compare capital expenditure quotes using AI.",
+  },
+  {
+    title: "OPEX Tracker",
+    href: "/opex-tracker",
+    icon: Icons.Opex,
+    description: "Log and categorize operational expenses for tracking.",
+  },
+  {
+    title: "Budget Forecasting",
+    href: "/budget-forecasting",
+    icon: Icons.Forecasting,
+    description: "Predict future budgetary needs with AI.",
+  },
+  {
+    title: "Contracts",
+    href: "/contracts",
+    icon: Icons.Contracts,
+    description: "Store and manage contracts, SLAs, and AMCs.",
+  },
+];
