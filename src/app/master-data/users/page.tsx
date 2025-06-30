@@ -304,10 +304,10 @@ export default function CreateUserPage() {
                                       <div key={level} className="flex items-center space-x-3">
                                         <RadioGroupItem
                                           value={level}
-                                          id={`${item.id}-${level.replace(/\s+/g, '-')}`}
+                                          id={`${item.moduleId}-${index}-${level.replace(/\s+/g, '-')}`}
                                         />
                                         <Label
-                                          htmlFor={`${item.id}-${level.replace(/\s+/g, '-')}`}
+                                          htmlFor={`${item.moduleId}-${index}-${level.replace(/\s+/g, '-')}`}
                                           className="font-normal text-[11px]"
                                         >
                                           {level}
