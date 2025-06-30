@@ -166,7 +166,7 @@ export default function UserRegistrationPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">None</SelectItem>
+                            <SelectItem value="none">None</SelectItem>
                             {approvalMatrix.map((level) => (
                               <SelectItem key={level.id} value={level.approverRole}>
                                 {level.approverRole}
