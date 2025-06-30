@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -233,6 +234,8 @@ export default function OpexRegistryPage() {
                       <TableHead className="text-[12px]">Period</TableHead>
                       <TableHead className="text-[12px]">Amount (QAR)</TableHead>
                       <TableHead className="text-right text-[12px]">Annual Value (QAR)</TableHead>
+                      <TableHead className="text-[12px]">Implementation</TableHead>
+                      <TableHead className="text-[12px]">Service Status</TableHead>
                       <TableHead className="text-[12px]">Supplier</TableHead>
                       <TableHead className="text-[12px]">Remarks</TableHead>
                     </TableRow>
@@ -254,6 +257,8 @@ export default function OpexRegistryPage() {
                           <TableCell className="text-[11px]">{item.period}</TableCell>
                           <TableCell className="text-[11px]">{item.amount.toLocaleString()}</TableCell>
                           <TableCell className="text-right font-medium text-[11px]">{annualValue.toLocaleString()}</TableCell>
+                          <TableCell className="text-[11px]">{item.implementation}</TableCell>
+                          <TableCell className="text-[11px]">{item.serviceStatus}</TableCell>
                           <TableCell className="text-[11px]">{supplierName}</TableCell>
                           <TableCell className="text-[11px]">{item.remarks}</TableCell>
                         </TableRow>
