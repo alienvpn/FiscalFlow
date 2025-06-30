@@ -54,7 +54,6 @@ const capexItemSchema = z.object({
   priority: z.string().min(1, "Priority is required."),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
   amount: z.coerce.number().min(0, "Amount is required."),
-  period: z.string().min(1, "Period is required."),
   justification: z.string().min(1, "Justification is required."),
   remarks: z.string().optional(),
 });
@@ -221,7 +220,6 @@ export default function CapexRegistryPage() {
                       <TableHead className="w-[80px] text-[12px]">Qty</TableHead>
                       <TableHead className="w-[120px] text-[12px]">Amount</TableHead>
                       <TableHead className="w-[120px] text-[12px]">Total</TableHead>
-                      <TableHead className="w-[150px] text-[12px]">Period</TableHead>
                       <TableHead className="w-[250px] text-[12px]">Justification</TableHead>
                       <TableHead className="w-[250px] text-[12px]">Remarks</TableHead>
                       <TableHead className="w-[150px] text-[12px]">Attachment</TableHead>
@@ -274,9 +272,6 @@ export default function CapexRegistryPage() {
                              {total.toLocaleString()} QAR
                           </TableCell>
                           <TableCell className="align-top">
-                             <FormField control={form.control} name={`items.${index}.period`} render={({ field }) => (<FormItem><FormControl><Input placeholder="e.g., 12 Months" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                          </TableCell>
-                          <TableCell className="align-top">
                             <FormField control={form.control} name={`items.${index}.justification`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                           </TableCell>
                            <TableCell className="align-top">
@@ -295,7 +290,7 @@ export default function CapexRegistryPage() {
                     })}
                      {fields.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={11} className="h-24 text-center text-[12px] text-muted-foreground">
+                          <TableCell colSpan={10} className="h-24 text-center text-[12px] text-muted-foreground">
                             No items added yet.
                           </TableCell>
                         </TableRow>
@@ -308,7 +303,7 @@ export default function CapexRegistryPage() {
                 variant="outline"
                 size="sm"
                 className="mt-4"
-                onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, period: "", justification: "", remarks: "" })}
+                onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, justification: "", remarks: "" })}
               >
                 <Icons.Add className="mr-2 h-4 w-4" />
                 Add Item
@@ -335,5 +330,3 @@ export default function CapexRegistryPage() {
     </div>
   );
 }
-
-    
