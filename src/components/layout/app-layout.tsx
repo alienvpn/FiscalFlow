@@ -55,6 +55,11 @@ const menuItems = [
     label: "Vendors",
     icon: Icons.Vendors,
   },
+  {
+    href: "/item-registry",
+    label: "Device/Item/Service Registry",
+    icon: Icons.Registry,
+  },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {

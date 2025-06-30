@@ -10,6 +10,7 @@ import {
   PlusCircle,
   Trash2,
   Building2,
+  ClipboardList,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -22,6 +23,7 @@ export const Icons = {
   Forecasting: Lightbulb,
   MasterData: Database,
   Vendors: Building2,
+  Registry: ClipboardList,
   Spinner: LoaderCircle,
   Add: PlusCircle,
   Delete: Trash2,
