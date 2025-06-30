@@ -77,6 +77,12 @@ export const menuItems: {
     title: "Reports",
     links: [
       {
+        title: "Reports Overview",
+        href: "/reports",
+        icon: Icons.Reports,
+        description: "An overview of all available reports.",
+      },
+      {
         title: "CAPEX Report",
         href: "/reports/capex",
         icon: Icons.Capex,

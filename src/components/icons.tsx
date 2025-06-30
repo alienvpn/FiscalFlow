@@ -16,6 +16,7 @@ import {
   Users,
   UserPlus,
   ClipboardCheck,
+  AreaChart,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -37,4 +38,5 @@ export const Icons = {
   Users: Users,
   UserPlus: UserPlus,
   Approvals: ClipboardCheck,
+  Reports: AreaChart,
 };
