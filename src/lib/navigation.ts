@@ -91,6 +91,17 @@ export const menuItems: {
       },
     ],
   },
+  {
+    title: "Settings",
+    links: [
+      {
+        title: "User Registration",
+        href: "/settings/user-registration",
+        icon: Icons.UserPlus,
+        description: "Create and manage user accounts and permissions.",
+      },
+    ],
+  },
 ];
 
 // Helper to get all modules for the home page
@@ -120,4 +131,5 @@ export const allModules: NavLink[] = [
     icon: Icons.Forecasting,
     description: "Predict future budgetary needs with AI.",
   },
-];
+].filter((v,i,a)=>a.findIndex(v2=>(v2.href===v.href))===i); // Make unique
+

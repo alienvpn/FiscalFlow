@@ -13,6 +13,8 @@ import {
   ClipboardList,
   ClipboardPlus,
   ClipboardEdit,
+  Users,
+  UserPlus,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -31,4 +33,6 @@ export const Icons = {
   Spinner: LoaderCircle,
   Add: PlusCircle,
   Delete: Trash2,
+  Users: Users,
+  UserPlus: UserPlus,
 };
