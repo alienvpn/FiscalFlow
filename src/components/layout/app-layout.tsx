@@ -15,7 +15,7 @@ import { usePathname } from "next/navigation";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/login";
+  const isLoginPage = pathname === "/";
 
   if (isLoginPage) {
     return <main className="flex-1">{children}</main>;
@@ -26,7 +26,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/home" className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-1">
               {/* Home Link */}
               <Link
-                href="/"
+                href="/home"
                 className="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none"
               >
                 Home
@@ -79,7 +79,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </Menubar>
             </div>
-            <Link href="/login" passHref>
+            <Link href="/" passHref>
               <Button variant="outline">Login</Button>
             </Link>
           </div>
