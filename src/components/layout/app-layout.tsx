@@ -1,4 +1,3 @@
-
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -78,7 +77,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar className="print:hidden">
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <svg
@@ -131,10 +130,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset>
         {mounted ? (
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:hidden">
+          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:hidden print:hidden">
             <SidebarTrigger />
           </header>
-        ) : <div className="h-14 md:hidden"/>}
+        ) : <div className="h-14 md:hidden print:hidden"/>}
         <main>{children}</main>
       </SidebarInset>
     </SidebarProvider>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -222,8 +221,8 @@ export default function CapexRegistryPage() {
                       <TableHead className="w-[120px] text-[12px]">Total</TableHead>
                       <TableHead className="w-[250px] text-[12px]">Justification</TableHead>
                       <TableHead className="w-[250px] text-[12px]">Remarks</TableHead>
-                      <TableHead className="w-[150px] text-[12px]">Attachment</TableHead>
-                      <TableHead className="w-[50px] text-right text-[12px]">Actions</TableHead>
+                      <TableHead className="w-[150px] text-[12px] print:hidden">Attachment</TableHead>
+                      <TableHead className="w-[50px] text-right text-[12px] print:hidden">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -277,10 +276,10 @@ export default function CapexRegistryPage() {
                            <TableCell className="align-top">
                             <FormField control={form.control} name={`items.${index}.remarks`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                           </TableCell>
-                          <TableCell className="align-top pt-5">
+                          <TableCell className="align-top pt-5 print:hidden">
                             <Button variant="outline" size="sm" type="button">Attach</Button>
                           </TableCell>
-                          <TableCell className="text-right align-top pt-4">
+                          <TableCell className="text-right align-top pt-4 print:hidden">
                             <Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}>
                               <Icons.Delete className="h-4 w-4 text-destructive" />
                             </Button>
@@ -302,7 +301,7 @@ export default function CapexRegistryPage() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="mt-4"
+                className="mt-4 print:hidden"
                 onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, justification: "", remarks: "" })}
               >
                 <Icons.Add className="mr-2 h-4 w-4" />
@@ -324,7 +323,12 @@ export default function CapexRegistryPage() {
             </CardFooter>
           </Card>
           
-          <Button type="submit">Save CAPEX Sheet</Button>
+          <div className="flex items-center gap-4 print:hidden">
+            <Button type="submit">Save CAPEX Sheet</Button>
+            <Button type="button" variant="outline" onClick={() => window.print()}>
+              Print &amp; Preview
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
