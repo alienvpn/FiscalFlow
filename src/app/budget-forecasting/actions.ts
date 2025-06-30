@@ -1,16 +1,11 @@
 "use server";
 
-import { forecastBudget } from "@/ai/flows/budget-forecasting";
-import { z } from "zod";
+import {
+  forecastBudget,
+  type BudgetForecastingInput,
+} from "@/ai/flows/budget-forecasting";
 
-export const BudgetForecastingSchema = z.object({
-  historicalSpendingData: z.string().min(1, "Historical data is required."),
-  contractObligations: z.string().min(1, "Contract obligations are required."),
-});
-
-export async function getBudgetForecast(
-  values: z.infer<typeof BudgetForecastingSchema>
-) {
+export async function getBudgetForecast(values: BudgetForecastingInput) {
   "use server";
   try {
     const result = await forecastBudget(values);

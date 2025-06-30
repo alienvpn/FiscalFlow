@@ -22,13 +22,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  getBudgetForecast,
-  BudgetForecastingSchema,
-} from "./actions";
+import { getBudgetForecast } from "./actions";
 import type { BudgetForecastingOutput } from "@/ai/flows/budget-forecasting";
 
 type ForecastResult = BudgetForecastingOutput | null;
+
+const BudgetForecastingSchema = z.object({
+  historicalSpendingData: z.string().min(1, "Historical data is required."),
+  contractObligations: z.string().min(1, "Contract obligations are required."),
+});
 
 const defaultHistoricalData = `Date,Category,Amount
 2023-01-15,Salaries,50000

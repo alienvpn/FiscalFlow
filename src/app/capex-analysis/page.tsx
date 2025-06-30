@@ -26,10 +26,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { CapexAnalysisSchema, getCapexAnalysis } from "./actions";
+import { getCapexAnalysis } from "./actions";
 import type { CompareCAPEXQuotesOutput } from "@/ai/flows/capex-analysis";
 
 type AnalysisResult = CompareCAPEXQuotesOutput | null;
+
+const QuoteSchema = z.object({
+  vendor: z.string().min(1, "Vendor is required."),
+  description: z.string().min(1, "Description is required."),
+  price: z.coerce.number().min(0, "Price must be a positive number."),
+  terms: z.string().min(1, "Terms are required."),
+});
+
+const CapexAnalysisSchema = z.object({
+  quotes: z.array(QuoteSchema).min(1, "At least one quote is required."),
+  criteria: z.string().min(1, "Criteria are required."),
+});
 
 export default function CapexAnalysisPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult>(null);
