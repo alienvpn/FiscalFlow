@@ -64,7 +64,7 @@ const userRegistrationSchema = z
 type UserRegistrationFormValues = z.infer<typeof userRegistrationSchema>;
 
 const modulesForPermissions = allModules.filter(
-  (m) => m.href !== "/settings/user-registration"
+  (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/"
 );
 
 const defaultPermissions = modulesForPermissions.reduce(
@@ -164,40 +164,45 @@ export default function UserRegistrationPage() {
                 <CardTitle className="text-[13px]">Module Permissions</CardTitle>
                 <CardDescription className="text-[12px]">Set access levels for each module.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-[2fr_auto_auto_auto_auto] border rounded-md overflow-hidden">
-                  <div className="p-2 font-bold border-b bg-muted text-[11px]">Module / Section</div>
-                  <div className="p-2 font-bold border-b bg-muted text-center text-[11px]">Read Only</div>
-                  <div className="p-2 font-bold border-b bg-muted text-center text-[11px]">Read & Write</div>
-                  <div className="p-2 font-bold border-b bg-muted text-center text-[11px]">Full Access</div>
-                  <div className="p-2 font-bold border-b bg-muted text-center text-[11px]">No Access</div>
-                  
-                  {modulesForPermissions.map((module) => (
-                    <FormField
-                      key={module.href}
-                      control={form.control}
-                      name={`permissions.${module.href}` as const}
-                      render={({ field }) => (
-                        <FormItem className="contents">
-                          <div className="p-2 border-b flex items-center text-[11px]">{module.title}</div>
-                          <FormControl>
+              <CardContent className="space-y-4">
+                 <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-x-4 border-b pb-2 mb-2">
+                    <div className="font-bold text-[11px]">Module / Section</div>
+                    <div className="font-bold text-center text-[11px]">Read Only</div>
+                    <div className="font-bold text-center text-[11px]">Read & Write</div>
+                    <div className="font-bold text-center text-[11px]">Full Access</div>
+                    <div className="font-bold text-center text-[11px]">No Access</div>
+                </div>
+
+                {modulesForPermissions.map((module) => (
+                  <FormField
+                    key={module.href}
+                    control={form.control}
+                    name={`permissions.${module.href}` as const}
+                    render={({ field }) => (
+                      <FormItem className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-x-4 py-2 border-b">
+                        <FormLabel className="text-[11px] font-normal">
+                          {module.title}
+                        </FormLabel>
+                        
+                        <div className="col-span-4">
+                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="contents"
+                              value={field.value}
+                              className="grid grid-cols-4 items-center justify-items-center"
                             >
-                              <div className="p-2 border-b flex justify-center items-center"><RadioGroupItem value="read" id={`${module.href}-read`} /></div>
-                              <div className="p-2 border-b flex justify-center items-center"><RadioGroupItem value="write" id={`${module.href}-write`} /></div>
-                              <div className="p-2 border-b flex justify-center items-center"><RadioGroupItem value="full" id={`${module.href}-full`} /></div>
-                              <div className="p-2 border-b flex justify-center items-center"><RadioGroupItem value="none" id={`${module.href}-none`} /></div>
+                              <RadioGroupItem value="read" id={`${module.href}-read`} />
+                              <RadioGroupItem value="write" id={`${module.href}-write`} />
+                              <RadioGroupItem value="full" id={`${module.href}-full`} />
+                              <RadioGroupItem value="none" id={`${module.href}-none`} />
                             </RadioGroup>
                           </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                 <FormField control={form.control} name="permissions" render={() => <FormMessage className="mt-2" />} />
+                        </div>
+                         <FormMessage className="col-span-5" />
+                      </FormItem>
+                    )}
+                  />
+                ))}
               </CardContent>
             </Card>
             <Button type="submit">Create User</Button>
@@ -218,7 +223,7 @@ export default function UserRegistrationPage() {
                         <li>Uppercase letters (A–Z)</li>
                         <li>Lowercase letters (a–z)</li>
                         <li>Numbers (0–9)</li>
-                        <li>Special characters (e.g., !@#$%)</li>
+                        <li>Special characters (e.g., !@#$%^&amp;*()_+-=[]{}|;:'",.&lt;&gt;?)</li>
                       </ul>
                     </li>
                   </ul>
@@ -226,17 +231,17 @@ export default function UserRegistrationPage() {
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Password Change Policy</h4>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Optional: Change every 180 days</li>
+                    <li>Optional: Change every 180 days (configurable)</li>
                     <li>Cannot reuse the last 5 passwords</li>
-                    <li>Must wait 24 hours before reuse</li>
+                    <li>Must wait at least 24 hours before reusing the same password</li>
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Account Lockout & Throttling</h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Lock account after 5 failed attempts</li>
-                    <li>Unlock after 15 minutes or via email</li>
-                    <li>Progressive delays for repeated failures</li>
+                    <li>Unlock after 15 minutes or via email/MFA verification</li>
+                    <li>Apply progressive delays for repeated failed attempts (rate limiting)</li>
                   </ul>
                 </div>
               </CardContent>
