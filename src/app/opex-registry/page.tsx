@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -41,6 +40,7 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
+import { useToast } from "@/hooks/use-toast";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
@@ -68,6 +68,7 @@ const opexRegistrySchema = z.object({
 type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
+  const { toast } = useToast();
   const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[]>([]);
 
   const form = useForm<OpexFormValues>({
@@ -86,7 +87,6 @@ export default function OpexRegistryPage() {
   });
 
   const watchedItems = form.watch("items");
-  const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
@@ -110,7 +110,7 @@ export default function OpexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form.watch]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -144,6 +144,7 @@ export default function OpexRegistryPage() {
   }, [previousYearItems]);
 
   const generateOpexSeqNum = (index: number) => {
+    const { organization, department, year } = form.getValues();
     const orgName = organizations.find((o) => o.id === organization)?.name.substring(0, 3).toUpperCase() || 'ORG';
     const deptName = departments.find((d) => d.id === department)?.name.substring(0, 4).toUpperCase() || 'DEPT';
     const itemNum = (index + 1).toString().padStart(3, '0');
@@ -151,8 +152,20 @@ export default function OpexRegistryPage() {
   };
 
   function onSubmit(values: OpexFormValues) {
-    console.log(values);
-    // Handle form submission
+    console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+    toast({
+      title: "Sheet Submitted",
+      description: "Your OPEX sheet has been sent for approval.",
+    });
+  }
+
+  function handleSaveAsDraft() {
+    const values = form.getValues();
+    console.log("Saving as draft:", { ...values, status: 'Draft' });
+    toast({
+      title: "Draft Saved",
+      description: "Your OPEX sheet has been saved as a draft.",
+    });
   }
 
   return (
@@ -248,7 +261,7 @@ export default function OpexRegistryPage() {
           {previousYearItems.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} OPEX Sheet</CardTitle>
+                <CardTitle className="text-[13px]">Reference: {(parseInt(form.getValues().year, 10) - 1)} OPEX Sheet</CardTitle>
                 <CardDescription className="text-[12px]">Items from the previous year for your reference.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -381,7 +394,8 @@ export default function OpexRegistryPage() {
           </Card>
           
           <div className="flex items-center gap-4 print:hidden">
-            <Button type="submit">Save OPEX Sheet</Button>
+            <Button type="submit">Submit for Approval</Button>
+            <Button type="button" variant="secondary" onClick={handleSaveAsDraft}>Save as Draft</Button>
             <Button type="button" variant="outline" onClick={() => window.print()}>Print &amp; Preview</Button>
           </div>
         </form>

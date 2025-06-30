@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -42,6 +41,7 @@ import {
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
 import { organizations, departments, capexSheets } from "@/lib/mock-data";
+import { useToast } from "@/hooks/use-toast";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
@@ -68,6 +68,7 @@ const capexRegistrySchema = z.object({
 type CapexFormValues = z.infer<typeof capexRegistrySchema>;
 
 export default function CapexRegistryPage() {
+  const { toast } = useToast();
   const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[]>([]);
 
   const form = useForm<CapexFormValues>({
@@ -86,7 +87,6 @@ export default function CapexRegistryPage() {
   });
 
   const watchedItems = form.watch("items");
-  const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
@@ -110,7 +110,7 @@ export default function CapexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form.watch]);
 
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -128,7 +128,8 @@ export default function CapexRegistryPage() {
     }, 0);
   }, [previousYearItems]);
 
-  const generateCapexSeqNum = (index: number, seqYear: string = year) => {
+  const generateCapexSeqNum = (index: number, seqYear: string) => {
+    const { organization, department } = form.getValues();
     const orgName = organizations.find((o) => o.id === organization)?.name.substring(0, 3).toUpperCase() || 'ORG';
     const deptName = departments.find((d) => d.id === department)?.name.substring(0, 4).toUpperCase() || 'DEPT';
     const itemNum = (index + 1).toString().padStart(3, '0');
@@ -136,8 +137,20 @@ export default function CapexRegistryPage() {
   };
 
   function onSubmit(values: CapexFormValues) {
-    console.log(values);
-    // Handle form submission
+    console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+    toast({
+      title: "Sheet Submitted",
+      description: "Your CAPEX sheet has been sent for approval.",
+    });
+  }
+
+  function handleSaveAsDraft() {
+    const values = form.getValues();
+    console.log("Saving as draft:", { ...values, status: 'Draft' });
+    toast({
+      title: "Draft Saved",
+      description: "Your CAPEX sheet has been saved as a draft.",
+    });
   }
 
   return (
@@ -239,7 +252,7 @@ export default function CapexRegistryPage() {
           {previousYearItems.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} CAPEX Sheet</CardTitle>
+                <CardTitle className="text-[13px]">Reference: {(parseInt(form.getValues().year, 10) - 1)} CAPEX Sheet</CardTitle>
                 <CardDescription className="text-[12px]">Items from the previous year for your reference.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -259,7 +272,7 @@ export default function CapexRegistryPage() {
                   <TableBody>
                     {previousYearItems.map((item, index) => {
                       const total = (item.quantity || 0) * (item.amount || 0);
-                      const prevYear = (parseInt(year, 10) - 1).toString();
+                      const prevYear = (parseInt(form.getValues().year, 10) - 1).toString();
                       return (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium text-[11px]">{generateCapexSeqNum(index, prevYear)}</TableCell>
@@ -326,7 +339,7 @@ export default function CapexRegistryPage() {
                       return (
                         <TableRow key={field.id}>
                           <TableCell className="font-medium text-[11px] align-top pt-5">
-                             {generateCapexSeqNum(index)}
+                             {generateCapexSeqNum(index, form.getValues().year)}
                           </TableCell>
                           <TableCell className="align-top">
                             <FormField control={form.control} name={`items.${index}.description`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
@@ -417,7 +430,8 @@ export default function CapexRegistryPage() {
           </Card>
           
           <div className="flex items-center gap-4 print:hidden">
-            <Button type="submit">Save CAPEX Sheet</Button>
+            <Button type="submit">Submit for Approval</Button>
+            <Button type="button" variant="secondary" onClick={handleSaveAsDraft}>Save as Draft</Button>
             <Button type="button" variant="outline" onClick={() => window.print()}>
               Print &amp; Preview
             </Button>
