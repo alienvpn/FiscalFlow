@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -32,6 +33,8 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import { addDays, isAfter, isBefore } from "date-fns";
+import { initialContracts } from "@/lib/mock-data";
 
 const budgetData = [
   { name: "IT", spent: 4500, budget: 8000 },
@@ -73,6 +76,14 @@ const recentExpenses = [
 ];
 
 export default function Dashboard() {
+  const today = new Date();
+  const activeContracts = initialContracts.filter((c) =>
+    isAfter(c.serviceEndDate, today)
+  );
+  const expiringSoonContracts = activeContracts.filter((c) =>
+    isBefore(c.serviceEndDate, addDays(today, 30))
+  );
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6">
       <h2 className="text-lg font-bold tracking-tight">Executive Dashboard</h2>
@@ -114,9 +125,9 @@ export default function Dashboard() {
             <FileWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold">42</div>
+            <div className="text-base font-bold">{activeContracts.length}</div>
             <p className="text-[10px] text-muted-foreground">
-              2 contracts expiring soon
+              {expiringSoonContracts.length} contracts expiring soon
             </p>
           </CardContent>
         </Card>
