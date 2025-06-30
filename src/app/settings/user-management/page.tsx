@@ -30,13 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -200,42 +193,48 @@ export default function UserManagementPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableCell className="font-semibold">Module</TableCell>
-                          <TableCell className="font-semibold text-center">Read Only</TableCell>
-                          <TableCell className="font-semibold text-center">View Only</TableCell>
-                          <TableCell className="font-semibold text-center">Read & Write</TableCell>
-                          <TableCell className="font-semibold text-center">Full Access</TableCell>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {modules.map((module) => (
-                          <FormField
-                            key={module}
-                            control={form.control}
-                            name={`permissions.${module}`}
-                            render={({ field }) => (
-                              <TableRow>
-                                <TableCell>{module}</TableCell>
-                                  <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="grid grid-cols-4 items-center"
-                                  >
-                                  <TableCell className="text-center"> <FormControl> <RadioGroupItem value="read-only" /> </FormControl> </TableCell>
-                                  <TableCell className="text-center"> <FormControl> <RadioGroupItem value="view-only" /> </FormControl> </TableCell>
-                                  <TableCell className="text-center"> <FormControl> <RadioGroupItem value="read-write" /> </FormControl> </TableCell>
-                                  <TableCell className="text-center"> <FormControl> <RadioGroupItem value="full-access" /> </FormControl> </TableCell>
-                                </RadioGroup>
-                              </TableRow>
-                            )}
-                          />
-                        ))}
-                      </TableBody>
-                    </Table>
+                  <div className="grid grid-cols-5 gap-x-4 gap-y-2 border-b pb-2 font-semibold">
+                    <div className="col-span-1">Module</div>
+                    <div className="text-center">Read Only</div>
+                    <div className="text-center">View Only</div>
+                    <div className="text-center">Read & Write</div>
+                    <div className="text-center">Full Access</div>
+                  </div>
+                  <div className="space-y-2 pt-4">
+                    {modules.map((module) => (
+                      <FormField
+                        key={module}
+                        control={form.control}
+                        name={`permissions.${module}`}
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-5 items-center gap-x-4">
+                            <FormLabel className="col-span-1 font-normal">
+                              {module}
+                            </FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                className="col-span-4 grid grid-cols-4"
+                              >
+                                <div className="flex justify-center">
+                                  <RadioGroupItem value="read-only" />
+                                </div>
+                                <div className="flex justify-center">
+                                  <RadioGroupItem value="view-only" />
+                                </div>
+                                <div className="flex justify-center">
+                                  <RadioGroupItem value="read-write" />
+                                </div>
+                                <div className="flex justify-center">
+                                  <RadioGroupItem value="full-access" />
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -252,3 +251,6 @@ export default function UserManagementPage() {
     </div>
   );
 }
+
+
+    
