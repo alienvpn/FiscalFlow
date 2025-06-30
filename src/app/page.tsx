@@ -61,10 +61,12 @@ export default function LoginPage() {
     },
   });
 
+  const { watch, setValue } = form;
+
   // Watchers for dependent dropdowns
-  const groupId = form.watch("groupId");
-  const organizationId = form.watch("organizationId");
-  const departmentId = form.watch("departmentId");
+  const groupId = watch("groupId");
+  const organizationId = watch("organizationId");
+  const departmentId = watch("departmentId");
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
@@ -80,16 +82,16 @@ export default function LoginPage() {
   );
 
   React.useEffect(() => {
-    form.setValue("organizationId", "");
-  }, [groupId, form]);
+    setValue("organizationId", "");
+  }, [groupId, setValue]);
 
   React.useEffect(() => {
-    form.setValue("departmentId", "");
-  }, [organizationId, form]);
+    setValue("departmentId", "");
+  }, [organizationId, setValue]);
 
   React.useEffect(() => {
-    form.setValue("subDepartmentId", "");
-  }, [departmentId, form]);
+    setValue("subDepartmentId", "");
+  }, [departmentId, setValue]);
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     console.log("Login submitted:", values);
