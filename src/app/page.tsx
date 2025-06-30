@@ -17,16 +17,16 @@ export default function HomePage() {
             key={item.title}
             className="block rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
           >
-            <div className="relative flex flex-col justify-center items-center h-32 text-white text-center bg-gradient-to-r from-cyan-400 to-indigo-600">
+            <div className="relative flex flex-col justify-center items-center h-[123px] text-primary-foreground text-center bg-gradient-to-br from-primary via-primary/70 to-secondary">
               {/* Glossy effect */}
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
 
               <div className="relative z-10 w-full px-4">
-                <div className="w-full h-px bg-white/50 mb-2" />
+                <div className="w-full h-px bg-primary-foreground/50 mb-2" />
                 <h2 className="py-2 text-[12px] font-bold tracking-wide uppercase">
                   {item.title}
                 </h2>
-                <div className="w-full h-px bg-white/50 mt-2" />
+                <div className="w-full h-px bg-primary-foreground/50 mt-2" />
               </div>
             </div>
           </Link>
