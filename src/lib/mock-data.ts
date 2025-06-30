@@ -221,8 +221,9 @@ export const pendingApprovals = [
 ];
 
 export const approvalMatrix = [
-    { id: 'level-1', level: 1, approverRole: 'Department Head', description: 'Approves all sheets from their department.' },
-    { id: 'level-2', level: 2, approverRole: 'Finance Manager', description: 'Approves all sheets with total value over 50,000 QAR.' },
-    { id: 'level-3', level: 3, approverRole: 'CEO', description: 'Final approval for all sheets with total value over 200,000 QAR.' },
+    { id: 'level-1', level: 1, approverRole: 'Department Head', description: 'Initial review and approval by the head of the requesting department.' },
+    { id: 'level-2', level: 2, approverRole: 'Finance Manager', description: 'Financial review for budget alignment and accuracy.' },
+    { id: 'level-3', level: 3, approverRole: 'General Manager', description: 'Operational approval for strategic alignment.' },
+    { id: 'level-4', level: 4, approverRole: 'Director of Finance', description: 'Final financial sign-off for all expenditures.' },
 ];
 // --- END MOCK DATA ---
