@@ -72,7 +72,50 @@
     size: A4 landscape;
     margin: 1cm;
   }
+  
+  :root, .dark {
+    /* Re-define all colors for a black & white print-friendly theme */
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 3.9%; /* Black */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+
+    /* Primary will be black text on white bg */
+    --primary: 0 0% 3.9%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary will be a light grey bg with black text */
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%; /* Grey */
+    
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    
+    /* Destructive elements will be black text on white bg */
+    --destructive: 0 0% 3.9%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 83.1%; /* Grey border */
+    --input: 0 0% 83.1%;
+    --ring: 0 0% 3.9%;
+    
+    /* Grayscale chart colors */
+    --chart-1: 0 0% 9%; /* Almost black */
+    --chart-2: 0 0% 45%; /* Dark grey */
+    --chart-3: 0 0% 65%; /* Medium grey */
+    --chart-4: 0 0% 80%; /* Light grey */
+    --chart-5: 0 0% 90%; /* Very light grey */
+  }
+
   body {
+    /* This ensures that the browser uses the background colors we define for printing */
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
