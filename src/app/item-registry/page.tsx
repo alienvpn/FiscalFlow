@@ -307,7 +307,10 @@ export default function ItemRegistryPage() {
             </Card>
           )}
 
-          <Button type="submit">Save Entry</Button>
+          <div className="flex items-center gap-4">
+            <Button type="submit">Update</Button>
+            <Button type="submit">Save Data</Button>
+          </div>
         </form>
       </Form>
     </div>

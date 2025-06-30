@@ -115,7 +115,8 @@ export default function SubDepartmentsPage() {
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit">Save</Button>
+                  <Button type="submit">Update</Button>
+                  <Button type="submit">Save Data</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

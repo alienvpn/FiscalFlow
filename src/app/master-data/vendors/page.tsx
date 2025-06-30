@@ -402,7 +402,10 @@ export default function VendorsPage() {
             </Tabs>
           </div>
 
-          <Button type="submit">Save Vendor</Button>
+          <div className="flex items-center gap-4">
+            <Button type="submit">Update</Button>
+            <Button type="submit">Save Data</Button>
+          </div>
         </form>
       </Form>
     </div>
