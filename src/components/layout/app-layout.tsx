@@ -36,7 +36,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <nav className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
               {/* Home Link */}
               <Link
                 href="/"
@@ -80,7 +80,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </MenubarMenu>
                 ))}
               </Menubar>
-            </nav>
+            </div>
 
             <Avatar className="h-9 w-9">
               <AvatarImage
