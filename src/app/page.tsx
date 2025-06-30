@@ -10,17 +10,14 @@ export default function HomePage() {
           Your central hub for budget and contract management.
         </p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-6 mt-8">
         {allModules.map((item) => (
           <Link
             href={item.href}
             key={item.title}
-            className="block rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
+            className="block rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 h-[50px]"
           >
-            <div className="relative flex flex-col justify-center items-center h-[118px] text-primary-foreground text-center bg-gradient-to-br from-primary via-primary/70 to-secondary">
-              {/* Glossy effect */}
-              <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
-
+            <div className="relative flex flex-col justify-center items-center h-full text-primary-foreground text-center bg-primary">
               <div className="relative z-10 w-full px-4">
                 <div className="w-full h-px bg-primary-foreground/50 mb-2" />
                 <h2 className="py-2 text-[12px] font-bold tracking-wide uppercase">
