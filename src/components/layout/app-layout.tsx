@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -39,7 +40,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {/* Home Link */}
               <Link
                 href="/home"
@@ -77,6 +78,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </MenubarMenu>
                 ))}
               </Menubar>
+               <Button variant="outline" size="sm" asChild>
+                <Link href="/">Logout</Link>
+              </Button>
             </div>
           </div>
         </div>
