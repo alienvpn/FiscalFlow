@@ -51,6 +51,35 @@ export const menuItems: {
       },
     ],
   },
+  {
+    title: "Reports",
+    links: [
+      {
+        title: "CAPEX Report",
+        href: "/reports/capex",
+        icon: Icons.Capex,
+        description: "View detailed reports on capital expenditures.",
+      },
+      {
+        title: "OPEX Report",
+        href: "/reports/opex",
+        icon: Icons.Opex,
+        description: "View detailed reports on operational expenditures.",
+      },
+      {
+        title: "Contract Report",
+        href: "/reports/contracts",
+        icon: Icons.Contracts,
+        description: "View reports on active and expired contracts.",
+      },
+      {
+        title: "Vendor Report",
+        href: "/reports/vendors",
+        icon: Icons.Vendors,
+        description: "View reports on supplier and vendor data.",
+      },
+    ],
+  },
 ];
 
 // Helper to get all modules for the home page
