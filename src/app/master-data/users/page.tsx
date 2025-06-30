@@ -289,26 +289,27 @@ export default function CreateUserPage() {
                           <p className="text-[11px] font-normal text-muted-foreground mt-1">{allModules.find(m => m.href === field.moduleId)?.description}</p>
                         </TableCell>
                         <TableCell>
-                           <FormField
+                          <FormField
                             control={form.control}
                             name={`moduleAccess.${index}.accessLevel`}
-                            render={({ field }) => (
+                            render={({ field: renderField }) => (
                               <FormItem className="space-y-3">
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                  className="flex flex-col space-y-2"
-                                  ref={field.ref}
-                                >
-                                  {accessLevels.map((level) => (
-                                    <div key={level} className="flex items-center space-x-3 space-y-0">
-                                      <RadioGroupItem value={level} id={`${field.name}-${level.replace(/\s+/g, '-')}`} />
-                                      <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
-                                        {level}
-                                      </Label>
-                                    </div>
-                                  ))}
-                                </RadioGroup>
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={renderField.onChange}
+                                    value={renderField.value}
+                                    className="flex flex-col space-y-2"
+                                  >
+                                    {accessLevels.map((level) => (
+                                      <div key={level} className="flex items-center space-x-3 space-y-0">
+                                        <RadioGroupItem value={level} id={`${renderField.name}-${level.replace(/\s+/g, '-')}`} />
+                                        <Label htmlFor={`${renderField.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
+                                          {level}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
