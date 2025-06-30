@@ -75,30 +75,30 @@ const recentExpenses = [
 export default function Dashboard() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6">
-      <h2 className="text-2xl font-bold tracking-tight">Executive Dashboard</h2>
+      <h2 className="text-lg font-bold tracking-tight">Executive Dashboard</h2>
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
+            <CardTitle className="text-xs font-medium">Total Budget</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">41,500 QAR</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-base font-bold">41,500 QAR</div>
+            <p className="text-[10px] text-muted-foreground">
               Total allocated for this period
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs font-medium">
               Total Expenditure
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">31,000 QAR</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-base font-bold">31,000 QAR</div>
+            <p className="text-[10px] text-muted-foreground">
               <span className="text-primary flex items-center">
                 <ArrowDown className="h-3 w-3 mr-1" />
                 74.7% of total budget
@@ -108,28 +108,28 @@ export default function Dashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs font-medium">
               Active Contracts
             </CardTitle>
             <FileWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-base font-bold">42</div>
+            <p className="text-[10px] text-muted-foreground">
               2 contracts expiring soon
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs font-medium">
               Budget Overrun Risk
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">Low</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-base font-bold">Low</div>
+            <p className="text-[10px] text-muted-foreground">
               <span className="text-destructive flex items-center">
                 <ArrowUp className="h-3 w-3 mr-1" />1 department near limit
               </span>
@@ -140,8 +140,8 @@ export default function Dashboard() {
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Budget vs. Expenditure</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg">Budget vs. Expenditure</CardTitle>
+            <CardDescription className="text-xs">
               Department-wise spending for the current period.
             </CardDescription>
           </CardHeader>
@@ -151,13 +151,13 @@ export default function Dashboard() {
                 <XAxis
                   dataKey="name"
                   stroke="#888888"
-                  fontSize={10}
+                  fontSize={8}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="#888888"
-                  fontSize={10}
+                  fontSize={8}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => `${value / 1000}k QAR`}
@@ -168,6 +168,8 @@ export default function Dashboard() {
                     background: "hsl(var(--background))",
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "var(--radius)",
+                    fontSize: "10px",
+                    padding: "4px 8px",
                   }}
                 />
                 <Bar
@@ -188,8 +190,8 @@ export default function Dashboard() {
         </Card>
         <Card className="col-span-4 lg:col-span-3">
           <CardHeader>
-            <CardTitle>Recent Expenses</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg">Recent Expenses</CardTitle>
+            <CardDescription className="text-xs">
               A log of the latest operational expenses.
             </CardDescription>
           </CardHeader>
@@ -197,24 +199,28 @@ export default function Dashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="h-10 px-2">Description</TableHead>
-                  <TableHead className="h-10 px-2">Category</TableHead>
-                  <TableHead className="h-10 px-2 text-right">Amount</TableHead>
+                  <TableHead className="h-8 px-2 text-xs">Description</TableHead>
+                  <TableHead className="h-8 px-2 text-xs">Category</TableHead>
+                  <TableHead className="h-8 px-2 text-right text-xs">
+                    Amount
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentExpenses.map((expense) => (
                   <TableRow key={expense.id}>
                     <TableCell className="p-2">
-                      <div className="font-medium text-sm">{expense.description}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="font-medium text-xs">
+                        {expense.description}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
                         {expense.date}
                       </div>
                     </TableCell>
                     <TableCell className="p-2">
                       <Badge variant="outline">{expense.category}</Badge>
                     </TableCell>
-                    <TableCell className="p-2 text-right">
+                    <TableCell className="p-2 text-right text-xs">
                       {expense.amount.toLocaleString()} QAR
                     </TableCell>
                   </TableRow>
@@ -227,16 +233,16 @@ export default function Dashboard() {
       <div className="space-y-4">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Contract Renewal Notice</AlertTitle>
-          <AlertDescription>
+          <AlertTitle className="text-sm">Contract Renewal Notice</AlertTitle>
+          <AlertDescription className="text-xs">
             The contract for 'VendorLink CRM' is expiring in 15 days. Please
             initiate renewal process.
           </AlertDescription>
         </Alert>
         <Alert variant="destructive">
           <FileWarning className="h-4 w-4" />
-          <AlertTitle>SLA Breach Detected</AlertTitle>
-          <AlertDescription>
+          <AlertTitle className="text-sm">SLA Breach Detected</AlertTitle>
+          <AlertDescription className="text-xs">
             SLA for 'Server Hosting Pro' has been breached (99.5% uptime).
             Follow up with vendor required.
           </AlertDescription>
