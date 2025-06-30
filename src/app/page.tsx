@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { modules } from "@/lib/navigation";
+import { allModules } from "@/lib/navigation";
 
 export default function HomePage() {
   return (
@@ -20,7 +20,7 @@ export default function HomePage() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {modules.map((item) => {
+        {allModules.map((item) => {
           const ItemIcon = item.icon;
           return (
             <Card

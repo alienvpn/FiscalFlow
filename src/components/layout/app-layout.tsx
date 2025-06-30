@@ -9,9 +9,13 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { modules } from "@/lib/navigation";
+import { menuItems } from "@/lib/navigation";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -32,19 +36,36 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-4">
             <Menubar className="border-none bg-transparent p-0">
-              <MenubarMenu>
-                <MenubarTrigger>Modules</MenubarTrigger>
-                <MenubarContent align="end">
-                  {modules.map((item) => (
-                    <MenubarItem key={item.title} asChild>
-                      <Link href={item.href}>
-                        <item.icon className="mr-2 h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </MenubarItem>
-                  ))}
-                </MenubarContent>
-              </MenubarMenu>
+              {/* Home Link */}
+              <Link
+                href="/"
+                className={cn(
+                  "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+                  pathname === "/" && "bg-accent"
+                )}
+              >
+                Home
+              </Link>
+
+              {/* Dynamic Menu Items */}
+              {menuItems.map((item) => (
+                <MenubarMenu key={item.title}>
+                  <MenubarTrigger>{item.title}</MenubarTrigger>
+                  <MenubarContent>
+                    {item.links.map((link) => {
+                      const LinkIcon = link.icon;
+                      return (
+                        <MenubarItem key={link.title} asChild>
+                          <Link href={link.href}>
+                            <LinkIcon className="mr-2 h-4 w-4" />
+                            <span>{link.title}</span>
+                          </Link>
+                        </MenubarItem>
+                      );
+                    })}
+                  </MenubarContent>
+                </MenubarMenu>
+              ))}
             </Menubar>
 
             <Avatar className="h-9 w-9">
