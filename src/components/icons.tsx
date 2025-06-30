@@ -11,6 +11,7 @@ import {
   Trash2,
   Building2,
   ClipboardList,
+  ClipboardPlus,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -24,6 +25,7 @@ export const Icons = {
   MasterData: Database,
   Vendors: Building2,
   Registry: ClipboardList,
+  CapexRegistry: ClipboardPlus,
   Spinner: LoaderCircle,
   Add: PlusCircle,
   Delete: Trash2,

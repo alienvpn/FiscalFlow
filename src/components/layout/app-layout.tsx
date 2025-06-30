@@ -45,6 +45,16 @@ const menuItems = [
     label: "Budget Forecasting",
     icon: Icons.Forecasting,
   },
+   {
+    href: "/capex-registry",
+    label: "CAPEX Registry",
+    icon: Icons.CapexRegistry,
+  },
+  {
+    href: "/item-registry",
+    label: "Device/Item/Service Registry",
+    icon: Icons.Registry,
+  },
   {
     href: "/master-data/company-profile",
     label: "Master Data",
@@ -54,11 +64,6 @@ const menuItems = [
     href: "/master-data/vendors",
     label: "Vendors",
     icon: Icons.Vendors,
-  },
-  {
-    href: "/item-registry",
-    label: "Device/Item/Service Registry",
-    icon: Icons.Registry,
   },
 ];
 
