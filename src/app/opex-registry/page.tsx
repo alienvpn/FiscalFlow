@@ -40,8 +40,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
-import { organizations, departments, vendors, opexSheets, approvalWorkflows } from "@/lib/mock-data";
+import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
+import { submitOpexSheet, saveOpexSheetAsDraft } from "./actions";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
@@ -70,6 +71,7 @@ type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[]>([]);
 
   const form = useForm<OpexFormValues>({
@@ -111,7 +113,7 @@ export default function OpexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form.watch]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -152,23 +154,41 @@ export default function OpexRegistryPage() {
     return `OPEX/${orgName}/${deptName}/${year}/${itemNum}`;
   };
 
-  function onSubmit(values: OpexFormValues) {
-    console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
-    const firstApproverRole = approvalWorkflows.budget[0]?.approverRole || "First Approver";
-    console.log(`Simulated: Email notification sent to '${firstApproverRole}' for approval of OPEX sheet.`);
-    toast({
-      title: "Sheet Submitted",
-      description: `Your OPEX sheet has been sent for approval to the ${firstApproverRole}.`,
-    });
+  async function onSubmit(values: OpexFormValues) {
+    setIsSubmitting(true);
+    const result = await submitOpexSheet(values);
+    if (result.success) {
+        toast({
+            title: "Sheet Submitted",
+            description: result.message,
+        });
+    } else {
+        toast({
+            title: "Submission Failed",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setIsSubmitting(false);
   }
 
-  function handleSaveAsDraft() {
+  async function handleSaveAsDraft() {
+    setIsSubmitting(true);
     const values = form.getValues();
-    console.log("Saving as draft:", { ...values, status: 'Draft' });
-    toast({
-      title: "Draft Saved",
-      description: "Your OPEX sheet has been saved as a draft.",
-    });
+    const result = await saveOpexSheetAsDraft(values);
+    if (result.success) {
+        toast({
+            title: "Draft Saved",
+            description: result.message,
+        });
+    } else {
+        toast({
+            title: "Save Failed",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setIsSubmitting(false);
   }
 
   return (
@@ -380,7 +400,7 @@ export default function OpexRegistryPage() {
                   </TableBody>
                 </Table>
               </div>
-              <Button type="button" variant="outline" size="sm" className="mt-4 print:hidden" onClick={() => append({ id: crypto.randomUUID(), description: "", period: "", amount: 0, implementation: "", serviceStatus: "", supplier: "", remarks: "" })}>
+              <Button type="button" variant="outline" size="sm" className="mt-4 print:hidden" disabled={isSubmitting} onClick={() => append({ id: crypto.randomUUID(), description: "", period: "", amount: 0, implementation: "", serviceStatus: "", supplier: "", remarks: "" })}>
                 <Icons.Add className="mr-2 h-4 w-4" />
                 Add Item
               </Button>
@@ -397,8 +417,14 @@ export default function OpexRegistryPage() {
           </Card>
           
           <div className="flex items-center gap-4 print:hidden">
-            <Button type="submit">Submit for Approval</Button>
-            <Button type="button" variant="secondary" onClick={handleSaveAsDraft}>Save as Draft</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+              Submit for Approval
+            </Button>
+            <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting}>
+               {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+              Save as Draft
+            </Button>
             <Button type="button" variant="outline" onClick={() => window.print()}>Print &amp; Preview</Button>
           </div>
         </form>

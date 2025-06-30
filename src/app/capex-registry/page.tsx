@@ -41,8 +41,9 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
-import { organizations, departments, capexSheets, approvalWorkflows } from "@/lib/mock-data";
+import { organizations, departments, capexSheets } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
+import { submitCapexSheet, saveCapexSheetAsDraft } from "./actions";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
@@ -70,6 +71,7 @@ type CapexFormValues = z.infer<typeof capexRegistrySchema>;
 
 export default function CapexRegistryPage() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[]>([]);
 
   const form = useForm<CapexFormValues>({
@@ -111,7 +113,8 @@ export default function CapexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form.watch]);
+
 
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -137,23 +140,41 @@ export default function CapexRegistryPage() {
     return `${orgName}/${deptName}/${seqYear}/${itemNum}`;
   };
 
-  function onSubmit(values: CapexFormValues) {
-    console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
-    const firstApproverRole = approvalWorkflows.budget[0]?.approverRole || "First Approver";
-    console.log(`Simulated: Email notification sent to '${firstApproverRole}' for approval of CAPEX sheet.`);
-    toast({
-      title: "Sheet Submitted",
-      description: `Your CAPEX sheet has been sent for approval to the ${firstApproverRole}.`,
-    });
+  async function onSubmit(values: CapexFormValues) {
+    setIsSubmitting(true);
+    const result = await submitCapexSheet(values);
+    if (result.success) {
+        toast({
+            title: "Sheet Submitted",
+            description: result.message,
+        });
+    } else {
+        toast({
+            title: "Submission Failed",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setIsSubmitting(false);
   }
 
-  function handleSaveAsDraft() {
+  async function handleSaveAsDraft() {
+    setIsSubmitting(true);
     const values = form.getValues();
-    console.log("Saving as draft:", { ...values, status: 'Draft' });
-    toast({
-      title: "Draft Saved",
-      description: "Your CAPEX sheet has been saved as a draft.",
-    });
+    const result = await saveCapexSheetAsDraft(values);
+    if (result.success) {
+        toast({
+            title: "Draft Saved",
+            description: result.message,
+        });
+    } else {
+         toast({
+            title: "Save Failed",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setIsSubmitting(false);
   }
 
   return (
@@ -411,6 +432,7 @@ export default function CapexRegistryPage() {
                 variant="outline"
                 size="sm"
                 className="mt-4 print:hidden"
+                disabled={isSubmitting}
                 onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, justification: "", remarks: "" })}
               >
                 <Icons.Add className="mr-2 h-4 w-4" />
@@ -433,8 +455,14 @@ export default function CapexRegistryPage() {
           </Card>
           
           <div className="flex items-center gap-4 print:hidden">
-            <Button type="submit">Submit for Approval</Button>
-            <Button type="button" variant="secondary" onClick={handleSaveAsDraft}>Save as Draft</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+              Submit for Approval
+            </Button>
+            <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting}>
+              {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+              Save as Draft
+            </Button>
             <Button type="button" variant="outline" onClick={() => window.print()}>
               Print &amp; Preview
             </Button>
