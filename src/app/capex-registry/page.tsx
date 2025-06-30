@@ -68,7 +68,7 @@ const capexRegistrySchema = z.object({
 type CapexFormValues = z.infer<typeof capexRegistrySchema>;
 
 export default function CapexRegistryPage() {
-  const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[] | null>(null);
+  const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[]>([]);
 
   const form = useForm<CapexFormValues>({
     resolver: zodResolver(capexRegistrySchema),
@@ -89,18 +89,23 @@ export default function CapexRegistryPage() {
   const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
-    if (organization && department && year) {
+    const subscription = form.watch((value) => {
+      const { organization, department, year } = value;
+      if (organization && department && year) {
         const prevYear = (parseInt(year, 10) - 1).toString();
-        const sheet = capexSheets.find(s => 
-            s.year === prevYear && 
-            s.organizationId === organization && 
+        const sheet = capexSheets.find(
+          (s) =>
+            s.year === prevYear &&
+            s.organizationId === organization &&
             s.departmentId === department
         );
-        setPreviousYearItems(sheet ? sheet.items : null);
-    } else {
-        setPreviousYearItems(null);
-    }
-  }, [organization, department, year]);
+        setPreviousYearItems(sheet ? sheet.items : []);
+      } else {
+        setPreviousYearItems([]);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -218,7 +223,7 @@ export default function CapexRegistryPage() {
             </CardContent>
           </Card>
           
-          {previousYearItems && previousYearItems.length > 0 && (
+          {previousYearItems.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} CAPEX Sheet</CardTitle>

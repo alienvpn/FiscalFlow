@@ -68,7 +68,7 @@ const opexRegistrySchema = z.object({
 type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
-  const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[] | null>(null);
+  const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[]>([]);
 
   const form = useForm<OpexFormValues>({
     resolver: zodResolver(opexRegistrySchema),
@@ -89,18 +89,23 @@ export default function OpexRegistryPage() {
   const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
-    if (organization && department && year) {
+    const subscription = form.watch((value) => {
+      const { organization, department, year } = value;
+      if (organization && department && year) {
         const prevYear = (parseInt(year, 10) - 1).toString();
-        const sheet = opexSheets.find(s => 
-            s.year === prevYear && 
-            s.organizationId === organization && 
+        const sheet = opexSheets.find(
+          (s) =>
+            s.year === prevYear &&
+            s.organizationId === organization &&
             s.departmentId === department
         );
-        setPreviousYearItems(sheet ? sheet.items : null);
-    } else {
-        setPreviousYearItems(null);
-    }
-  }, [organization, department, year]);
+        setPreviousYearItems(sheet ? sheet.items : []);
+      } else {
+        setPreviousYearItems([]);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -220,7 +225,7 @@ export default function OpexRegistryPage() {
             </CardContent>
           </Card>
 
-          {previousYearItems && previousYearItems.length > 0 && (
+          {previousYearItems.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} OPEX Sheet</CardTitle>
