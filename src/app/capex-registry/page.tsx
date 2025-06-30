@@ -51,6 +51,7 @@ const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
 const capexItemSchema = z.object({
   id: z.string(),
   description: z.string().min(1, "Description is required."),
+  priority: z.string().min(1, "Priority is required."),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
   amount: z.coerce.number().min(0, "Amount is required."),
   period: z.string().min(1, "Period is required."),
@@ -216,6 +217,7 @@ export default function CapexRegistryPage() {
                     <TableRow>
                       <TableHead className="w-[150px] text-[12px]">CAPEX Seq. No</TableHead>
                       <TableHead className="w-[250px] text-[12px]">Description</TableHead>
+                      <TableHead className="w-[120px] text-[12px]">Priority</TableHead>
                       <TableHead className="w-[80px] text-[12px]">Qty</TableHead>
                       <TableHead className="w-[120px] text-[12px]">Amount</TableHead>
                       <TableHead className="w-[120px] text-[12px]">Total</TableHead>
@@ -238,6 +240,29 @@ export default function CapexRegistryPage() {
                           </TableCell>
                           <TableCell className="align-top">
                             <FormField control={form.control} name={`items.${index}.description`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                          </TableCell>
+                          <TableCell className="align-top">
+                            <FormField
+                              control={form.control}
+                              name={`items.${index}.priority`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className="text-[11px]">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="High" className="text-[11px]">High</SelectItem>
+                                      <SelectItem value="Medium" className="text-[11px]">Medium</SelectItem>
+                                      <SelectItem value="Low" className="text-[11px]">Low</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </TableCell>
                           <TableCell className="align-top">
                              <FormField control={form.control} name={`items.${index}.quantity`} render={({ field }) => (<FormItem><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/>
@@ -270,7 +295,7 @@ export default function CapexRegistryPage() {
                     })}
                      {fields.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={10} className="h-24 text-center text-[12px] text-muted-foreground">
+                          <TableCell colSpan={11} className="h-24 text-center text-[12px] text-muted-foreground">
                             No items added yet.
                           </TableCell>
                         </TableRow>
@@ -283,7 +308,7 @@ export default function CapexRegistryPage() {
                 variant="outline"
                 size="sm"
                 className="mt-4"
-                onClick={() => append({ id: crypto.randomUUID(), description: "", quantity: 1, amount: 0, period: "", justification: "", remarks: "" })}
+                onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, period: "", justification: "", remarks: "" })}
               >
                 <Icons.Add className="mr-2 h-4 w-4" />
                 Add Item
@@ -311,3 +336,4 @@ export default function CapexRegistryPage() {
   );
 }
 
+    
