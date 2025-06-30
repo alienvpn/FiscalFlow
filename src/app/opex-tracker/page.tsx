@@ -82,7 +82,7 @@ export default function OpexTrackerPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h2 className="text-3xl font-bold tracking-tight mb-2">OPEX Tracker</h2>
+      <h2 className="text-sm font-bold tracking-tight mb-2">OPEX Tracker</h2>
       <p className="text-muted-foreground mb-6">
         Log and categorize operational expenses for real-time budget tracking.
       </p>
@@ -135,7 +135,7 @@ export default function OpexTrackerPage() {
                         <Badge variant="outline">{item.category}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        ${item.amount.toLocaleString("en-US")}
+                        {item.amount.toLocaleString("en-US")} QAR
                       </TableCell>
                     </TableRow>
                   ))

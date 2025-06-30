@@ -38,9 +38,9 @@ const defaultHistoricalData = `Date,Category,Amount
 2023-03-15,Salaries,51000
 2023-03-18,Hardware,10000`;
 
-const defaultContractObligations = `- Office Lease: $5000/month, expires 2025-12-31
-- CRM Subscription: $1500/month, auto-renews annually
-- Cloud Hosting: ~$3000/month, usage-based`;
+const defaultContractObligations = `- Office Lease: 5000 QAR/month, expires 2025-12-31
+- CRM Subscription: 1500 QAR/month, auto-renews annually
+- Cloud Hosting: ~3000 QAR/month, usage-based`;
 
 export default function BudgetForecastingPage() {
   const [forecastResult, setForecastResult] = useState<ForecastResult>(null);
@@ -71,8 +71,8 @@ export default function BudgetForecastingPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold tracking-tight mb-2">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-sm font-bold tracking-tight mb-2">
           Budget Forecasting Tool
         </h2>
         <p className="text-muted-foreground mb-6">

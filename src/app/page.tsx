@@ -75,7 +75,7 @@ const recentExpenses = [
 export default function Dashboard() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <h2 className="text-3xl font-bold tracking-tight">Executive Dashboard</h2>
+      <h2 className="text-sm font-bold tracking-tight">Executive Dashboard</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -83,7 +83,7 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$41,500</div>
+            <div className="text-2xl font-bold">41,500 QAR</div>
             <p className="text-xs text-muted-foreground">
               Total allocated for this period
             </p>
@@ -97,7 +97,7 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$31,000</div>
+            <div className="text-2xl font-bold">31,000 QAR</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600 flex items-center">
                 <ArrowDown className="h-3 w-3 mr-1" />
@@ -160,7 +160,7 @@ export default function Dashboard() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$${value / 1000}k`}
+                  tickFormatter={(value) => `${value / 1000}k QAR`}
                 />
                 <Tooltip
                   cursor={{ fill: "hsl(var(--accent))" }}
@@ -215,7 +215,7 @@ export default function Dashboard() {
                       <Badge variant="outline">{expense.category}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      ${expense.amount.toLocaleString()}
+                      {expense.amount.toLocaleString()} QAR
                     </TableCell>
                   </TableRow>
                 ))}

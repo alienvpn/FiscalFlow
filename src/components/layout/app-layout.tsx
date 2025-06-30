@@ -1,4 +1,3 @@
-
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -62,7 +61,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z" />
             </svg>
-            <h1 className="text-xl font-semibold">FiscalFlow</h1>
+            <h1 className="text-sm font-semibold">FiscalFlow</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -95,7 +94,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="text-sm font-semibold">Admin User</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 admin@fiscalflow.com
               </span>
             </div>

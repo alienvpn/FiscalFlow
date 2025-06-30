@@ -66,8 +66,8 @@ export default function CapexAnalysisPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold tracking-tight mb-2">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-sm font-bold tracking-tight mb-2">
           CAPEX Analysis Tool
         </h2>
         <p className="text-muted-foreground mb-6">
@@ -118,7 +118,7 @@ export default function CapexAnalysisPage() {
                         name={`quotes.${index}.price`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Price ($)</FormLabel>
+                            <FormLabel>Price (QAR)</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} />
                             </FormControl>
@@ -227,7 +227,7 @@ export default function CapexAnalysisPage() {
 
         {analysisResult && (
           <div className="mt-8 space-y-6">
-            <h3 className="text-2xl font-bold">Analysis Result</h3>
+            <h3 className="text-base font-bold">Analysis Result</h3>
             <Card>
               <CardHeader>
                 <CardTitle>Summary</CardTitle>
