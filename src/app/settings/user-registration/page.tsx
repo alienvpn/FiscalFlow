@@ -39,7 +39,7 @@ import {
   organizations as allOrganizations,
   departments as allDepartments,
   subDepartments as allSubDepartments,
-  approvalMatrix,
+  approvalWorkflows,
 } from "@/lib/mock-data";
 
 const permissionsSchema = z.record(z.enum(["read", "write", "full", "none"]));
@@ -110,6 +110,13 @@ export default function UserRegistrationPage() {
     () => allSubDepartments.filter((d) => d.departmentId === departmentId),
     [departmentId]
   );
+    
+  const allApprovalRoles = React.useMemo(() => {
+    const budgetRoles = approvalWorkflows.budget.map((level) => level.approverRole);
+    const contractRoles = approvalWorkflows.contract.map((level) => level.approverRole);
+    const allRoles = [...budgetRoles, ...contractRoles];
+    return [...new Set(allRoles)];
+  }, []);
 
   React.useEffect(() => setValue("organizationId", ""), [groupId, setValue]);
   React.useEffect(() => setValue("departmentId", ""), [organizationId, setValue]);
@@ -159,7 +166,7 @@ export default function UserRegistrationPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>User Role (Approval)</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <Select onValueChange={field.onChange} value={field.value || "none"}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
@@ -167,9 +174,9 @@ export default function UserRegistrationPage() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>
-                            {approvalMatrix.map((level) => (
-                              <SelectItem key={level.id} value={level.approverRole}>
-                                {level.approverRole}
+                            {allApprovalRoles.map((role) => (
+                              <SelectItem key={role} value={role}>
+                                {role}
                               </SelectItem>
                             ))}
                           </SelectContent>

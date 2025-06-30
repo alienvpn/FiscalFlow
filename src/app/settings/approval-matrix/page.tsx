@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
-import { approvalMatrix as initialApprovalMatrix } from "@/lib/mock-data";
+import { approvalWorkflows as initialApprovalWorkflows } from "@/lib/mock-data";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const approvalLevelSchema = z.object({
   id: z.string().optional(),
@@ -46,13 +47,16 @@ const approvalMatrixSchema = z.object({
   levels: z.array(approvalLevelSchema),
 });
 
+type ApprovalMatrixType = keyof typeof initialApprovalWorkflows;
+
 export default function ApprovalMatrixPage() {
   const { toast } = useToast();
+  const [matrixType, setMatrixType] = React.useState<ApprovalMatrixType>("budget");
 
   const form = useForm<z.infer<typeof approvalMatrixSchema>>({
     resolver: zodResolver(approvalMatrixSchema),
     defaultValues: {
-      levels: initialApprovalMatrix,
+      levels: initialApprovalWorkflows[matrixType],
     },
   });
 
@@ -61,11 +65,15 @@ export default function ApprovalMatrixPage() {
     name: "levels",
   });
 
+  React.useEffect(() => {
+    form.reset({ levels: initialApprovalWorkflows[matrixType] });
+  }, [matrixType, form]);
+
   function onSubmit(values: z.infer<typeof approvalMatrixSchema>) {
-    console.log("Saving approval matrix:", values);
+    console.log(`Saving ${matrixType} approval matrix:`, values);
     toast({
       title: "Approval Matrix Saved",
-      description: "The approval workflow has been updated.",
+      description: `The approval workflow for ${matrixType === 'budget' ? 'Budget Sheets' : 'Contract Renewal'} has been updated.`,
     });
   }
 
@@ -75,14 +83,36 @@ export default function ApprovalMatrixPage() {
         Approval Matrix
       </h2>
       <p className="text-muted-foreground mb-6 text-[12px]">
-        Define the roles and levels for the approval workflow. These roles can be assigned to users in the User Registration page.
+        Define the roles and levels for different approval workflows. These roles can be assigned to users in the User Registration page.
       </p>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-[13px]">Select Workflow to Configure</CardTitle>
+          <CardDescription className="text-[12px]">
+            Choose the approval workflow you want to edit.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Select onValueChange={(value) => setMatrixType(value as ApprovalMatrixType)} defaultValue={matrixType}>
+            <SelectTrigger className="w-full md:w-[320px]">
+              <SelectValue placeholder="Select a workflow" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="budget">Budget Sheets (CAPEX/OPEX)</SelectItem>
+              <SelectItem value="contract">Contract Renewal</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-[13px]">Approval Levels</CardTitle>
+              <CardTitle className="text-[13px]">
+                Approval Levels for {matrixType === 'budget' ? 'Budget Sheets' : 'Contract Renewal'}
+              </CardTitle>
               <CardDescription className="text-[12px]">
                 Add, remove, or re-order levels to define the chain of command.
               </CardDescription>
