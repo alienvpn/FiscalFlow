@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -64,7 +63,7 @@ const userRegistrationSchema = z
 type UserRegistrationFormValues = z.infer<typeof userRegistrationSchema>;
 
 const modulesForPermissions = allModules.filter(
-  (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/"
+  (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/" && m.href !== "/home"
 );
 
 const defaultPermissions = modulesForPermissions.reduce(
@@ -184,21 +183,34 @@ export default function UserRegistrationPage() {
                           {module.title}
                         </FormLabel>
                         
-                        <div className="col-span-4">
-                           <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              value={field.value}
-                              className="grid grid-cols-4 items-center justify-items-center"
-                            >
-                              <RadioGroupItem value="read" id={`${module.href}-read`} />
-                              <RadioGroupItem value="write" id={`${module.href}-write`} />
-                              <RadioGroupItem value="full" id={`${module.href}-full`} />
-                              <RadioGroupItem value="none" id={`${module.href}-none`} />
-                            </RadioGroup>
-                          </FormControl>
-                        </div>
-                         <FormMessage className="col-span-5" />
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="col-span-4 grid grid-cols-4 items-center justify-items-center"
+                        >
+                          <FormItem className="flex items-center justify-center">
+                            <FormControl>
+                              <RadioGroupItem value="read" />
+                            </FormControl>
+                          </FormItem>
+                          <FormItem className="flex items-center justify-center">
+                             <FormControl>
+                              <RadioGroupItem value="write" />
+                            </FormControl>
+                          </FormItem>
+                          <FormItem className="flex items-center justify-center">
+                             <FormControl>
+                              <RadioGroupItem value="full" />
+                            </FormControl>
+                          </FormItem>
+                          <FormItem className="flex items-center justify-center">
+                             <FormControl>
+                              <RadioGroupItem value="none" />
+                            </FormControl>
+                          </FormItem>
+                        </RadioGroup>
+                        
+                        <FormMessage className="col-span-5" />
                       </FormItem>
                     )}
                   />
