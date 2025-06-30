@@ -282,11 +282,11 @@ export default function CreateUserPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {fields.map((field, index) => (
-                      <TableRow key={field.id}>
+                    {fields.map((item, index) => (
+                      <TableRow key={item.id}>
                         <TableCell className="font-medium text-[12px] align-top pt-4">
-                          {field.moduleTitle}
-                          <p className="text-[11px] font-normal text-muted-foreground mt-1">{allModules.find(m => m.href === field.moduleId)?.description}</p>
+                          {item.moduleTitle}
+                          <p className="text-[11px] font-normal text-muted-foreground mt-1">{allModules.find(m => m.href === item.moduleId)?.description}</p>
                         </TableCell>
                         <TableCell>
                           <FormField
@@ -294,22 +294,23 @@ export default function CreateUserPage() {
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
                               <FormItem className="space-y-3">
-                                <FormControl>
-                                  <RadioGroup
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    className="flex flex-col space-y-2"
-                                  >
-                                    {accessLevels.map((level) => (
-                                      <div key={level} className="flex items-center space-x-3">
-                                        <RadioGroupItem value={level} id={`${field.name}-${level.replace(/\s+/g, '-')}`} />
-                                        <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
-                                          {level}
-                                        </Label>
-                                      </div>
-                                    ))}
-                                  </RadioGroup>
-                                </FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                  className="flex flex-col space-y-2"
+                                >
+                                  {accessLevels.map((level) => (
+                                    <div key={level} className="flex items-center space-x-3">
+                                      <RadioGroupItem
+                                        value={level}
+                                        id={`${field.name}-${level.replace(/\s+/g, '-')}`}
+                                      />
+                                      <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
+                                        {level}
+                                      </Label>
+                                    </div>
+                                  ))}
+                                </RadioGroup>
                                 <FormMessage />
                               </FormItem>
                             )}
