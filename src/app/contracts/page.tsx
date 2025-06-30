@@ -45,8 +45,27 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
+import { Label } from "@/components/ui/label";
 
 // --- MOCK DATA (should be fetched from an API in a real app) ---
+
+const organizations = [
+  { id: "org-1", name: "Qatar Branch" },
+  { id: "org-2", name: "UAE Branch" },
+];
+
+const departments = [
+  { id: "dept-1", name: "IT Division", organizationId: "org-1" },
+  { id: "dept-2", name: "Marketing Division", organizationId: "org-1" },
+  { id: "dept-3", name: "HR Division", organizationId: "org-2" },
+];
+
+const subDepartments = [
+  { id: "sub-dept-1", name: "Infrastructure", departmentId: "dept-1" },
+  { id: "sub-dept-2", name: "Software Development", departmentId: "dept-1" },
+  { id: "sub-dept-3", name: "Digital Marketing", departmentId: "dept-2" },
+  { id: "sub-dept-4", name: "Recruitment", departmentId: "dept-3" },
+];
 
 const registryItems = [
     { id: "item-1", description: "Dell XPS 15 Laptop" },
@@ -59,30 +78,45 @@ const vendors = [
   { id: "vendor-2", name: "Creative Solutions LLC" },
 ];
 
-const departments = [
-  { id: "dept-1", name: "IT Division" },
-  { id: "dept-2", name: "Marketing Division" },
-];
-
-const subDepartments = [
-  { id: "sub-dept-1", name: "Infrastructure", departmentId: "dept-1" },
-  { id: "sub-dept-2", name: "Software Development", departmentId: "dept-1" },
-  { id: "sub-dept-3", name: "Digital Marketing", departmentId: "dept-2" },
-];
-
 const initialContracts = [
     {
         id: "con-1",
         contractDescription: "item-2",
         quantity: 1,
         supplierId: "vendor-1",
-        mainDepartmentId: "dept-1",
+        mainDepartmentId: "dept-1", // IT -> Org 1
         subDepartmentId: "sub-dept-1",
         contractPeriod: "1 Year",
         contractAmount: 12000,
         paymentTerms: "Net 30",
         serviceStartDate: new Date("2024-01-01"),
         serviceEndDate: new Date("2024-12-31"),
+    },
+    {
+        id: "con-2",
+        contractDescription: "item-1",
+        quantity: 1,
+        supplierId: "vendor-2",
+        mainDepartmentId: "dept-2", // Marketing -> Org 1
+        subDepartmentId: "sub-dept-3",
+        contractPeriod: "1 Year",
+        contractAmount: 24000,
+        paymentTerms: "Net 30",
+        serviceStartDate: new Date("2024-05-01"),
+        serviceEndDate: new Date("2025-04-30"),
+    },
+    {
+        id: "con-3",
+        contractDescription: "item-3",
+        quantity: 1,
+        supplierId: "vendor-1",
+        mainDepartmentId: "dept-3", // HR -> Org 2
+        subDepartmentId: "sub-dept-4",
+        contractPeriod: "1 Year",
+        contractAmount: 36000,
+        paymentTerms: "Net 30",
+        serviceStartDate: new Date("2023-11-01"),
+        serviceEndDate: new Date("2024-10-31"),
     }
 ];
 // --- END MOCK DATA ---
@@ -163,6 +197,8 @@ export default function ContractsPage() {
     const [contracts, setContracts] = React.useState<ContractFormValues[]>(initialContracts);
     const [editingContractId, setEditingContractId] = React.useState<string | null>(null);
     const [activeTab, setActiveTab] = React.useState("view");
+    const [organizationFilter, setOrganizationFilter] = React.useState("all");
+    const [departmentFilter, setDepartmentFilter] = React.useState("all");
 
     const form = useForm<ContractFormValues>({
         resolver: zodResolver(contractSchema),
@@ -202,6 +238,37 @@ export default function ContractsPage() {
         return subDepartments.filter(sd => sd.departmentId === mainDepartmentId);
     }, [mainDepartmentId]);
 
+    const organizationName = React.useMemo(() => {
+        if (!mainDepartmentId) return "---";
+        const dept = departments.find(d => d.id === mainDepartmentId);
+        if (!dept) return "---";
+        const org = organizations.find(o => o.id === dept.organizationId);
+        return org ? org.name : "---";
+    }, [mainDepartmentId]);
+
+
+    const availableFilterDepartments = React.useMemo(() => {
+        if (organizationFilter === 'all') return departments;
+        return departments.filter(d => d.organizationId === organizationFilter);
+    }, [organizationFilter]);
+
+    const filteredContracts = React.useMemo(() => {
+        return contracts
+            .filter(c => {
+                if (organizationFilter === 'all') return true;
+                const dept = departments.find(d => d.id === c.mainDepartmentId);
+                return dept?.organizationId === organizationFilter;
+            })
+            .filter(c => {
+                if (departmentFilter === 'all') return true;
+                return c.mainDepartmentId === departmentFilter;
+            });
+    }, [contracts, organizationFilter, departmentFilter]);
+    
+    React.useEffect(() => {
+        setDepartmentFilter("all");
+    }, [organizationFilter]);
+
 
     function handleEdit(contractId: string) {
         setEditingContractId(contractId);
@@ -210,6 +277,7 @@ export default function ContractsPage() {
 
     function handleCreateNew() {
         setEditingContractId(null);
+        reset(defaultValues);
         setActiveTab("create");
     }
     
@@ -250,6 +318,36 @@ export default function ContractsPage() {
                     <Card className="mt-4">
                          <CardHeader>
                             <CardTitle className="text-[13px]">Existing Contracts</CardTitle>
+                            <div className="grid md:grid-cols-2 gap-4 pt-4">
+                                <div>
+                                    <Label className="text-[12px]">Filter by Organization</Label>
+                                    <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+                                        <SelectTrigger className="text-[11px] mt-2">
+                                            <SelectValue placeholder="Select an organization" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all" className="text-[11px]">All Organizations</SelectItem>
+                                            {organizations.map((org) => (
+                                                <SelectItem key={org.id} value={org.id} className="text-[11px]">{org.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label className="text-[12px]">Filter by Department</Label>
+                                    <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                                        <SelectTrigger className="text-[11px] mt-2">
+                                            <SelectValue placeholder="Select a department" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all" className="text-[11px]">All Departments</SelectItem>
+                                            {availableFilterDepartments.map((dept) => (
+                                                 <SelectItem key={dept.id} value={dept.id} className="text-[11px]">{dept.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -263,17 +361,25 @@ export default function ContractsPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {contracts.map(contract => (
-                                        <TableRow key={contract.id}>
-                                            <TableCell className="font-medium text-[11px]">{registryItems.find(i => i.id === contract.contractDescription)?.description}</TableCell>
-                                            <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.name}</TableCell>
-                                            <TableCell className="text-[11px]">{contract.serviceEndDate ? format(contract.serviceEndDate, "PPP") : "N/A"}</TableCell>
-                                            <TableCell><Badge variant={getStatusBadgeVariant(contract.contractStatus)}>{contract.contractStatus || "N/A"}</Badge></TableCell>
-                                            <TableCell className="text-right">
-                                                <Button variant="ghost" size="sm" onClick={() => contract.id && handleEdit(contract.id)}>Edit</Button>
+                                    {filteredContracts.length > 0 ? (
+                                        filteredContracts.map(contract => (
+                                            <TableRow key={contract.id}>
+                                                <TableCell className="font-medium text-[11px]">{registryItems.find(i => i.id === contract.contractDescription)?.description}</TableCell>
+                                                <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.name}</TableCell>
+                                                <TableCell className="text-[11px]">{contract.serviceEndDate ? format(contract.serviceEndDate, "PPP") : "N/A"}</TableCell>
+                                                <TableCell><Badge variant={getStatusBadgeVariant(contract.contractStatus)}>{contract.contractStatus || "N/A"}</Badge></TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="sm" onClick={() => contract.id && handleEdit(contract.id)}>Edit</Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                                No contracts found.
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    )}
                                 </TableBody>
                             </Table>
                             <Button size="sm" className="mt-4" onClick={handleCreateNew}><Icons.Add className="mr-2" /> Create New Contract</Button>
@@ -290,6 +396,12 @@ export default function ContractsPage() {
                                         <FormField control={form.control} name="contractDescription" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Contract Description</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select an item/service" /></SelectTrigger></FormControl><SelectContent>{registryItems.map(item => (<SelectItem key={item.id} value={item.id} className="text-[11px]">{item.description}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                         <FormField control={form.control} name="quantity" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Item/Service Quantity</FormLabel><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id} className="text-[11px]">{v.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                                    </div>
+                                    <div className="grid md:grid-cols-3 gap-4 pt-4">
+                                        <FormItem>
+                                            <FormLabel className="text-[12px]">Service Allocation Organization</FormLabel>
+                                            <Input readOnly disabled value={organizationName} className="text-[11px]" />
+                                        </FormItem>
                                         <FormField control={form.control} name="mainDepartmentId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Service Allocation Main Department</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a department" /></SelectTrigger></FormControl><SelectContent>{departments.map(d => (<SelectItem key={d.id} value={d.id} className="text-[11px]">{d.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                         <FormField control={form.control} name="subDepartmentId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Service Allocation Sub Department</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!mainDepartmentId}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a sub-department" /></SelectTrigger></FormControl><SelectContent>{availableSubDepartments.map(sd => (<SelectItem key={sd.id} value={sd.id} className="text-[11px]">{sd.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                     </div>
@@ -370,5 +482,3 @@ export default function ContractsPage() {
         </div>
     );
 }
-
-    
