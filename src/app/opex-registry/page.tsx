@@ -138,9 +138,72 @@ export default function OpexRegistryPage() {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
-                <FormField control={form.control} name="organization" render={({ field }) => ( <FormItem> <FormLabel className="text-[12px]">Organization</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"> <SelectValue placeholder="Select an organization" /> </SelectTrigger> </FormControl> <SelectContent> {organizations.map((org) => ( <SelectItem key={org.id} value={org.id} className="text-[11px]">{org.name}</SelectItem> ))} </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                <FormField control={form.control} name="department" render={({ field }) => ( <FormItem> <FormLabel className="text-[12px]">Department</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"> <SelectValue placeholder="Select a department" /> </SelectTrigger> </FormControl> <SelectContent> {departments.map((dept) => ( <SelectItem key={dept.id} value={dept.id} className="text-[11px]">{dept.name}</SelectItem> ))} </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                <FormField control={form.control} name="year" render={({ field }) => ( <FormItem> <FormLabel className="text-[12px]">Year</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"> <SelectValue placeholder="Select a year" /> </SelectTrigger> </FormControl> <SelectContent> {years.map((y) => ( <SelectItem key={y} value={y} className="text-[11px]">{y}</SelectItem> ))} </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                <FormField
+                  control={form.control}
+                  name="organization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[12px]">Organization</FormLabel>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="text-[11px]">
+                              <SelectValue placeholder="Select an organization" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {organizations.map((org) => (
+                                <SelectItem key={org.id} value={org.id} className="text-[11px]">{org.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[12px]">Department</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="text-[11px]">
+                              <SelectValue placeholder="Select a department" />
+                            </SelectTrigger>
+                          <SelectContent>
+                            {departments.map((dept) => (
+                              <SelectItem key={dept.id} value={dept.id} className="text-[11px]">{dept.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[12px]">Year</FormLabel>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="text-[11px]">
+                              <SelectValue placeholder="Select a year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {years.map((y) => (
+                                <SelectItem key={y} value={y} className="text-[11px]">{y}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </CardContent>
           </Card>
@@ -182,12 +245,12 @@ export default function OpexRegistryPage() {
                         <TableRow key={field.id}>
                           <TableCell className="font-medium text-[11px] align-top pt-5">{generateOpexSeqNum(index)}</TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.description`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/></TableCell>
-                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.period`} render={({ field }) => ( <FormItem> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="Monthly" className="text-[11px]">Monthly</SelectItem> <SelectItem value="Quarterly" className="text-[11px]">Quarterly</SelectItem> <SelectItem value="Annually" className="text-[11px]">Annually</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/></TableCell>
+                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.period`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> <SelectItem value="Monthly" className="text-[11px]">Monthly</SelectItem> <SelectItem value="Quarterly" className="text-[11px]">Quarterly</SelectItem> <SelectItem value="Annually" className="text-[11px]">Annually</SelectItem> </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.amount`} render={({ field }) => (<FormItem><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/></TableCell>
                           <TableCell className="text-right align-top pt-5 font-medium text-[11px]">{annualValue.toLocaleString()} QAR</TableCell>
-                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.implementation`} render={({ field }) => ( <FormItem> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="New" className="text-[11px]">New</SelectItem> <SelectItem value="Renewal" className="text-[11px]">Renewal</SelectItem> <SelectItem value="Ongoing" className="text-[11px]">Ongoing</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/></TableCell>
-                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.serviceStatus`} render={({ field }) => ( <FormItem> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="Active" className="text-[11px]">Active</SelectItem> <SelectItem value="Inactive" className="text-[11px]">Inactive</SelectItem> <SelectItem value="To be Renewed" className="text-[11px]">To be Renewed</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/></TableCell>
-                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.supplier`} render={({ field }) => ( <FormItem> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger> </FormControl> <SelectContent> {suppliers.map(s => <SelectItem key={s.id} value={s.id} className="text-[11px]">{s.name}</SelectItem>)} </SelectContent> </Select> <FormMessage /> </FormItem> )}/></TableCell>
+                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.implementation`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> <SelectItem value="New" className="text-[11px]">New</SelectItem> <SelectItem value="Renewal" className="text-[11px]">Renewal</SelectItem> <SelectItem value="Ongoing" className="text-[11px]">Ongoing</SelectItem> </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
+                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.serviceStatus`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> <SelectItem value="Active" className="text-[11px]">Active</SelectItem> <SelectItem value="Inactive" className="text-[11px]">Inactive</SelectItem> <SelectItem value="To be Renewed" className="text-[11px]">To be Renewed</SelectItem> </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
+                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.supplier`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> {suppliers.map(s => <SelectItem key={s.id} value={s.id} className="text-[11px]">{s.name}</SelectItem>)} </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.remarks`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/></TableCell>
                           <TableCell className="text-right align-top pt-4 print:hidden"><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><Icons.Delete className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>
