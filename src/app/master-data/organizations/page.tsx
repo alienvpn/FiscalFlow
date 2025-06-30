@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -112,7 +113,6 @@ export default function OrganizationsPage() {
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit">Update</Button>
                   <Button type="submit">Save Data</Button>
                 </DialogFooter>
               </DialogContent>

@@ -418,7 +418,6 @@ export default function ItemRegistryPage() {
               )}
 
               <div className="flex items-center gap-4">
-                <Button type="submit">Update</Button>
                 <Button type="submit">Save Data</Button>
               </div>
             </form>
