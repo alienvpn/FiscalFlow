@@ -74,32 +74,32 @@ const recentExpenses = [
 
 export default function Dashboard() {
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8">
-      <h2 className="text-3xl font-bold tracking-tight">Executive Dashboard</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="flex-1 space-y-4 p-4 md:p-6">
+      <h2 className="text-2xl font-bold tracking-tight">Executive Dashboard</h2>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">41,500 QAR</div>
+            <div className="text-xl font-bold">41,500 QAR</div>
             <p className="text-xs text-muted-foreground">
               Total allocated for this period
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">
               Total Expenditure
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">31,000 QAR</div>
+            <div className="text-xl font-bold">31,000 QAR</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center">
+              <span className="text-primary flex items-center">
                 <ArrowDown className="h-3 w-3 mr-1" />
                 74.7% of total budget
               </span>
@@ -107,37 +107,37 @@ export default function Dashboard() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">
               Active Contracts
             </CardTitle>
             <FileWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42</div>
+            <div className="text-xl font-bold">42</div>
             <p className="text-xs text-muted-foreground">
               2 contracts expiring soon
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">
               Budget Overrun Risk
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Low</div>
+            <div className="text-xl font-bold">Low</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-red-600 flex items-center">
+              <span className="text-destructive flex items-center">
                 <ArrowUp className="h-3 w-3 mr-1" />1 department near limit
               </span>
             </p>
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Budget vs. Expenditure</CardTitle>
@@ -146,18 +146,18 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
+            <ResponsiveContainer width="100%" height={250}>
               <BarChart data={budgetData}>
                 <XAxis
                   dataKey="name"
                   stroke="#888888"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="#888888"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => `${value / 1000}k QAR`}
@@ -172,13 +172,13 @@ export default function Dashboard() {
                 />
                 <Bar
                   dataKey="spent"
-                  fill="hsl(var(--primary))"
+                  fill="hsl(var(--chart-1))"
                   name="Spent"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="budget"
-                  fill="hsl(var(--secondary))"
+                  fill="hsl(var(--chart-2))"
                   name="Budget"
                   radius={[4, 4, 0, 0]}
                 />
@@ -197,24 +197,24 @@ export default function Dashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="h-10 px-2">Description</TableHead>
+                  <TableHead className="h-10 px-2">Category</TableHead>
+                  <TableHead className="h-10 px-2 text-right">Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentExpenses.map((expense) => (
                   <TableRow key={expense.id}>
-                    <TableCell>
-                      <div className="font-medium">{expense.description}</div>
+                    <TableCell className="p-2">
+                      <div className="font-medium text-sm">{expense.description}</div>
                       <div className="text-xs text-muted-foreground">
                         {expense.date}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-2">
                       <Badge variant="outline">{expense.category}</Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="p-2 text-right">
                       {expense.amount.toLocaleString()} QAR
                     </TableCell>
                   </TableRow>
