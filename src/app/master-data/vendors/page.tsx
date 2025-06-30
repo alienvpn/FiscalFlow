@@ -168,31 +168,32 @@ export default function VendorsPage() {
     defaultValues: defaultValues,
   });
 
-  const selectedCountry = form.watch("country");
+  const { watch, setValue, reset } = form;
+  const selectedCountry = watch("country");
 
   React.useEffect(() => {
     if (selectedCountry) {
       const countryData = countryCityData.find(c => c.name === selectedCountry);
       setCities(countryData?.cities || []);
-      form.setValue("city", "");
+      setValue("city", "");
     } else {
       setCities([]);
     }
-  }, [selectedCountry, form]);
-  
+  }, [selectedCountry, setValue]);
+
   React.useEffect(() => {
     if (editingVendorId) {
       const vendorToEdit = vendors.find((v) => v.id === editingVendorId);
       if (vendorToEdit) {
-        form.reset(vendorToEdit);
+        reset(vendorToEdit);
         const countryData = countryCityData.find(c => c.name === vendorToEdit.country);
         setCities(countryData?.cities || []);
-        form.setValue("city", vendorToEdit.city);
+        setValue("city", vendorToEdit.city);
       }
     } else {
-      form.reset(defaultValues);
+      reset(defaultValues);
     }
-  }, [editingVendorId, form, vendors]);
+  }, [editingVendorId, vendors, reset, setValue]);
 
   function handleEdit(vendorId: string) {
     setEditingVendorId(vendorId);
