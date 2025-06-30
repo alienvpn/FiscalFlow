@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -100,8 +101,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-lg mx-auto">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
