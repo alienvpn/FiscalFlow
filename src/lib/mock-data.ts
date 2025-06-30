@@ -233,4 +233,76 @@ export const approvalWorkflows = {
     { id: 'contract-level-3', level: 3, approverRole: 'Finance Director', description: 'Final financial approval for renewal.' },
   ]
 };
+
+export const mockUsers = [
+  {
+    id: 'user-1',
+    username: 'alice.j',
+    email: 'alice.johnson@fiscalflow.com',
+    userRole: 'Department Head',
+    department: 'IT Division',
+    permissions: {
+      '/capex-registry': 'full',
+      '/opex-registry': 'full',
+      '/contracts': 'write',
+      '/approvals/inbox': 'full',
+      '/reports': 'read',
+      '/master-data/company-profile': 'none',
+      '/item-registry': 'write',
+      '/master-data/vendors': 'read',
+      '/reports/capex': 'read',
+      '/reports/opex': 'read',
+      '/reports/contracts': 'read',
+      '/reports/vendors': 'read',
+      '/settings/user-registration': 'none',
+      '/settings/approval-matrix': 'none',
+    }
+  },
+  {
+    id: 'user-2',
+    username: 'bob.w',
+    email: 'bob.williams@fiscalflow.com',
+    userRole: 'Finance Manager',
+    department: 'Finance',
+    permissions: {
+      '/capex-registry': 'read',
+      '/opex-registry': 'read',
+      '/contracts': 'read',
+      '/approvals/inbox': 'full',
+      '/reports': 'full',
+      '/master-data/company-profile': 'read',
+      '/item-registry': 'read',
+      '/master-data/vendors': 'read',
+      '/reports/capex': 'full',
+      '/reports/opex': 'full',
+      '/reports/contracts': 'full',
+      '/reports/vendors': 'full',
+      '/settings/user-registration': 'none',
+      '/settings/approval-matrix': 'read',
+    }
+  },
+  {
+    id: 'user-3',
+    username: 'charlie.b',
+    email: 'charlie.brown@fiscalflow.com',
+    userRole: '', // No approval role
+    department: 'Marketing Division',
+    permissions: {
+      '/capex-registry': 'write',
+      '/opex-registry': 'write',
+      '/contracts': 'none',
+      '/approvals/inbox': 'none',
+      '/reports': 'read',
+      '/master-data/company-profile': 'none',
+      '/item-registry': 'none',
+      '/master-data/vendors': 'read',
+      '/reports/capex': 'read',
+      '/reports/opex': 'read',
+      '/reports/contracts': 'none',
+      '/reports/vendors': 'read',
+      '/settings/user-registration': 'none',
+      '/settings/approval-matrix': 'none',
+    }
+  }
+];
 // --- END MOCK DATA ---

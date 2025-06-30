@@ -8,7 +8,7 @@ type NavLink = {
 };
 
 export const menuItems: {
-  title: string;
+  title:string;
   links: NavLink[];
 }[] = [
   {
@@ -105,6 +105,12 @@ export const menuItems: {
         href: "/reports/vendors",
         icon: Icons.Vendors,
         description: "View reports on supplier and vendor data.",
+      },
+      {
+        title: "User Access Rights Report",
+        href: "/reports/user-access-rights",
+        icon: Icons.UserAccess,
+        description: "View a report on user roles and module access permissions.",
       },
     ],
   },
