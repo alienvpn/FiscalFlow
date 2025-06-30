@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -21,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const vendorSchema = z.object({
   companyName: z.string().min(1, "Company Name is required."),
@@ -29,7 +29,7 @@ const vendorSchema = z.object({
   telephone: z.string().min(1, "Telephone is required."),
   fax: z.string().optional(),
   whatsapp: z.string().optional(),
-  website: z.string().url("Invalid URL.").optional().or(z.literal('')),
+  website: z.string().url("Invalid URL.").optional().or(z.literal("")),
 
   accountManager: z.object({
     name: z.string().min(1, "Name is required."),
@@ -42,19 +42,19 @@ const vendorSchema = z.object({
 
   techSupport1: z.object({
     name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal('')),
+    email: z.string().email("Invalid email.").optional().or(z.literal("")),
     telephone: z.string().optional(),
     mobile: z.string().optional(),
   }),
   techSupport2: z.object({
     name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal('')),
+    email: z.string().email("Invalid email.").optional().or(z.literal("")),
     telephone: z.string().optional(),
     mobile: z.string().optional(),
   }),
   techSupport3: z.object({
     name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal('')),
+    email: z.string().email("Invalid email.").optional().or(z.literal("")),
     telephone: z.string().optional(),
     mobile: z.string().optional(),
   }),
@@ -92,12 +92,7 @@ export default function VendorsPage() {
 
   const renderTechSupportFields = (contactNumber: 1 | 2 | 3) => (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-[13px]">
-          Technical Support {contactNumber}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="grid md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -180,7 +175,9 @@ export default function VendorsPage() {
                   name="companyName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[12px]">Company Name</FormLabel>
+                      <FormLabel className="text-[12px]">
+                        Company Name
+                      </FormLabel>
                       <FormControl>
                         <Input className="text-[11px]" {...field} />
                       </FormControl>
@@ -193,7 +190,9 @@ export default function VendorsPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[12px]">Email Address</FormLabel>
+                      <FormLabel className="text-[12px]">
+                        Email Address
+                      </FormLabel>
                       <FormControl>
                         <Input className="text-[11px]" {...field} />
                       </FormControl>
@@ -282,115 +281,125 @@ export default function VendorsPage() {
             <h3 className="text-[13px] font-semibold mb-4">
               Point of Contacts
             </h3>
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-[13px]">
-                    Account Manager
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="accountManager.name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">Name</FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="accountManager.designation"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">
-                            Designation
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="accountManager.email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">
-                            Email Address
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="accountManager.telephone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">
-                            Telephone
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="accountManager.mobile"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">
-                            Mobile Number
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="accountManager.whatsapp"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[12px]">
-                            What’s App
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="text-[11px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {renderTechSupportFields(1)}
-              {renderTechSupportFields(2)}
-              {renderTechSupportFields(3)}
-            </div>
+            <Tabs defaultValue="accountManager" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="accountManager">
+                  Account Manager
+                </TabsTrigger>
+                <TabsTrigger value="techSupport1">Tech Support 1</TabsTrigger>
+                <TabsTrigger value="techSupport2">Tech Support 2</TabsTrigger>
+                <TabsTrigger value="techSupport3">Tech Support 3</TabsTrigger>
+              </TabsList>
+              <TabsContent value="accountManager">
+                <Card>
+                  <CardContent className="space-y-4 pt-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="accountManager.name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">Name</FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accountManager.designation"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">
+                              Designation
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="accountManager.email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">
+                              Email Address
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accountManager.telephone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">
+                              Telephone
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="accountManager.mobile"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">
+                              Mobile Number
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accountManager.whatsapp"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[12px]">
+                              What’s App
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="text-[11px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="techSupport1">
+                {renderTechSupportFields(1)}
+              </TabsContent>
+              <TabsContent value="techSupport2">
+                {renderTechSupportFields(2)}
+              </TabsContent>
+              <TabsContent value="techSupport3">
+                {renderTechSupportFields(3)}
+              </TabsContent>
+            </Tabs>
           </div>
 
           <Button type="submit">Save Vendor</Button>
