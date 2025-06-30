@@ -289,11 +289,12 @@ export default function CreateUserPage() {
                           <p className="text-[11px] font-normal text-muted-foreground mt-1">{allModules.find(m => m.href === item.moduleId)?.description}</p>
                         </TableCell>
                         <TableCell>
-                           <FormField
+                          <FormField
                             control={form.control}
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
                               <FormItem className="space-y-3">
+                                <FormControl>
                                   <RadioGroup
                                     onValueChange={field.onChange}
                                     value={field.value}
@@ -314,6 +315,7 @@ export default function CreateUserPage() {
                                       </div>
                                     ))}
                                   </RadioGroup>
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
