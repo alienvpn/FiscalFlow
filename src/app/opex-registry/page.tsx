@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -40,14 +39,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
-import { organizations, departments } from "@/lib/mock-data";
+import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
 
-// Mock data
-const suppliers = [
-    { id: "sup-1", name: "AWS" },
-    { id: "sup-2", name: "Salesforce" },
-    { id: "sup-3", name: "Ooredoo" },
-];
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
 
@@ -62,6 +55,8 @@ const opexItemSchema = z.object({
   remarks: z.string().optional(),
 });
 
+type OpexItem = z.infer<typeof opexItemSchema>;
+
 const opexRegistrySchema = z.object({
   organization: z.string().min(1, "Organization is required."),
   department: z.string().min(1, "Department is required."),
@@ -72,6 +67,8 @@ const opexRegistrySchema = z.object({
 type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
+  const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[] | null>(null);
+
   const form = useForm<OpexFormValues>({
     resolver: zodResolver(opexRegistrySchema),
     defaultValues: {
@@ -89,6 +86,21 @@ export default function OpexRegistryPage() {
 
   const watchedItems = form.watch("items");
   const { organization, department, year } = form.watch();
+
+  React.useEffect(() => {
+    if (organization && department && year) {
+        const prevYear = (parseInt(year, 10) - 1).toString();
+        const sheet = opexSheets.find(s => 
+            s.year === prevYear && 
+            s.organizationId === organization && 
+            s.departmentId === department
+        );
+        setPreviousYearItems(sheet ? sheet.items : null);
+    } else {
+        setPreviousYearItems(null);
+    }
+  }, [organization, department, year]);
+
 
   const totalAnnualValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -207,6 +219,52 @@ export default function OpexRegistryPage() {
             </CardContent>
           </Card>
 
+          {previousYearItems && previousYearItems.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} OPEX Sheet</CardTitle>
+                <CardDescription className="text-[12px]">Items from the previous year for your reference.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[12px]">Description</TableHead>
+                      <TableHead className="text-[12px]">Period</TableHead>
+                      <TableHead className="text-[12px]">Amount (QAR)</TableHead>
+                      <TableHead className="text-right text-[12px]">Annual Value (QAR)</TableHead>
+                      <TableHead className="text-[12px]">Supplier</TableHead>
+                      <TableHead className="text-[12px]">Remarks</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {previousYearItems.map(item => {
+                      const period = item.period;
+                      const amount = item.amount || 0;
+                      let annualValue = 0;
+                      if (period === "Monthly") annualValue = amount * 12;
+                      else if (period === "Quarterly") annualValue = amount * 4;
+                      else if (period === "Annually") annualValue = amount;
+                      
+                      const supplierName = vendors.find(v => v.id === item.supplier)?.companyName || item.supplier;
+
+                      return (
+                        <TableRow key={item.id}>
+                          <TableCell className="text-[11px]">{item.description}</TableCell>
+                          <TableCell className="text-[11px]">{item.period}</TableCell>
+                          <TableCell className="text-[11px]">{item.amount.toLocaleString()}</TableCell>
+                          <TableCell className="text-right font-medium text-[11px]">{annualValue.toLocaleString()}</TableCell>
+                          <TableCell className="text-[11px]">{supplierName}</TableCell>
+                          <TableCell className="text-[11px]">{item.remarks}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-[13px]">OPEX Items</CardTitle>
@@ -249,7 +307,7 @@ export default function OpexRegistryPage() {
                           <TableCell className="text-right align-top pt-5 font-medium text-[11px]">{annualValue.toLocaleString()} QAR</TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.implementation`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> <SelectItem value="New" className="text-[11px]">New</SelectItem> <SelectItem value="Renewal" className="text-[11px]">Renewal</SelectItem> <SelectItem value="Ongoing" className="text-[11px]">Ongoing</SelectItem> </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.serviceStatus`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> <SelectItem value="Active" className="text-[11px]">Active</SelectItem> <SelectItem value="Inactive" className="text-[11px]">Inactive</SelectItem> <SelectItem value="To be Renewed" className="text-[11px]">To be Renewed</SelectItem> </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
-                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.supplier`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> {suppliers.map(s => <SelectItem key={s.id} value={s.id} className="text-[11px]">{s.name}</SelectItem>)} </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
+                          <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.supplier`} render={({ field }) => ( <FormItem><FormControl><Select onValueChange={field.onChange} defaultValue={field.value}><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select" /></SelectTrigger><SelectContent> {vendors.map(s => <SelectItem key={s.id} value={s.id!} className="text-[11px]">{s.companyName}</SelectItem>)} </SelectContent></Select></FormControl><FormMessage /></FormItem> )}/></TableCell>
                           <TableCell className="align-top"><FormField control={form.control} name={`items.${index}.remarks`} render={({ field }) => (<FormItem><FormControl><Textarea className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)}/></TableCell>
                           <TableCell className="text-right align-top pt-4 print:hidden"><Button variant="ghost" size="icon" type="button" onClick={() => remove(index)}><Icons.Delete className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>

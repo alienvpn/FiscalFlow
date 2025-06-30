@@ -139,4 +139,24 @@ export const initialContracts = [
         serviceEndDate: new Date("2024-07-25"), // Expiring soon
     }
 ];
+
+export const opexSheets = [
+  {
+    year: (new Date().getFullYear() - 1).toString(),
+    organizationId: 'org-1',
+    departmentId: 'dept-1',
+    items: [
+      { id: 'prev-opex-item-1', description: 'Cloud Hosting - Previous Year', period: 'Monthly', amount: 3000, implementation: 'Ongoing', serviceStatus: 'Active', supplier: 'vendor-1', remarks: 'Standard cloud costs for IT Infra' },
+      { id: 'prev-opex-item-2', description: 'CRM Subscription - Previous Year', period: 'Annually', amount: 18000, implementation: 'Renewal', serviceStatus: 'Active', supplier: 'vendor-2', remarks: 'Annual license for Sales' },
+    ]
+  },
+  {
+    year: (new Date().getFullYear() - 1).toString(),
+    organizationId: 'org-1',
+    departmentId: 'dept-2',
+    items: [
+      { id: 'prev-opex-item-3', description: 'Social Media Ads Budget', period: 'Monthly', amount: 5000, implementation: 'Ongoing', serviceStatus: 'Active', supplier: 'vendor-2', remarks: 'For marketing campaigns' },
+    ]
+  }
+];
 // --- END MOCK DATA ---
