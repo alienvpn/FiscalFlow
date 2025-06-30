@@ -52,6 +52,17 @@ export const menuItems: {
     ],
   },
   {
+    title: "Contract Management",
+    links: [
+      {
+        title: "Contracts",
+        href: "/contracts",
+        icon: Icons.Contracts,
+        description: "Store and manage contracts, SLAs, and AMCs.",
+      },
+    ],
+  },
+  {
     title: "Reports",
     links: [
       {
@@ -108,11 +119,5 @@ export const allModules: NavLink[] = [
     href: "/budget-forecasting",
     icon: Icons.Forecasting,
     description: "Predict future budgetary needs with AI.",
-  },
-  {
-    title: "Contracts",
-    href: "/contracts",
-    icon: Icons.Contracts,
-    description: "Store and manage contracts, SLAs, and AMCs.",
   },
 ];
