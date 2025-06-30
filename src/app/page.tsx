@@ -1,7 +1,4 @@
-
-"use client";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -9,239 +6,116 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import {
-  AlertTriangle,
-  ArrowUp,
-  ArrowDown,
-  DollarSign,
-  FileWarning,
-} from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
+import { Icons, type Icon } from "@/components/icons";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const budgetData = [
-  { name: "IT", spent: 4500, budget: 8000 },
-  { name: "Marketing", spent: 6200, budget: 7500 },
-  { name: "Operations", spent: 7800, budget: 9000 },
-  { name: "HR", spent: 3000, budget: 5000 },
-  { name: "Sales", spent: 9500, budget: 12000 },
+const modules: {
+  title: string;
+  description: string;
+  href: string;
+  icon: Icon;
+}[] = [
+  {
+    title: "Executive Dashboard",
+    description: "View key metrics, charts, and financial summaries.",
+    href: "/dashboard",
+    icon: Icons.Dashboard,
+  },
+  {
+    title: "CAPEX Analysis",
+    description: "Compare capital expenditure quotes using AI.",
+    href: "/capex-analysis",
+    icon: Icons.Capex,
+  },
+  {
+    title: "OPEX Tracker",
+    description: "Log and categorize operational expenses for tracking.",
+    href: "/opex-tracker",
+    icon: Icons.Opex,
+  },
+  {
+    title: "OPEX Registry",
+    description: "Create and manage yearly OPEX sheets.",
+    href: "/opex-registry",
+    icon: Icons.OpexRegistry,
+  },
+  {
+    title: "Contracts",
+    description: "Store and manage contracts, SLAs, and AMCs.",
+    href: "/contracts",
+    icon: Icons.Contracts,
+  },
+  {
+    title: "Budget Forecasting",
+    description: "Predict future budgetary needs with AI.",
+    href: "/budget-forecasting",
+    icon: Icons.Forecasting,
+  },
+  {
+    title: "CAPEX Registry",
+    description: "Create and manage yearly CAPEX sheets.",
+    href: "/capex-registry",
+    icon: Icons.CapexRegistry,
+  },
+  {
+    title: "Device/Item/Service Registry",
+    description: "Register new devices, items, or services.",
+    href: "/item-registry",
+    icon: Icons.Registry,
+  },
+  {
+    title: "Master Data",
+    description: "Manage core company, vendor, and organizational data.",
+    href: "/master-data/company-profile",
+    icon: Icons.MasterData,
+  },
+  {
+    title: "Vendors",
+    description: "Manage supplier and service provider information.",
+    href: "/master-data/vendors",
+    icon: Icons.Vendors,
+  },
 ];
 
-const recentExpenses = [
-  {
-    id: "exp-01",
-    description: "Cloud Services Renewal",
-    amount: 1200,
-    category: "IT",
-    date: "2 days ago",
-  },
-  {
-    id: "exp-02",
-    description: "Marketing Campaign Q3",
-    amount: 4500,
-    category: "Marketing",
-    date: "4 days ago",
-  },
-  {
-    id: "exp-03",
-    description: "Office Supplies",
-    amount: 350,
-    category: "Operations",
-    date: "1 week ago",
-  },
-  {
-    id: "exp-04",
-    description: "New Hire Onboarding",
-    amount: 800,
-    category: "HR",
-    date: "1 week ago",
-  },
-];
-
-export default function Dashboard() {
+export default function HomePage() {
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8">
-      <h2 className="text-sm font-bold tracking-tight">Executive Dashboard</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">41,500 QAR</div>
-            <p className="text-xs text-muted-foreground">
-              Total allocated for this period
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Expenditure
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">31,000 QAR</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center">
-                <ArrowDown className="h-3 w-3 mr-1" />
-                74.7% of total budget
-              </span>
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Contracts
-            </CardTitle>
-            <FileWarning className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">
-              2 contracts expiring soon
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Budget Overrun Risk
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Low</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-red-600 flex items-center">
-                <ArrowUp className="h-3 w-3 mr-1" />1 department near limit
-              </span>
-            </p>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold tracking-tight">FiscalFlow</h1>
+        <p className="text-muted-foreground mt-2">
+          Your central hub for budget and contract management.
+        </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Budget vs. Expenditure</CardTitle>
-            <CardDescription>
-              Department-wise spending for the current period.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={budgetData}>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${value / 1000}k QAR`}
-                />
-                <Tooltip
-                  cursor={{ fill: "hsl(var(--accent))" }}
-                  contentStyle={{
-                    background: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Bar
-                  dataKey="spent"
-                  fill="hsl(var(--primary))"
-                  name="Spent"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="budget"
-                  fill="hsl(var(--secondary))"
-                  name="Budget"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="col-span-4 lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Expenses</CardTitle>
-            <CardDescription>
-              A log of the latest operational expenses.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentExpenses.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell>
-                      <div className="font-medium">{expense.description}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {expense.date}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{expense.category}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {expense.amount.toLocaleString()} QAR
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="space-y-4">
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Contract Renewal Notice</AlertTitle>
-          <AlertDescription>
-            The contract for 'VendorLink CRM' is expiring in 15 days. Please
-            initiate renewal process.
-          </AlertDescription>
-        </Alert>
-        <Alert variant="destructive">
-          <FileWarning className="h-4 w-4" />
-          <AlertTitle>SLA Breach Detected</AlertTitle>
-          <AlertDescription>
-            SLA for 'Server Hosting Pro' has been breached (99.5% uptime).
-            Follow up with vendor required.
-          </AlertDescription>
-        </Alert>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {modules.map((item) => {
+          const ItemIcon = item.icon;
+          return (
+            <Card
+              key={item.title}
+              className="flex flex-col justify-between hover:shadow-lg transition-shadow"
+            >
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <ItemIcon className="h-8 w-8 text-primary" />
+                  <div>
+                    <CardTitle>{item.title}</CardTitle>
+                    <CardDescription className="mt-1">
+                      {item.description}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Link href={item.href}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Go to {item.title} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
