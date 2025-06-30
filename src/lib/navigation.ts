@@ -21,12 +21,6 @@ export const menuItems: {
         description: "Manage core company, vendor, and organizational data.",
       },
       {
-        title: "Create User",
-        href: "/master-data/create-user",
-        icon: Icons.UserPlus,
-        description: "Create and manage application users and their permissions.",
-      },
-      {
         title: "Create Items/Devices/Services",
         href: "/item-registry",
         icon: Icons.Registry,
