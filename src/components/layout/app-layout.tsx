@@ -13,9 +13,15 @@ import {
 import { menuItems } from "@/lib/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from "react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -42,7 +48,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 href="/"
                 className={cn(
                   "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground",
-                  pathname === "/" && "bg-accent"
+                  isMounted && pathname === "/" && "bg-accent"
                 )}
               >
                 Home
@@ -53,7 +59,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 href="/dashboard"
                 className={cn(
                   "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground",
-                  pathname === "/dashboard" && "bg-accent"
+                  isMounted && pathname === "/dashboard" && "bg-accent"
                 )}
               >
                 Executive Dashboard
