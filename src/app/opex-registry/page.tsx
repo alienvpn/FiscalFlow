@@ -89,23 +89,28 @@ export default function OpexRegistryPage() {
   const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
-    const subscription = form.watch((value) => {
-      const { organization, department, year } = value;
-      if (organization && department && year) {
-        const prevYear = (parseInt(year, 10) - 1).toString();
-        const sheet = opexSheets.find(
-          (s) =>
-            s.year === prevYear &&
-            s.organizationId === organization &&
-            s.departmentId === department
-        );
-        setPreviousYearItems(sheet ? sheet.items : []);
-      } else {
-        setPreviousYearItems([]);
+    const subscription = form.watch((value, { name, type }) => {
+      if (
+        type === "change" &&
+        (name === "organization" || name === "department" || name === "year")
+      ) {
+        const { organization, department, year } = value;
+        if (organization && department && year) {
+          const prevYear = (parseInt(year, 10) - 1).toString();
+          const sheet = opexSheets.find(
+            (s) =>
+              s.year === prevYear &&
+              s.organizationId === organization &&
+              s.departmentId === department
+          );
+          setPreviousYearItems(sheet ? sheet.items : []);
+        } else {
+          setPreviousYearItems([]);
+        }
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -122,6 +127,21 @@ export default function OpexRegistryPage() {
       return acc + annualValue;
     }, 0);
   }, [watchedItems]);
+
+  const previousYearTotalAnnualValue = React.useMemo(() => {
+    return previousYearItems.reduce((acc, item) => {
+      const amount = item.amount || 0;
+      let annualValue = 0;
+      if (item.period === "Monthly") {
+        annualValue = amount * 12;
+      } else if (item.period === "Quarterly") {
+        annualValue = amount * 4;
+      } else if (item.period === "Annually") {
+        annualValue = amount;
+      }
+      return acc + annualValue;
+    }, 0);
+  }, [previousYearItems]);
 
   const generateOpexSeqNum = (index: number) => {
     const orgName = organizations.find((o) => o.id === organization)?.name.substring(0, 3).toUpperCase() || 'ORG';
@@ -272,6 +292,21 @@ export default function OpexRegistryPage() {
                   </TableBody>
                 </Table>
               </CardContent>
+              <CardFooter className="flex justify-end">
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      Total Annual Value of Previous Year's Sheet
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Sum of all item annual values from last year.
+                    </p>
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {previousYearTotalAnnualValue.toLocaleString()} QAR
+                  </div>
+                </div>
+              </CardFooter>
             </Card>
           )}
 

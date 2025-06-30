@@ -89,23 +89,28 @@ export default function CapexRegistryPage() {
   const { organization, department, year } = form.watch();
 
   React.useEffect(() => {
-    const subscription = form.watch((value) => {
-      const { organization, department, year } = value;
-      if (organization && department && year) {
-        const prevYear = (parseInt(year, 10) - 1).toString();
-        const sheet = capexSheets.find(
-          (s) =>
-            s.year === prevYear &&
-            s.organizationId === organization &&
-            s.departmentId === department
-        );
-        setPreviousYearItems(sheet ? sheet.items : []);
-      } else {
-        setPreviousYearItems([]);
+    const subscription = form.watch((value, { name, type }) => {
+      if (
+        type === "change" &&
+        (name === "organization" || name === "department" || name === "year")
+      ) {
+        const { organization, department, year } = value;
+        if (organization && department && year) {
+          const prevYear = (parseInt(year, 10) - 1).toString();
+          const sheet = capexSheets.find(
+            (s) =>
+              s.year === prevYear &&
+              s.organizationId === organization &&
+              s.departmentId === department
+          );
+          setPreviousYearItems(sheet ? sheet.items : []);
+        } else {
+          setPreviousYearItems([]);
+        }
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form]);
 
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -114,6 +119,14 @@ export default function CapexRegistryPage() {
       return acc + quantity * amount;
     }, 0);
   }, [watchedItems]);
+
+  const previousYearTotalValue = React.useMemo(() => {
+    return previousYearItems.reduce((acc, item) => {
+      const quantity = item.quantity || 0;
+      const amount = item.amount || 0;
+      return acc + quantity * amount;
+    }, 0);
+  }, [previousYearItems]);
 
   const generateCapexSeqNum = (index: number, seqYear: string = year) => {
     const orgName = organizations.find((o) => o.id === organization)?.name.substring(0, 3).toUpperCase() || 'ORG';
@@ -263,6 +276,21 @@ export default function CapexRegistryPage() {
                   </TableBody>
                 </Table>
               </CardContent>
+              <CardFooter className="flex justify-end">
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      Total Value of Previous Year's Sheet
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Sum of all item totals from last year.
+                    </p>
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {previousYearTotalValue.toLocaleString()} QAR
+                  </div>
+                </div>
+              </CardFooter>
             </Card>
           )}
 
