@@ -91,17 +91,6 @@ export const menuItems: {
       },
     ],
   },
-  {
-    title: "Settings",
-    links: [
-      {
-        title: "User Management",
-        href: "/settings/user-management",
-        icon: Icons.Users,
-        description: "Manage application users and permissions.",
-      },
-    ],
-  },
 ];
 
 // Helper to get all modules for the home page
