@@ -63,6 +63,17 @@ export const menuItems: {
     ],
   },
   {
+    title: "Approvals",
+    links: [
+      {
+        title: "Approval Inbox",
+        href: "/approvals/inbox",
+        icon: Icons.Approvals,
+        description: "Review and approve submitted budget sheets.",
+      },
+    ],
+  },
+  {
     title: "Reports",
     links: [
       {
@@ -100,6 +111,12 @@ export const menuItems: {
         icon: Icons.UserPlus,
         description: "Create and manage user accounts and permissions.",
       },
+      {
+        title: "Approval Matrix",
+        href: "/settings/approval-matrix",
+        icon: Icons.Users,
+        description: "Configure the approval workflow and levels.",
+      },
     ],
   },
 ];
@@ -132,4 +149,3 @@ export const allModules: NavLink[] = [
     description: "Predict future budgetary needs with AI.",
   },
 ].filter((v,i,a)=>a.findIndex(v2=>(v2.href===v.href))===i); // Make unique
-

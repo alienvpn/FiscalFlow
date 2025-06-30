@@ -15,6 +15,7 @@ import {
   ClipboardEdit,
   Users,
   UserPlus,
+  ClipboardCheck,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -35,4 +36,5 @@ export const Icons = {
   Delete: Trash2,
   Users: Users,
   UserPlus: UserPlus,
+  Approvals: ClipboardCheck,
 };

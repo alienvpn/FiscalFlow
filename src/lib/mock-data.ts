@@ -145,6 +145,7 @@ export const opexSheets = [
     year: (new Date().getFullYear() - 1).toString(),
     organizationId: 'org-1',
     departmentId: 'dept-1',
+    status: 'Approved',
     items: [
       { id: 'prev-opex-item-1', description: 'Cloud Hosting - Previous Year', period: 'Monthly', amount: 3000, implementation: 'Ongoing', serviceStatus: 'Active', supplier: 'vendor-1', remarks: 'Standard cloud costs for IT Infra' },
       { id: 'prev-opex-item-2', description: 'CRM Subscription - Previous Year', period: 'Annually', amount: 18000, implementation: 'Renewal', serviceStatus: 'Active', supplier: 'vendor-2', remarks: 'Annual license for Sales' },
@@ -154,6 +155,7 @@ export const opexSheets = [
     year: (new Date().getFullYear() - 1).toString(),
     organizationId: 'org-1',
     departmentId: 'dept-2',
+    status: 'Approved',
     items: [
       { id: 'prev-opex-item-3', description: 'Social Media Ads Budget', period: 'Monthly', amount: 5000, implementation: 'Ongoing', serviceStatus: 'Active', supplier: 'vendor-2', remarks: 'For marketing campaigns' },
     ]
@@ -165,6 +167,7 @@ export const capexSheets = [
     year: (new Date().getFullYear() - 1).toString(),
     organizationId: 'org-1',
     departmentId: 'dept-1',
+    status: 'Approved',
     items: [
       { id: 'prev-capex-item-1', description: 'New Developer Laptops (10x)', priority: 'High', quantity: 10, amount: 6000, justification: 'To replace aging hardware for the development team', remarks: 'Model: MacBook Pro 16"' },
       { id: 'prev-capex-item-2', description: 'Office Server Upgrade', priority: 'Medium', quantity: 1, amount: 15000, justification: 'Increase storage and processing power', remarks: 'Dell PowerEdge R750' },
@@ -174,9 +177,52 @@ export const capexSheets = [
     year: (new Date().getFullYear() - 1).toString(),
     organizationId: 'org-1',
     departmentId: 'dept-2',
+    status: 'Approved',
     items: [
       { id: 'prev-capex-item-3', description: 'Video Production Camera', priority: 'High', quantity: 1, amount: 12000, justification: 'For creating high-quality marketing content', remarks: 'Sony A7S III' },
     ]
   }
+];
+
+export const pendingApprovals = [
+  {
+    id: 'capex-sheet-2024-org1-dept1',
+    type: 'CAPEX',
+    year: '2024',
+    organizationId: 'org-1',
+    departmentId: 'dept-1',
+    submittedOn: new Date('2024-07-15T10:00:00Z'),
+    submittedBy: 'Alice Johnson',
+    totalValue: 75000,
+    status: 'Pending Approval (L1)',
+  },
+  {
+    id: 'opex-sheet-2024-org1-dept2',
+    type: 'OPEX',
+    year: '2024',
+    organizationId: 'org-1',
+    departmentId: 'dept-2',
+    submittedOn: new Date('2024-07-16T14:30:00Z'),
+    submittedBy: 'Bob Williams',
+    totalValue: 60000,
+    status: 'Pending Approval (L2)',
+  },
+  {
+    id: 'capex-sheet-2024-org2-dept3',
+    type: 'CAPEX',
+    year: '2024',
+    organizationId: 'org-2',
+    departmentId: 'dept-3',
+    submittedOn: new Date('2024-07-17T09:00:00Z'),
+    submittedBy: 'Charlie Brown',
+    totalValue: 120000,
+    status: 'Pending Approval (L1)',
+  }
+];
+
+export const approvalMatrix = [
+    { id: 'level-1', level: 1, approverRole: 'Department Head', description: 'Approves all sheets from their department.' },
+    { id: 'level-2', level: 2, approverRole: 'Finance Manager', description: 'Approves all sheets with total value over 50,000 QAR.' },
+    { id: 'level-3', level: 3, approverRole: 'CEO', description: 'Final approval for all sheets with total value over 200,000 QAR.' },
 ];
 // --- END MOCK DATA ---
