@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -35,7 +36,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <Menubar className="border-none bg-transparent p-0">
+            <nav className="flex items-center gap-1">
               {/* Home Link */}
               <Link
                 href="/"
@@ -59,25 +60,27 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
 
               {/* Dynamic Menu Items */}
-              {menuItems.map((item) => (
-                <MenubarMenu key={item.title}>
-                  <MenubarTrigger>{item.title}</MenubarTrigger>
-                  <MenubarContent>
-                    {item.links.map((link) => {
-                      const LinkIcon = link.icon;
-                      return (
-                        <MenubarItem key={link.title} asChild>
-                          <Link href={link.href}>
-                            <LinkIcon className="mr-2 h-4 w-4" />
-                            <span>{link.title}</span>
-                          </Link>
-                        </MenubarItem>
-                      );
-                    })}
-                  </MenubarContent>
-                </MenubarMenu>
-              ))}
-            </Menubar>
+              <Menubar className="border-none bg-transparent p-0">
+                {menuItems.map((item) => (
+                  <MenubarMenu key={item.title}>
+                    <MenubarTrigger>{item.title}</MenubarTrigger>
+                    <MenubarContent>
+                      {item.links.map((link) => {
+                        const LinkIcon = link.icon;
+                        return (
+                          <MenubarItem key={link.title} asChild>
+                            <Link href={link.href}>
+                              <LinkIcon className="mr-2 h-4 w-4" />
+                              <span>{link.title}</span>
+                            </Link>
+                          </MenubarItem>
+                        );
+                      })}
+                    </MenubarContent>
+                  </MenubarMenu>
+                ))}
+              </Menubar>
+            </nav>
 
             <Avatar className="h-9 w-9">
               <AvatarImage
