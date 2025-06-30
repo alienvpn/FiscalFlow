@@ -26,16 +26,21 @@ const structureItems = [
     description: "Manage specific teams or units within a department.",
     href: "/master-data/sub-departments",
   },
+  {
+    title: "Suppliers / Vendors",
+    description: "Manage suppliers, vendors, and service providers.",
+    href: "/master-data/vendors",
+  },
 ];
 
 export default function CompanyProfilePage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h2 className="text-[14px] font-bold tracking-tight mb-2">
-        Company Profile & Structure
+        Master Data
       </h2>
       <p className="text-muted-foreground mb-6 text-[12px]">
-        Select a category to manage the organizational structure.
+        Select a category to manage your master data.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {structureItems.map((item) => (

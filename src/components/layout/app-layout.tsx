@@ -48,6 +48,11 @@ const menuItems = [
     label: "Master Data",
     icon: Icons.MasterData,
   },
+  {
+    href: "/master-data/vendors",
+    label: "Vendors",
+    icon: Icons.Vendors,
+  },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -73,7 +78,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref>
+                <Link href={item.href}>
                   <SidebarMenuButton
                     isActive={pathname === item.href}
                     tooltip={{ children: item.label }}
