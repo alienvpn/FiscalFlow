@@ -1,9 +1,10 @@
-
 // --- MOCK DATA (should be fetched from an API in a real app) ---
 
+export const groups = [{ id: "grp-1", name: "Global Tech Inc." }];
+
 export const organizations = [
-  { id: "org-1", name: "Qatar Branch" },
-  { id: "org-2", name: "UAE Branch" },
+  { id: "org-1", name: "Qatar Branch", groupId: "grp-1" },
+  { id: "org-2", name: "UAE Branch", groupId: "grp-1" },
 ];
 
 export const departments = [

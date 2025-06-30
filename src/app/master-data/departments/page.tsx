@@ -37,13 +37,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Icons } from "@/components/icons";
-
-const initialOrganizations = [
-  { id: "org-1", name: "Qatar Branch", groupId: "grp-1" },
-];
-const initialDepartments = [
-  { id: "dept-1", name: "IT Division", organizationId: "org-1" },
-];
+import {
+  organizations as initialOrganizations,
+  departments as initialDepartments,
+} from "@/lib/mock-data";
 
 export default function DepartmentsPage() {
   const [organizations, setOrganizations] =

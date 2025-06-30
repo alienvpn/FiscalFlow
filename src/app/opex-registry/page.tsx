@@ -40,10 +40,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
+import { organizations, departments } from "@/lib/mock-data";
 
 // Mock data
-const organizations = [{ id: "org-1", name: "Qatar Branch" }];
-const departments = [{ id: "dept-1", name: "IT Division" }];
 const suppliers = [
     { id: "sup-1", name: "AWS" },
     { id: "sup-2", name: "Salesforce" },

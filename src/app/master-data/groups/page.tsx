@@ -30,8 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
-
-const initialGroups = [{ id: "grp-1", name: "Global Tech Inc." }];
+import { groups as initialGroups } from "@/lib/mock-data";
 
 export default function GroupsPage() {
   const [groups, setGroups] = React.useState(initialGroups);

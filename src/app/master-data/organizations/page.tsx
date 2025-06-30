@@ -37,11 +37,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Icons } from "@/components/icons";
-
-const initialGroups = [{ id: "grp-1", name: "Global Tech Inc." }];
-const initialOrganizations = [
-  { id: "org-1", name: "Qatar Branch", groupId: "grp-1" },
-];
+import {
+  groups as initialGroups,
+  organizations as initialOrganizations,
+} from "@/lib/mock-data";
 
 export default function OrganizationsPage() {
   const [groups, setGroups] = React.useState(initialGroups);

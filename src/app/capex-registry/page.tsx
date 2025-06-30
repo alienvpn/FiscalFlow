@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -40,10 +41,8 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
+import { organizations, departments } from "@/lib/mock-data";
 
-// Mock data, this would typically come from an API
-const organizations = [{ id: "org-1", name: "Qatar Branch" }];
-const departments = [{ id: "dept-1", name: "IT Division" }];
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
 

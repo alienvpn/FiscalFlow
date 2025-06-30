@@ -37,13 +37,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Icons } from "@/components/icons";
-
-const initialDepartments = [
-  { id: "dept-1", name: "IT Division", organizationId: "org-1" },
-];
-const initialSubDepartments = [
-  { id: "sub-dept-1", name: "Infrastructure", departmentId: "dept-1" },
-];
+import {
+  departments as initialDepartments,
+  subDepartments as initialSubDepartments,
+} from "@/lib/mock-data";
 
 export default function SubDepartmentsPage() {
   const [departments, setDepartments] = React.useState(initialDepartments);

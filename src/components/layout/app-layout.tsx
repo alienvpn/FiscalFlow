@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Menubar,
   MenubarContent,
@@ -11,8 +11,16 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { menuItems } from "@/lib/navigation";
+import { usePathname } from "next/navigation";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
+
+  if (isLoginPage) {
+    return <main className="flex-1">{children}</main>;
+  }
+  
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -71,15 +79,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </Menubar>
             </div>
-
-            <Avatar className="h-9 w-9">
-              <AvatarImage
-                src="https://placehold.co/100x100.png"
-                alt="User"
-                data-ai-hint="user avatar"
-              />
-              <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
+            <Link href="/login" passHref>
+              <Button variant="outline">Login</Button>
+            </Link>
           </div>
         </div>
       </header>
