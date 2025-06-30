@@ -211,7 +211,6 @@ export default function UserManagementPage() {
                             <FormLabel className="col-span-1 font-normal">
                               {module}
                             </FormLabel>
-                            <FormControl>
                               <RadioGroup
                                 onValueChange={field.onChange}
                                 value={field.value}
@@ -230,7 +229,6 @@ export default function UserManagementPage() {
                                   <RadioGroupItem value="full-access" />
                                 </div>
                               </RadioGroup>
-                            </FormControl>
                           </FormItem>
                         )}
                       />
@@ -251,6 +249,3 @@ export default function UserManagementPage() {
     </div>
   );
 }
-
-
-    
