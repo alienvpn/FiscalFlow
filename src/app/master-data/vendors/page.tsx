@@ -41,11 +41,13 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
+import { countryCityData } from "@/lib/location-data";
 
 const vendorSchema = z.object({
   companyName: z.string().min(1, "Company Name is required."),
   address: z.string().min(1, "Address is required."),
   country: z.string().min(1, "Country is required."),
+  city: z.string().min(1, "City is required."),
   email: z.string().email("Invalid email address."),
   telephone: z.string().min(1, "Telephone is required."),
   fax: z.string().optional(),
@@ -87,8 +89,9 @@ const initialVendors: VendorFormValues[] = [
     {
         id: "vendor-1",
         companyName: "Global Tech Supplies",
-        address: "123 Tech Avenue, Silicon Valley, CA",
+        address: "123 Tech Avenue",
         country: "United States",
+        city: "Los Angeles",
         email: "contact@globaltech.com",
         telephone: "1-800-555-1234",
         fax: "",
@@ -109,8 +112,9 @@ const initialVendors: VendorFormValues[] = [
     {
         id: "vendor-2",
         companyName: "Creative Solutions LLC",
-        address: "456 Marketing Blvd, New York, NY",
+        address: "456 Marketing Blvd",
         country: "United States",
+        city: "New York City",
         email: "hello@creativesolutions.com",
         telephone: "1-212-555-5678",
         fax: "",
@@ -134,6 +138,7 @@ const defaultValues: Partial<VendorFormValues> = {
     companyName: "",
     address: "",
     country: "",
+    city: "",
     email: "",
     telephone: "",
     fax: "",
@@ -152,48 +157,37 @@ const defaultValues: Partial<VendorFormValues> = {
     techSupport3: { name: "", email: "", telephone: "", mobile: "" },
 };
 
-const countries = [
-  "Afghanistan", "Algeria", "Angola", "Argentina", "Australia", "Austria",
-  "Bahrain", "Bangladesh", "Belarus", "Belgium", "Benin", "Bolivia", "Botswana", "Brazil", "Bulgaria",
-  "Cambodia", "Cameroon", "Canada", "Chad", "Chile", "China", "Colombia", "Congo, Democratic Republic of the", "Croatia", "Cyprus", "Czech Republic",
-  "Denmark",
-  "Ecuador", "Egypt", "Estonia", "Ethiopia",
-  "Fiji", "Finland", "France",
-  "Gabon", "Germany", "Ghana", "Greece", "Guinea",
-  "Hungary",
-  "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast",
-  "Japan", "Jordan",
-  "Kazakhstan", "Kenya", "Kuwait",
-  "Laos", "Latvia", "Lebanon", "Libya", "Lithuania", "Luxembourg",
-  "Madagascar", "Malaysia", "Mali", "Mexico", "Mongolia", "Morocco", "Mozambique", "Myanmar",
-  "Namibia", "Nepal", "Netherlands", "New Zealand", "Niger", "Nigeria", "Norway",
-  "Oman",
-  "Pakistan", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
-  "Qatar",
-  "Romania", "Russia",
-  "Saudi Arabia", "Senegal", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria",
-  "Tanzania", "Thailand", "Tunisia", "Turkey",
-  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
-  "Venezuela", "Vietnam",
-  "Yemen",
-  "Zambia", "Zimbabwe",
-].sort();
-
 export default function VendorsPage() {
   const [vendors, setVendors] = React.useState<VendorFormValues[]>(initialVendors);
   const [editingVendorId, setEditingVendorId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("view");
+  const [cities, setCities] = React.useState<string[]>([]);
 
   const form = useForm<z.infer<typeof vendorSchema>>({
     resolver: zodResolver(vendorSchema),
     defaultValues: defaultValues,
   });
 
+  const selectedCountry = form.watch("country");
+
+  React.useEffect(() => {
+    if (selectedCountry) {
+      const countryData = countryCityData.find(c => c.name === selectedCountry);
+      setCities(countryData?.cities || []);
+      form.setValue("city", "");
+    } else {
+      setCities([]);
+    }
+  }, [selectedCountry, form]);
+  
   React.useEffect(() => {
     if (editingVendorId) {
       const vendorToEdit = vendors.find((v) => v.id === editingVendorId);
       if (vendorToEdit) {
         form.reset(vendorToEdit);
+        const countryData = countryCityData.find(c => c.name === vendorToEdit.country);
+        setCities(countryData?.cities || []);
+        form.setValue("city", vendorToEdit.city);
       }
     } else {
       form.reset(defaultValues);
@@ -316,6 +310,7 @@ export default function VendorsPage() {
                       <TableRow>
                         <TableHead>Company Name</TableHead>
                         <TableHead>Country</TableHead>
+                        <TableHead>City</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Account Manager</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -329,6 +324,9 @@ export default function VendorsPage() {
                           </TableCell>
                           <TableCell className="text-[11px]">
                             {vendor.country}
+                          </TableCell>
+                          <TableCell className="text-[11px]">
+                            {vendor.city}
                           </TableCell>
                           <TableCell className="text-[11px]">
                             {vendor.email}
@@ -393,7 +391,7 @@ export default function VendorsPage() {
                         )}
                       />
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-3 gap-4">
                          <FormField
                           control={form.control}
                           name="address"
@@ -402,7 +400,7 @@ export default function VendorsPage() {
                               <FormLabel className="text-[12px]">Address</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="PO.Box, Street Name, Zone, City"
+                                  placeholder="PO.Box, Street Name, Zone"
                                   className="text-[11px]"
                                   {...field}
                                 />
@@ -427,13 +425,13 @@ export default function VendorsPage() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {countries.map((country) => (
+                                  {countryCityData.map((country) => (
                                     <SelectItem
-                                      key={country}
-                                      value={country}
+                                      key={country.name}
+                                      value={country.name}
                                       className="text-[11px]"
                                     >
-                                      {country}
+                                      {country.name}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -442,6 +440,38 @@ export default function VendorsPage() {
                             </FormItem>
                           )}
                         />
+                         <FormField
+                            control={form.control}
+                            name="city"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel className="text-[12px]">City</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    disabled={!selectedCountry || cities.length === 0}
+                                >
+                                    <FormControl>
+                                    <SelectTrigger className="text-[11px]">
+                                        <SelectValue placeholder="Select a city" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {cities.map((city) => (
+                                        <SelectItem
+                                        key={city}
+                                        value={city}
+                                        className="text-[11px]"
+                                        >
+                                        {city}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <FormField
