@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -294,23 +293,28 @@ export default function CreateUserPage() {
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
                               <FormItem className="space-y-3">
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                  className="flex flex-col space-y-2"
-                                >
-                                  {accessLevels.map((level) => (
-                                    <div key={level} className="flex items-center space-x-3">
-                                      <RadioGroupItem
-                                        value={level}
-                                        id={`${field.name}-${level.replace(/\s+/g, '-')}`}
-                                      />
-                                      <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
-                                        {level}
-                                      </Label>
-                                    </div>
-                                  ))}
-                                </RadioGroup>
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="flex flex-col space-y-2"
+                                  >
+                                    {accessLevels.map((level) => (
+                                      <div key={level} className="flex items-center space-x-3">
+                                        <RadioGroupItem
+                                          value={level}
+                                          id={`${item.id}-${level.replace(/\s+/g, '-')}`}
+                                        />
+                                        <Label
+                                          htmlFor={`${item.id}-${level.replace(/\s+/g, '-')}`}
+                                          className="font-normal text-[11px]"
+                                        >
+                                          {level}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -332,5 +336,3 @@ export default function CreateUserPage() {
     </div>
   );
 }
-
-    
