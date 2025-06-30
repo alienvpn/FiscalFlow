@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   groups,
   organizations,
@@ -37,584 +37,227 @@ import {
   subDepartments,
 } from "@/lib/mock-data";
 
-// Schemas
-const userLoginSchema = z.object({
-  identifier: z.string().min(1, "Username or Email is required."),
-  password: z.string().min(1, "Password is required."),
-});
-
-const groupLoginSchema = z.object({
-  groupId: z.string().min(1, "Group is required."),
-  password: z.string().min(1, "Password is required."),
-});
-
-const orgLoginSchema = z.object({
-  groupId: z.string().min(1, "Group is required."),
-  organizationId: z.string().min(1, "Organization is required."),
-  password: z.string().min(1, "Password is required."),
-});
-
-const deptLoginSchema = z.object({
-  groupId: z.string().min(1, "Group is required."),
-  organizationId: z.string().min(1, "Organization is required."),
-  departmentId: z.string().min(1, "Department is required."),
-  password: z.string().min(1, "Password is required."),
-});
-
-const subDeptLoginSchema = z.object({
+const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
   organizationId: z.string().min(1, "Organization is required."),
   departmentId: z.string().min(1, "Department is required."),
   subDepartmentId: z.string().min(1, "Sub-department is required."),
+  username: z.string().min(1, "Username is required."),
   password: z.string().min(1, "Password is required."),
 });
 
 export default function LoginPage() {
-  const userForm = useForm<z.infer<typeof userLoginSchema>>({
-    resolver: zodResolver(userLoginSchema),
-    defaultValues: { identifier: "", password: "" },
-  });
+  const router = useRouter();
 
-  const groupForm = useForm<z.infer<typeof groupLoginSchema>>({
-    resolver: zodResolver(groupLoginSchema),
-    defaultValues: { groupId: "", password: "" },
-  });
-
-  const orgForm = useForm<z.infer<typeof orgLoginSchema>>({
-    resolver: zodResolver(orgLoginSchema),
-    defaultValues: { groupId: "", organizationId: "", password: "" },
-  });
-
-  const deptForm = useForm<z.infer<typeof deptLoginSchema>>({
-    resolver: zodResolver(deptLoginSchema),
-    defaultValues: {
-      groupId: "",
-      organizationId: "",
-      departmentId: "",
-      password: "",
-    },
-  });
-
-  const subDeptForm = useForm<z.infer<typeof subDeptLoginSchema>>({
-    resolver: zodResolver(subDeptLoginSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       groupId: "",
       organizationId: "",
       departmentId: "",
       subDepartmentId: "",
+      username: "",
       password: "",
     },
   });
 
   // Watchers for dependent dropdowns
-  const orgFormGroupId = orgForm.watch("groupId");
-  const deptFormGroupId = deptForm.watch("groupId");
-  const deptFormOrgId = deptForm.watch("organizationId");
-  const subDeptFormGroupId = subDeptForm.watch("groupId");
-  const subDeptFormOrgId = subDeptForm.watch("organizationId");
-  const subDeptFormDeptId = subDeptForm.watch("departmentId");
+  const groupId = form.watch("groupId");
+  const organizationId = form.watch("organizationId");
+  const departmentId = form.watch("departmentId");
 
-  const availableOrgsForOrgForm = React.useMemo(
-    () => organizations.filter((o) => o.groupId === orgFormGroupId),
-    [orgFormGroupId]
+  const availableOrganizations = React.useMemo(
+    () => organizations.filter((o) => o.groupId === groupId),
+    [groupId]
   );
-  const availableOrgsForDeptForm = React.useMemo(
-    () => organizations.filter((o) => o.groupId === deptFormGroupId),
-    [deptFormGroupId]
+  const availableDepartments = React.useMemo(
+    () => departments.filter((d) => d.organizationId === organizationId),
+    [organizationId]
   );
-  const availableDepts = React.useMemo(
-    () => departments.filter((d) => d.organizationId === deptFormOrgId),
-    [deptFormOrgId]
-  );
-  const availableOrgsForSubDeptForm = React.useMemo(
-    () => organizations.filter((o) => o.groupId === subDeptFormGroupId),
-    [subDeptFormGroupId]
-  );
-  const availableDeptsForSubDeptForm = React.useMemo(
-    () => departments.filter((d) => d.organizationId === subDeptFormOrgId),
-    [subDeptFormOrgId]
-  );
-  const availableSubDepts = React.useMemo(
-    () => subDepartments.filter((sd) => sd.departmentId === subDeptFormDeptId),
-    [subDeptFormDeptId]
+  const availableSubDepartments = React.useMemo(
+    () => subDepartments.filter((sd) => sd.departmentId === departmentId),
+    [departmentId]
   );
 
   React.useEffect(() => {
-    orgForm.setValue("organizationId", "");
-  }, [orgFormGroupId, orgForm]);
-  React.useEffect(() => {
-    deptForm.setValue("organizationId", "");
-  }, [deptFormGroupId, deptForm]);
-  React.useEffect(() => {
-    deptForm.setValue("departmentId", "");
-  }, [deptFormOrgId, deptForm]);
-  React.useEffect(() => {
-    subDeptForm.setValue("organizationId", "");
-  }, [subDeptFormGroupId, subDeptForm]);
-  React.useEffect(() => {
-    subDeptForm.setValue("departmentId", "");
-  }, [subDeptFormOrgId, subDeptForm]);
-  React.useEffect(() => {
-    subDeptForm.setValue("subDepartmentId", "");
-  }, [subDeptFormDeptId, subDeptForm]);
+    form.setValue("organizationId", "");
+  }, [groupId, form]);
 
-  function onUserSubmit(values: z.infer<typeof userLoginSchema>) {
-    console.log("User Login:", values);
-  }
-  function onGroupSubmit(values: z.infer<typeof groupLoginSchema>) {
-    console.log("Group Login:", values);
-  }
-  function onOrgSubmit(values: z.infer<typeof orgLoginSchema>) {
-    console.log("Organization Login:", values);
-  }
-  function onDeptSubmit(values: z.infer<typeof deptLoginSchema>) {
-    console.log("Department Login:", values);
-  }
-  function onSubDeptSubmit(values: z.infer<typeof subDeptLoginSchema>) {
-    console.log("Sub-Department Login:", values);
+  React.useEffect(() => {
+    form.setValue("departmentId", "");
+  }, [organizationId, form]);
+
+  React.useEffect(() => {
+    form.setValue("subDepartmentId", "");
+  }, [departmentId, form]);
+
+  function onSubmit(values: z.infer<typeof loginSchema>) {
+    console.log("Login submitted:", values);
+    // On successful login, redirect to the home page
+    router.push("/home");
   }
 
   return (
     <div className="container flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-lg mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Select your login method and enter your credentials.
+            Please enter your credentials to access the application.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="user" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="user">User</TabsTrigger>
-              <TabsTrigger value="group">Group</TabsTrigger>
-              <TabsTrigger value="organization">Org</TabsTrigger>
-              <TabsTrigger value="department">Dept</TabsTrigger>
-              <TabsTrigger value="subdepartment">Sub-Dept</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="user" className="pt-4">
-              <Form {...userForm}>
-                <form
-                  onSubmit={userForm.handleSubmit(onUserSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={userForm.control}
-                    name="identifier"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username or Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="user@example.com or username"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={userForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Login as User
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="group" className="pt-4">
-              <Form {...groupForm}>
-                <form
-                  onSubmit={groupForm.handleSubmit(onGroupSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={groupForm.control}
-                    name="groupId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Group</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a group" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {groups.map((g) => (
-                              <SelectItem key={g.id} value={g.id}>
-                                {g.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={groupForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Login as Group
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="organization" className="pt-4">
-              <Form {...orgForm}>
-                <form
-                  onSubmit={orgForm.handleSubmit(onOrgSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={orgForm.control}
-                    name="groupId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Group</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a group" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {groups.map((g) => (
-                              <SelectItem key={g.id} value={g.id}>
-                                {g.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={orgForm.control}
-                    name="organizationId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organization</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!orgFormGroupId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an organization" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableOrgsForOrgForm.map((o) => (
-                              <SelectItem key={o.id} value={o.id}>
-                                {o.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={orgForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Login as Organization
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="department" className="pt-4">
-              <Form {...deptForm}>
-                <form
-                  onSubmit={deptForm.handleSubmit(onDeptSubmit)}
-                  className="space-y-6"
-                >
-                  <FormField
-                    control={deptForm.control}
-                    name="groupId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Group</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a group" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {groups.map((g) => (
-                              <SelectItem key={g.id} value={g.id}>
-                                {g.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={deptForm.control}
-                    name="organizationId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organization</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!deptFormGroupId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an organization" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableOrgsForDeptForm.map((o) => (
-                              <SelectItem key={o.id} value={o.id}>
-                                {o.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={deptForm.control}
-                    name="departmentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Department</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!deptFormOrgId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a department" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableDepts.map((d) => (
-                              <SelectItem key={d.id} value={d.id}>
-                                {d.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={deptForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Login as Department
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="subdepartment" className="pt-4">
-              <Form {...subDeptForm}>
-                <form
-                  onSubmit={subDeptForm.handleSubmit(onSubDeptSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={subDeptForm.control}
-                    name="groupId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Group</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a group" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {groups.map((g) => (
-                              <SelectItem key={g.id} value={g.id}>
-                                {g.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={subDeptForm.control}
-                    name="organizationId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organization</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!subDeptFormGroupId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an organization" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableOrgsForSubDeptForm.map((o) => (
-                              <SelectItem key={o.id} value={o.id}>
-                                {o.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={subDeptForm.control}
-                    name="departmentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Department</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!subDeptFormOrgId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a department" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableDeptsForSubDeptForm.map((d) => (
-                              <SelectItem key={d.id} value={d.id}>
-                                {d.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={subDeptForm.control}
-                    name="subDepartmentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sub-Department</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!subDeptFormDeptId}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a sub-department" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableSubDepts.map((sd) => (
-                              <SelectItem key={sd.id} value={sd.id}>
-                                {sd.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={subDeptForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Login as Sub-Department
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-          </Tabs>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="groupId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Group</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a group" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {groups.map((g) => (
+                          <SelectItem key={g.id} value={g.id}>
+                            {g.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="organizationId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Organization</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!groupId}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an organization" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableOrganizations.map((o) => (
+                          <SelectItem key={o.id} value={o.id}>
+                            {o.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="departmentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!organizationId}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a department" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableDepartments.map((d) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="subDepartmentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sub-Department</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!departmentId}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a sub-department" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableSubDepartments.map((sd) => (
+                          <SelectItem key={sd.id} value={sd.id}>
+                            {sd.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full">
+                Login
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
