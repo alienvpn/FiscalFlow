@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
-import { organizations, departments } from "@/lib/mock-data";
+import { organizations, departments, capexSheets } from "@/lib/mock-data";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
@@ -56,6 +56,8 @@ const capexItemSchema = z.object({
   remarks: z.string().optional(),
 });
 
+type CapexItem = z.infer<typeof capexItemSchema>;
+
 const capexRegistrySchema = z.object({
   organization: z.string().min(1, "Organization is required."),
   department: z.string().min(1, "Department is required."),
@@ -66,6 +68,8 @@ const capexRegistrySchema = z.object({
 type CapexFormValues = z.infer<typeof capexRegistrySchema>;
 
 export default function CapexRegistryPage() {
+  const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[] | null>(null);
+
   const form = useForm<CapexFormValues>({
     resolver: zodResolver(capexRegistrySchema),
     defaultValues: {
@@ -84,6 +88,20 @@ export default function CapexRegistryPage() {
   const watchedItems = form.watch("items");
   const { organization, department, year } = form.watch();
 
+  React.useEffect(() => {
+    if (organization && department && year) {
+        const prevYear = (parseInt(year, 10) - 1).toString();
+        const sheet = capexSheets.find(s => 
+            s.year === prevYear && 
+            s.organizationId === organization && 
+            s.departmentId === department
+        );
+        setPreviousYearItems(sheet ? sheet.items : null);
+    } else {
+        setPreviousYearItems(null);
+    }
+  }, [organization, department, year]);
+
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
       const quantity = item.quantity || 0;
@@ -92,11 +110,11 @@ export default function CapexRegistryPage() {
     }, 0);
   }, [watchedItems]);
 
-  const generateCapexSeqNum = (index: number) => {
+  const generateCapexSeqNum = (index: number, seqYear: string = year) => {
     const orgName = organizations.find((o) => o.id === organization)?.name.substring(0, 3).toUpperCase() || 'ORG';
     const deptName = departments.find((d) => d.id === department)?.name.substring(0, 4).toUpperCase() || 'DEPT';
     const itemNum = (index + 1).toString().padStart(3, '0');
-    return `${orgName}/${deptName}/${year}/${itemNum}`;
+    return `${orgName}/${deptName}/${seqYear}/${itemNum}`;
   };
 
   function onSubmit(values: CapexFormValues) {
@@ -199,6 +217,49 @@ export default function CapexRegistryPage() {
               </div>
             </CardContent>
           </Card>
+          
+          {previousYearItems && previousYearItems.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[13px]">Reference: {(parseInt(year, 10) - 1)} CAPEX Sheet</CardTitle>
+                <CardDescription className="text-[12px]">Items from the previous year for your reference.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[150px] text-[12px]">CAPEX Seq. No</TableHead>
+                      <TableHead className="w-[250px] text-[12px]">Description</TableHead>
+                      <TableHead className="w-[120px] text-[12px]">Priority</TableHead>
+                      <TableHead className="w-[80px] text-[12px]">Qty</TableHead>
+                      <TableHead className="w-[120px] text-[12px]">Amount (QAR)</TableHead>
+                      <TableHead className="w-[120px] text-right text-[12px]">Total (QAR)</TableHead>
+                      <TableHead className="w-[250px] text-[12px]">Justification</TableHead>
+                      <TableHead className="w-[250px] text-[12px]">Remarks</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {previousYearItems.map((item, index) => {
+                      const total = (item.quantity || 0) * (item.amount || 0);
+                      const prevYear = (parseInt(year, 10) - 1).toString();
+                      return (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium text-[11px]">{generateCapexSeqNum(index, prevYear)}</TableCell>
+                          <TableCell className="text-[11px]">{item.description}</TableCell>
+                          <TableCell className="text-[11px]">{item.priority}</TableCell>
+                          <TableCell className="text-[11px]">{item.quantity.toLocaleString()}</TableCell>
+                          <TableCell className="text-[11px]">{item.amount.toLocaleString()}</TableCell>
+                          <TableCell className="text-right font-medium text-[11px]">{total.toLocaleString()}</TableCell>
+                          <TableCell className="text-[11px]">{item.justification}</TableCell>
+                          <TableCell className="text-[11px]">{item.remarks}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>

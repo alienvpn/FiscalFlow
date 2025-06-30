@@ -159,4 +159,24 @@ export const opexSheets = [
     ]
   }
 ];
+
+export const capexSheets = [
+  {
+    year: (new Date().getFullYear() - 1).toString(),
+    organizationId: 'org-1',
+    departmentId: 'dept-1',
+    items: [
+      { id: 'prev-capex-item-1', description: 'New Developer Laptops (10x)', priority: 'High', quantity: 10, amount: 6000, justification: 'To replace aging hardware for the development team', remarks: 'Model: MacBook Pro 16"' },
+      { id: 'prev-capex-item-2', description: 'Office Server Upgrade', priority: 'Medium', quantity: 1, amount: 15000, justification: 'Increase storage and processing power', remarks: 'Dell PowerEdge R750' },
+    ]
+  },
+  {
+    year: (new Date().getFullYear() - 1).toString(),
+    organizationId: 'org-1',
+    departmentId: 'dept-2',
+    items: [
+      { id: 'prev-capex-item-3', description: 'Video Production Camera', priority: 'High', quantity: 1, amount: 12000, justification: 'For creating high-quality marketing content', remarks: 'Sony A7S III' },
+    ]
+  }
+];
 // --- END MOCK DATA ---
