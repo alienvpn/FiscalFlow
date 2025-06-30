@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
+import { vendors, registryItems as initialItems } from "@/lib/mock-data"
 
 const serviceSchema = z.object({
   id: z.string().optional(),
@@ -81,43 +82,6 @@ const registrySchema = z.discriminatedUnion("type", [
 
 type RegistryFormValues = z.infer<typeof registrySchema>
 
-// Mock data, this would typically come from an API
-const vendors = [
-  { id: "ven-1", name: "AWS" },
-  { id: "ven-2", name: "Dell" },
-  { id: "ven-3", name: "Salesforce" },
-  { id: "ven-4", name: "Creative Co." },
-]
-
-const initialItems: RegistryFormValues[] = [
-    {
-        id: "item-1",
-        type: "device",
-        deviceDescription: "Dell XPS 15 Laptop",
-        model: "XPS 9530",
-        make: "Dell",
-        serialNumber: "SN-12345XYZ",
-        warrantyStartDate: new Date("2023-01-15"),
-        warrantyEndDate: new Date("2026-01-14"),
-    },
-    {
-        id: "item-2",
-        type: "service",
-        serviceDescription: "AWS Cloud Hosting",
-        supplierId: "ven-1", // Corresponds to AWS in vendors mock data
-        serviceStartDate: new Date("2024-01-01"),
-        serviceEndDate: new Date("2025-01-01"),
-    },
-    {
-        id: "item-3",
-        type: "device",
-        deviceDescription: "Logitech MX Master 3S Mouse",
-        model: "MX Master 3S",
-        make: "Logitech",
-        serialNumber: "SN-ABC9876",
-    },
-];
-
 const defaultValues = {
   type: "device" as const,
   deviceDescription: "",
@@ -130,7 +94,7 @@ const defaultValues = {
 }
 
 export default function ItemRegistryPage() {
-  const [items, setItems] = React.useState<RegistryFormValues[]>(initialItems)
+  const [items, setItems] = React.useState<RegistryFormValues[]>(initialItems.map(i => ({...i})))
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null)
   const [activeTab, setActiveTab] = React.useState("view")
 
@@ -240,7 +204,7 @@ export default function ItemRegistryPage() {
                         </TableCell>
                         <TableCell className="text-[11px] text-muted-foreground">
                           {item.type === "device" && `Model: ${item.model || "N/A"}`}
-                          {item.type === "service" && `Supplier: ${vendors.find(v => v.id === item.supplierId)?.name || "N/A"}`}
+                          {item.type === "service" && `Supplier: ${vendors.find(v => v.id === item.supplierId)?.companyName || "N/A"}`}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => item.id && handleEdit(item.id)}>
@@ -379,8 +343,8 @@ export default function ItemRegistryPage() {
                             </FormControl>
                             <SelectContent>
                               {vendors.map(vendor => (
-                                <SelectItem key={vendor.id} value={vendor.id} className="text-[11px]">
-                                  {vendor.name}
+                                <SelectItem key={vendor.id} value={vendor.id!} className="text-[11px]">
+                                  {vendor.companyName}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -464,5 +428,3 @@ export default function ItemRegistryPage() {
     </div>
   )
 }
-
-    

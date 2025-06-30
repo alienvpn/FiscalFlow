@@ -42,6 +42,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
 import { countryCityData } from "@/lib/location-data";
+import { vendors as initialVendors } from "@/lib/mock-data";
+
 
 const vendorSchema = z.object({
   companyName: z.string().min(1, "Company Name is required."),
@@ -85,55 +87,6 @@ const vendorSchema = z.object({
 
 type VendorFormValues = z.infer<typeof vendorSchema> & { id?: string };
 
-const initialVendors: VendorFormValues[] = [
-    {
-        id: "vendor-1",
-        companyName: "Global Tech Supplies",
-        address: "123 Tech Avenue",
-        country: "United States",
-        city: "Los Angeles",
-        email: "contact@globaltech.com",
-        telephone: "1-800-555-1234",
-        fax: "",
-        whatsapp: "",
-        website: "https://globaltech.com",
-        accountManager: {
-            name: "John Doe",
-            designation: "Senior Account Manager",
-            email: "john.doe@globaltech.com",
-            telephone: "1-800-555-1235",
-            mobile: "1-408-555-6789",
-            whatsapp: "",
-        },
-        techSupport1: { name: "", email: "", telephone: "", mobile: "" },
-        techSupport2: { name: "", email: "", telephone: "", mobile: "" },
-        techSupport3: { name: "", email: "", telephone: "", mobile: "" },
-    },
-    {
-        id: "vendor-2",
-        companyName: "Creative Solutions LLC",
-        address: "456 Marketing Blvd",
-        country: "United States",
-        city: "New York City",
-        email: "hello@creativesolutions.com",
-        telephone: "1-212-555-5678",
-        fax: "",
-        whatsapp: "",
-        website: "https://creativesolutions.com",
-        accountManager: {
-            name: "Jane Smith",
-            designation: "Client Partner",
-            email: "jane.s@creativesolutions.com",
-            telephone: "1-212-555-5679",
-            mobile: "1-917-555-1234",
-            whatsapp: "",
-        },
-        techSupport1: { name: "", email: "", telephone: "", mobile: "" },
-        techSupport2: { name: "", email: "", telephone: "", mobile: "" },
-        techSupport3: { name: "", email: "", telephone: "", mobile: "" },
-    }
-];
-
 const defaultValues: Partial<VendorFormValues> = {
     companyName: "",
     address: "",
@@ -158,7 +111,7 @@ const defaultValues: Partial<VendorFormValues> = {
 };
 
 export default function VendorsPage() {
-  const [vendors, setVendors] = React.useState<VendorFormValues[]>(initialVendors);
+  const [vendors, setVendors] = React.useState<VendorFormValues[]>(initialVendors.map(v => ({...v})));
   const [editingVendorId, setEditingVendorId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("view");
   const [cities, setCities] = React.useState<string[]>([]);

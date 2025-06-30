@@ -78,10 +78,10 @@ const recentExpenses = [
 export default function Dashboard() {
   const today = new Date();
   const activeContracts = initialContracts.filter((c) =>
-    isAfter(c.serviceEndDate, today)
+    c.serviceEndDate && isAfter(c.serviceEndDate, today)
   );
   const expiringSoonContracts = activeContracts.filter((c) =>
-    isBefore(c.serviceEndDate, addDays(today, 30))
+    c.serviceEndDate && isBefore(c.serviceEndDate, addDays(today, 30))
   );
 
   return (

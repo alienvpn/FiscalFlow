@@ -121,7 +121,7 @@ const FileInput = ({ label, fieldName, form }: { label: string, fieldName: any, 
 
 
 export default function ContractsPage() {
-    const [contracts, setContracts] = React.useState<ContractFormValues[]>(initialContracts);
+    const [contracts, setContracts] = React.useState<ContractFormValues[]>(initialContracts.map(c => ({...c})));
     const [editingContractId, setEditingContractId] = React.useState<string | null>(null);
     const [activeTab, setActiveTab] = React.useState("view");
     const [organizationFilter, setOrganizationFilter] = React.useState("all");
@@ -227,6 +227,13 @@ export default function ContractsPage() {
         setActiveTab("view");
     }
 
+    const getContractDescription = (contract: ContractFormValues) => {
+        const item = registryItems.find(i => i.id === contract.contractDescription);
+        if (!item) return "N/A";
+        return item.type === "device" ? item.deviceDescription : item.serviceDescription;
+    };
+
+
     return (
         <div className="container mx-auto p-4 md:p-8">
             <h2 className="text-[14px] font-bold tracking-tight mb-2">
@@ -291,8 +298,8 @@ export default function ContractsPage() {
                                     {filteredContracts.length > 0 ? (
                                         filteredContracts.map(contract => (
                                             <TableRow key={contract.id}>
-                                                <TableCell className="font-medium text-[11px]">{registryItems.find(i => i.id === contract.contractDescription)?.description}</TableCell>
-                                                <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.name}</TableCell>
+                                                <TableCell className="font-medium text-[11px]">{getContractDescription(contract)}</TableCell>
+                                                <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.companyName}</TableCell>
                                                 <TableCell className="text-[11px]">{contract.serviceEndDate ? format(contract.serviceEndDate, "PPP") : "N/A"}</TableCell>
                                                 <TableCell><Badge variant={getStatusBadgeVariant(contract.contractStatus)}>{contract.contractStatus || "N/A"}</Badge></TableCell>
                                                 <TableCell className="text-right">
@@ -320,9 +327,9 @@ export default function ContractsPage() {
                                 <CardHeader><CardTitle className="text-[13px]">Contract Details</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
                                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <FormField control={form.control} name="contractDescription" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Contract Description</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select an item/service" /></SelectTrigger></FormControl><SelectContent>{registryItems.map(item => (<SelectItem key={item.id} value={item.id} className="text-[11px]">{item.description}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                                        <FormField control={form.control} name="contractDescription" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Contract Description</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select an item/service" /></SelectTrigger></FormControl><SelectContent>{registryItems.map(item => (<SelectItem key={item.id} value={item.id} className="text-[11px]">{item.type === "device" ? item.deviceDescription : item.serviceDescription}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                         <FormField control={form.control} name="quantity" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Item/Service Quantity</FormLabel><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id} className="text-[11px]">{v.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                                        <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id} className="text-[11px]">{v.companyName}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-4 pt-4">
                                         <FormItem>
