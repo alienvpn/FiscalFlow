@@ -99,7 +99,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-4">
                   <ItemIcon className="h-8 w-8 text-primary" />
                   <div>
-                    <CardTitle>{item.title}</CardTitle>
+                    <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
                     <CardDescription className="mt-1">
                       {item.description}
                     </CardDescription>
