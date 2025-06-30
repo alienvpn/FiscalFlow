@@ -10,14 +10,14 @@ export default function HomePage() {
           Your central hub for budget and contract management.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-8">
         {allModules.map((item) => (
           <Link
             href={item.href}
             key={item.title}
             className="block rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
           >
-            <div className="relative flex flex-col justify-center items-center h-[123px] text-primary-foreground text-center bg-gradient-to-br from-primary via-primary/70 to-secondary">
+            <div className="relative flex flex-col justify-center items-center h-[118px] text-primary-foreground text-center bg-gradient-to-br from-primary via-primary/70 to-secondary">
               {/* Glossy effect */}
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
 
