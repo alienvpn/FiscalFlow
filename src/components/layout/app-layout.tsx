@@ -47,7 +47,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 href="/"
                 className={cn(
-                  "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground",
+                  "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none",
                   isMounted && pathname === "/" && "bg-accent"
                 )}
               >
@@ -58,7 +58,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 href="/dashboard"
                 className={cn(
-                  "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground",
+                  "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none",
                   isMounted && pathname === "/dashboard" && "bg-accent"
                 )}
               >
