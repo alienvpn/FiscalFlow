@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -40,7 +41,7 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
-import { organizations, departments, capexSheets } from "@/lib/mock-data";
+import { organizations, departments, capexSheets, approvalWorkflows } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 
 const currentYear = new Date().getFullYear();
@@ -110,7 +111,7 @@ export default function CapexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form]);
 
   const totalValue = React.useMemo(() => {
     return watchedItems.reduce((acc, item) => {
@@ -138,9 +139,11 @@ export default function CapexRegistryPage() {
 
   function onSubmit(values: CapexFormValues) {
     console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+    const firstApproverRole = approvalWorkflows.budget[0]?.approverRole || "First Approver";
+    console.log(`Simulated: Email notification sent to '${firstApproverRole}' for approval of CAPEX sheet.`);
     toast({
       title: "Sheet Submitted",
-      description: "Your CAPEX sheet has been sent for approval.",
+      description: `Your CAPEX sheet has been sent for approval to the ${firstApproverRole}.`,
     });
   }
 

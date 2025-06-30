@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -39,7 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
-import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
+import { organizations, departments, vendors, opexSheets, approvalWorkflows } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 
 const currentYear = new Date().getFullYear();
@@ -110,7 +111,7 @@ export default function OpexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -153,9 +154,11 @@ export default function OpexRegistryPage() {
 
   function onSubmit(values: OpexFormValues) {
     console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+    const firstApproverRole = approvalWorkflows.budget[0]?.approverRole || "First Approver";
+    console.log(`Simulated: Email notification sent to '${firstApproverRole}' for approval of OPEX sheet.`);
     toast({
       title: "Sheet Submitted",
-      description: "Your OPEX sheet has been sent for approval.",
+      description: `Your OPEX sheet has been sent for approval to the ${firstApproverRole}.`,
     });
   }
 
