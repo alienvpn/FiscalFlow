@@ -300,22 +300,22 @@ export default function CreateUserPage() {
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
                               <FormItem className="space-y-3">
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                  className="flex flex-col space-y-2"
-                                >
-                                  {accessLevels.map((level) => (
-                                    <FormItem key={level} className="flex items-center space-x-3 space-y-0">
-                                      <FormControl>
-                                        <RadioGroupItem value={level} id={`${item.moduleId}-${level}`} />
-                                      </FormControl>
-                                      <Label htmlFor={`${item.moduleId}-${level}`} className="font-normal text-[11px]">
-                                        {level}
-                                      </Label>
-                                    </FormItem>
-                                  ))}
-                                </RadioGroup>
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="flex flex-col space-y-2"
+                                  >
+                                    {accessLevels.map((level) => (
+                                      <div key={level} className="flex items-center space-x-3">
+                                        <RadioGroupItem value={level} id={`${item.id}-${level}`} />
+                                        <Label htmlFor={`${item.id}-${level}`} className="font-normal text-[11px]">
+                                          {level}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
