@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -37,8 +38,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
-import { organizations, departments, subDepartments } from "@/lib/mock-data"; // Assuming groups are not yet in mock-data
+import { Label } from "@/components/ui/label";
+import { organizations, departments, subDepartments } from "@/lib/mock-data";
 import { allModules } from "@/lib/navigation";
 
 const accessLevels = [
@@ -300,14 +301,12 @@ export default function CreateUserPage() {
                                     className="flex flex-col space-y-2"
                                   >
                                     {accessLevels.map((level) => (
-                                      <FormItem key={level} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                          <RadioGroupItem value={level} />
-                                        </FormControl>
-                                        <FormLabel className="font-normal text-[11px]">
+                                      <div key={level} className="flex items-center space-x-3 space-y-0">
+                                        <RadioGroupItem value={level} id={`${field.name}-${level.replace(/\s+/g, '-')}`} />
+                                        <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
                                           {level}
-                                        </FormLabel>
-                                      </FormItem>
+                                        </Label>
+                                      </div>
                                     ))}
                                   </RadioGroup>
                                 </FormControl>
