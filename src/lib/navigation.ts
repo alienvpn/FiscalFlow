@@ -22,7 +22,7 @@ export const menuItems: {
       },
       {
         title: "Create User",
-        href: "/master-data/users",
+        href: "/master-data/create-user",
         icon: Icons.UserPlus,
         description: "Create and manage application users and their permissions.",
       },
