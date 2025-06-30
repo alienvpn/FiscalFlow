@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "@/components/ui/datepicker"
+import { Separator } from "@/components/ui/separator"
 
 const serviceSchema = z.object({
   type: z.literal("service"),
@@ -251,7 +252,7 @@ export default function ItemRegistryPage() {
               <CardHeader>
                 <CardTitle className="text-[13px]">Device / Item Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
                   name="deviceDescription"
@@ -265,26 +266,42 @@ export default function ItemRegistryPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid md:grid-cols-3 gap-4">
-                    <FormField control={form.control} name="model" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Model</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="make" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Make</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="countryOfMake" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Country of Make</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="partNumber" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Part Number</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="serialNumber" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Serial Number</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="macAddress" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">MAC-Address</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                
+                <Separator />
+                
+                <div>
+                  <h3 className="text-[12px] font-medium mb-4">Specifications</h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                      <FormField control={form.control} name="model" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Model</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="make" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Make</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="countryOfMake" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Country of Make</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="partNumber" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Part Number</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="serialNumber" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Serial Number</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="macAddress" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">MAC-Address</FormLabel><FormControl><Input className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  </div>
                 </div>
-                <CardDescription className="text-[12px] pt-4">Dates</CardDescription>
-                <div className="grid md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="manufactureDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Manufacture Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="expireDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Expire Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="endOfSalesDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Sales Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="endOfSupportDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Support Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="endOfLifeDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Life Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+
+                <Separator />
+
+                <div>
+                  <h3 className="text-[12px] font-medium mb-4">Lifecycle Dates</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="manufactureDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Manufacture Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="expireDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Expire Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="endOfSalesDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Sales Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="endOfSupportDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Support Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="endOfLifeDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">End of Life Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                  </div>
                 </div>
-                <CardDescription className="text-[12px] pt-4">Warranty</CardDescription>
-                 <div className="grid md:grid-cols-2 gap-4">
-                     <FormField control={form.control} name="warrantyStartDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty Start Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="warrantyEndDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty End Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                
+                <Separator />
+
+                <div>
+                    <h3 className="text-[12px] font-medium mb-4">Warranty</h3>
+                   <div className="grid md:grid-cols-2 gap-4">
+                       <FormField control={form.control} name="warrantyStartDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty Start Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={form.control} name="warrantyEndDate" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Warranty End Date</FormLabel><FormControl><DatePicker value={field.value} onChange={field.onChange} placeholder="Select date" /></FormControl><FormMessage /></FormItem>)} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
