@@ -3,15 +3,12 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 import { modules } from "@/lib/navigation";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -34,26 +31,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="h-4 w-4" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Modules</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {modules.map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <Link href={item.href}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Menubar className="border-none bg-transparent p-0">
+              <MenubarMenu>
+                <MenubarTrigger>Modules</MenubarTrigger>
+                <MenubarContent align="end">
+                  {modules.map((item) => (
+                    <MenubarItem key={item.title} asChild>
+                      <Link href={item.href}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </MenubarItem>
+                  ))}
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
 
             <Avatar className="h-9 w-9">
               <AvatarImage
