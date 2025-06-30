@@ -294,22 +294,21 @@ export default function CreateUserPage() {
                             name={`moduleAccess.${index}.accessLevel`}
                             render={({ field }) => (
                               <FormItem className="space-y-3">
-                                <FormControl>
-                                  <RadioGroup
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    className="flex flex-col space-y-2"
-                                  >
-                                    {accessLevels.map((level) => (
-                                      <div key={level} className="flex items-center space-x-3 space-y-0">
-                                        <RadioGroupItem value={level} id={`${field.name}-${level.replace(/\s+/g, '-')}`} />
-                                        <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
-                                          {level}
-                                        </Label>
-                                      </div>
-                                    ))}
-                                  </RadioGroup>
-                                </FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                  className="flex flex-col space-y-2"
+                                  ref={field.ref}
+                                >
+                                  {accessLevels.map((level) => (
+                                    <div key={level} className="flex items-center space-x-3 space-y-0">
+                                      <RadioGroupItem value={level} id={`${field.name}-${level.replace(/\s+/g, '-')}`} />
+                                      <Label htmlFor={`${field.name}-${level.replace(/\s+/g, '-')}`} className="font-normal text-[11px]">
+                                        {level}
+                                      </Label>
+                                    </div>
+                                  ))}
+                                </RadioGroup>
                                 <FormMessage />
                               </FormItem>
                             )}
