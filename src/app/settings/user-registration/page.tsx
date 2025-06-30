@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -38,6 +39,7 @@ import {
   organizations as allOrganizations,
   departments as allDepartments,
   subDepartments as allSubDepartments,
+  approvalMatrix,
 } from "@/lib/mock-data";
 
 const permissionsSchema = z.record(z.enum(["read", "write", "full", "none"]));
@@ -51,6 +53,7 @@ const userRegistrationSchema = z
     username: z.string().min(3, "Username must be at least 3 characters."),
     email: z.string().email("Invalid email address."),
     mobile: z.string().min(1, "Mobile number is required."),
+    userRole: z.string().optional(),
     password: z.string().min(8, "Password must be at least 8 characters."),
     confirmPassword: z.string(),
     permissions: permissionsSchema,
@@ -83,6 +86,7 @@ export default function UserRegistrationPage() {
       username: "",
       email: "",
       mobile: "",
+      userRole: "",
       password: "",
       confirmPassword: "",
       permissions: defaultPermissions,
@@ -146,9 +150,34 @@ export default function UserRegistrationPage() {
                   <FormField control={form.control} name="subDepartmentId" render={({ field }) => (<FormItem><FormLabel>Sub Department</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!departmentId}><FormControl><SelectTrigger><SelectValue placeholder="Select a sub-department" /></SelectTrigger></FormControl><SelectContent>{availableSubDepartments.map((sd) => (<SelectItem key={sd.id} value={sd.id}>{sd.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                 </div>
                 <Separator />
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-3 gap-4">
                   <FormField control={form.control} name="username" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
                   <FormField control={form.control} name="mobile" render={({ field }) => (<FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField
+                    control={form.control}
+                    name="userRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>User Role (Approval)</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="">None</SelectItem>
+                            {approvalMatrix.map((level) => (
+                              <SelectItem key={level.id} value={level.approverRole}>
+                                {level.approverRole}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                  <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                 <div className="grid md:grid-cols-2 gap-4">

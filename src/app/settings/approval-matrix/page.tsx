@@ -75,7 +75,7 @@ export default function ApprovalMatrixPage() {
         Approval Matrix
       </h2>
       <p className="text-muted-foreground mb-6 text-[12px]">
-        Define the multi-level approval workflow for all budget sheets.
+        Define the roles and levels for the approval workflow. These roles can be assigned to users in the User Registration page.
       </p>
 
       <Form {...form}>
@@ -93,7 +93,7 @@ export default function ApprovalMatrixPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[100px]">Level</TableHead>
-                      <TableHead>Approver Role / Title</TableHead>
+                      <TableHead>Role / Title</TableHead>
                       <TableHead>Description / Condition</TableHead>
                       <TableHead className="w-[50px] text-right">Actions</TableHead>
                     </TableRow>
