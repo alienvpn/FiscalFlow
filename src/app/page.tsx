@@ -1,13 +1,4 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { allModules } from "@/lib/navigation";
 
 export default function HomePage() {
@@ -20,34 +11,26 @@ export default function HomePage() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {allModules.map((item) => {
-          const ItemIcon = item.icon;
-          return (
-            <Card
-              key={item.title}
-              className="flex flex-col justify-between hover:shadow-lg transition-shadow"
-            >
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <ItemIcon className="h-8 w-8 text-primary" />
-                  <div>
-                    <CardTitle>{item.title}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {item.description}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Link href={item.href}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Go to {item.title} <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {allModules.map((item) => (
+          <Link
+            href={item.href}
+            key={item.title}
+            className="block rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
+          >
+            <div className="relative flex flex-col justify-center items-center h-32 text-white text-center bg-gradient-to-r from-cyan-400 to-indigo-600">
+              {/* Glossy effect */}
+              <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
+
+              <div className="relative z-10 w-full px-4">
+                <div className="w-full h-px bg-white/50 mb-2" />
+                <h2 className="py-2 text-xl font-bold tracking-wide uppercase">
+                  {item.title}
+                </h2>
+                <div className="w-full h-px bg-white/50 mt-2" />
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
