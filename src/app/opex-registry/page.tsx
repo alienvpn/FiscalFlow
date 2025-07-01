@@ -109,10 +109,19 @@ export default function OpexRegistryPage() {
   const getDeptName = (id: string) => departments.find(d => d.id === id)?.name || "N/A";
   const getSheetTotal = (items: OpexItem[]) => items.reduce((acc, item) => acc + getAnnualValue(item), 0);
 
-  const handleLoadSheet = (sheet: any) => {
+  const handleEditSheet = (sheet: any) => {
     setEditingSheetId(sheet.id);
     form.reset(sheet);
     setActiveTab("form");
+  };
+
+  const handleDeleteSheet = (sheetId: string) => {
+    setOpexSheets(prev => prev.filter(s => s.id !== sheetId));
+    toast({
+        title: "Draft Deleted",
+        description: "The draft OPEX sheet has been successfully deleted.",
+        variant: "destructive"
+    });
   };
 
   const handleCreateNew = () => {
@@ -266,8 +275,8 @@ export default function OpexRegistryPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="form">{editingSheetId ? 'Edit OPEX Sheet' : 'Create New OPEX Sheet'}</TabsTrigger>
             <TabsTrigger value="list">Existing Sheets</TabsTrigger>
+            <TabsTrigger value="form">{editingSheetId ? 'Edit OPEX Sheet' : 'Create New OPEX Sheet'}</TabsTrigger>
         </TabsList>
         <TabsContent value="list" className="mt-4">
              <Card>
@@ -301,8 +310,15 @@ export default function OpexRegistryPage() {
                                         <TableCell className="text-[11px]">{sheet.year}</TableCell>
                                         <TableCell className="text-[11px] font-semibold">{getSheetTotal(sheet.items).toLocaleString()}</TableCell>
                                         <TableCell><Badge variant={sheet.status === 'Draft' ? 'secondary' : 'outline'}>{sheet.status}</Badge></TableCell>
-                                        <TableCell className="text-right">
-                                            <Button variant="outline" size="sm" onClick={() => handleLoadSheet(sheet)}>Load Sheet</Button>
+                                        <TableCell className="text-right space-x-2">
+                                            <Button variant="outline" size="sm" onClick={() => handleEditSheet(sheet)}>
+                                                {sheet.status === 'Draft' ? 'Edit' : 'View'}
+                                            </Button>
+                                            {sheet.status === 'Draft' && (
+                                                <Button variant="destructive" size="icon" onClick={() => handleDeleteSheet(sheet.id)}>
+                                                    <Icons.Delete className="h-4 w-4"/>
+                                                </Button>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -360,5 +376,7 @@ export default function OpexRegistryPage() {
     </div>
   );
 }
+
+    
 
     
