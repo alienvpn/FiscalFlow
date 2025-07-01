@@ -1,36 +1,110 @@
 
 "use client";
 
+import * as React from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ArrowUp, ArrowDown, DollarSign, FileWarning } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-import { addDays, isAfter, isBefore } from "date-fns";
+import { addDays, isAfter, isBefore, format } from "date-fns";
 import { useData } from "@/context/data-context";
-
-const budgetData = [
-  { name: "IT", spent: 4500, budget: 8000 },
-  { name: "Marketing", spent: 6200, budget: 7500 },
-  { name: "Operations", spent: 7800, budget: 9000 },
-  { name: "HR", spent: 3000, budget: 5000 },
-  { name: "Sales", spent: 9500, budget: 12000 },
-];
-
-const recentExpenses = [
-  { id: "exp-01", description: "Cloud Services Renewal", amount: 1200, category: "IT", date: "2 days ago" },
-  { id: "exp-02", description: "Marketing Campaign Q3", amount: 4500, category: "Marketing", date: "4 days ago" },
-  { id: "exp-03", description: "Office Supplies", amount: 350, category: "Operations", date: "1 week ago" },
-  { id: "exp-04", description: "New Hire Onboarding", amount: 800, category: "HR", date: "1 week ago" },
-];
+import type { OpexItem, CapexItem } from "@/lib/types";
 
 export default function Dashboard() {
-  const { contracts } = useData();
+  const { contracts, capexSheets, opexSheets, departments, registryItems, vendors } = useData();
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const today = new Date();
+  const currentYear = today.getFullYear().toString();
+
+  const activeContracts = contracts.filter((c) => c.serviceEndDate && isAfter(new Date(c.serviceEndDate), today));
+  const expiringSoonContracts = activeContracts.filter((c) => c.serviceEndDate && isBefore(new Date(c.serviceEndDate), addDays(today, 30)));
   
-  const activeContracts = contracts.filter((c) => c.serviceEndDate && isAfter(c.serviceEndDate, today));
-  const expiringSoonContracts = activeContracts.filter((c) => c.serviceEndDate && isBefore(c.serviceEndDate, addDays(today, 30)));
+  const getAnnualValue = (item: OpexItem) => {
+    const amount = item.amount || 0;
+    if (item.period === "Monthly") return amount * 12;
+    if (item.period === "Quarterly") return amount * 4;
+    return amount;
+  };
+
+  const getContractDescription = (id: string | undefined) => {
+    if (!id) return "N/A";
+    const item = registryItems.find(i => i.id === id);
+    if (!item) return "N/A";
+    const supplier = vendors.find(v => v.id === (item as any).supplierId);
+    const desc = item.type === "device" ? item.deviceDescription : item.serviceDescription;
+    return supplier ? `${desc} (${supplier.companyName})` : desc;
+  };
+
+  const dashboardData = React.useMemo(() => {
+    if (!isClient) {
+      return {
+        totalBudget: 0,
+        totalExpenditure: 0,
+        departmentsBudget: [],
+        recentExpenses: [],
+        departmentsAtRisk: 0,
+      };
+    }
+
+    const allCurrentCapexSheets = capexSheets.filter(sheet => sheet.year === currentYear);
+    const currentCapexItems: CapexItem[] = allCurrentCapexSheets.flatMap(sheet => sheet.items);
+
+    const allCurrentOpexSheets = opexSheets.filter(sheet => sheet.year === currentYear);
+    const currentOpexItems: OpexItem[] = allCurrentOpexSheets.flatMap(sheet => sheet.items);
+
+    const totalCapexBudget = currentCapexItems.reduce((acc, item) => acc + (item.quantity * item.amount), 0);
+    const totalOpexBudget = currentOpexItems.reduce((acc, item) => acc + getAnnualValue(item), 0);
+    const totalBudget = totalCapexBudget + totalOpexBudget;
+    
+    // For now, let's consider total expenditure as the total approved OPEX for the year.
+    const totalExpenditure = totalOpexBudget;
+
+    const departmentsBudget = departments.map(dept => {
+        const deptCapexItems = capexSheets
+            .filter(sheet => sheet.year === currentYear && sheet.department === dept.id)
+            .flatMap(sheet => sheet.items);
+        const deptOpexItems = opexSheets
+            .filter(sheet => sheet.year === currentYear && sheet.department === dept.id)
+            .flatMap(sheet => sheet.items);
+
+        const budget = deptCapexItems.reduce((acc, item) => acc + (item.quantity * item.amount), 0) +
+                       deptOpexItems.reduce((acc, item) => acc + getAnnualValue(item), 0);
+
+        const spent = deptOpexItems.reduce((acc, item) => acc + getAnnualValue(item), 0);
+
+        return {
+            name: dept.name.length > 10 ? dept.name.substring(0, 7) + '...' : dept.name,
+            budget,
+            spent,
+        };
+    }).filter(d => d.budget > 0 || d.spent > 0);
+    
+    const departmentsAtRisk = departmentsBudget.filter(d => d.budget > 0 && d.spent / d.budget > 0.8).length;
+    
+    const recentExpenses = currentOpexItems.slice(-5).map(item => {
+        const parentSheet = allCurrentOpexSheets.find(sheet => sheet.items.some((i: OpexItem) => i.id === item.id));
+        const departmentName = parentSheet ? (departments.find(d => d.id === parentSheet.department)?.name || 'N/A') : 'N/A';
+
+        return {
+            id: item.id,
+            description: item.description,
+            amount: getAnnualValue(item),
+            category: departmentName,
+            date: "Current Year"
+        };
+    }).reverse();
+
+    return { totalBudget, totalExpenditure, departmentsBudget, recentExpenses, departmentsAtRisk };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient, capexSheets, opexSheets, contracts, departments, vendors, registryItems, currentYear]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6">
@@ -42,7 +116,9 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold print:text-[10px]">41,500 QAR</div>
+            <div className="text-base font-bold print:text-[10px]">
+              {isClient ? dashboardData.totalBudget.toLocaleString() : "..."} QAR
+            </div>
             <p className="text-[10px] text-muted-foreground print:text-[10px]">
               Total allocated for this period
             </p>
@@ -56,12 +132,16 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold print:text-[10px]">31,000 QAR</div>
+            <div className="text-base font-bold print:text-[10px]">
+              {isClient ? dashboardData.totalExpenditure.toLocaleString() : "..."} QAR
+            </div>
             <p className="text-[10px] text-muted-foreground print:text-[10px]">
-              <span className="text-primary flex items-center">
-                <ArrowDown className="h-3 w-3 mr-1" />
-                74.7% of total budget
-              </span>
+              {isClient && dashboardData.totalBudget > 0 ? (
+                <span className="text-primary flex items-center">
+                  <ArrowDown className="h-3 w-3 mr-1" />
+                  {((dashboardData.totalExpenditure / dashboardData.totalBudget) * 100).toFixed(1)}% of total budget
+                </span>
+              ) : (isClient && <>&nbsp;</>)}
             </p>
           </CardContent>
         </Card>
@@ -73,9 +153,9 @@ export default function Dashboard() {
             <FileWarning className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold print:text-[10px]">{activeContracts.length}</div>
+            <div className="text-base font-bold print:text-[10px]">{isClient ? activeContracts.length : "..."}</div>
             <p className="text-[10px] text-muted-foreground print:text-[10px]">
-              {expiringSoonContracts.length} contracts expiring soon
+              {isClient ? expiringSoonContracts.length : "..."} contracts expiring soon
             </p>
           </CardContent>
         </Card>
@@ -87,11 +167,14 @@ export default function Dashboard() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base font-bold print:text-[10px]">Low</div>
+            <div className="text-base font-bold print:text-[10px]">{isClient ? (dashboardData.departmentsAtRisk > 0 ? "High" : "Low") : "..."}</div>
             <p className="text-[10px] text-muted-foreground print:text-[10px]">
-              <span className="text-destructive flex items-center">
-                <ArrowUp className="h-3 w-3 mr-1" />1 department near limit
-              </span>
+              {isClient ? (
+                <span className={dashboardData.departmentsAtRisk > 0 ? "text-destructive flex items-center" : ""}>
+                    {dashboardData.departmentsAtRisk > 0 && <ArrowUp className="h-3 w-3 mr-1" />}
+                    {dashboardData.departmentsAtRisk} department(s) near limit
+                </span>
+              ) : <>&nbsp;</>}
             </p>
           </CardContent>
         </Card>
@@ -105,51 +188,60 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={budgetData}>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={8}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={8}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${value / 1000}k QAR`}
-                />
-                <Tooltip
-                  cursor={{ fill: "hsl(var(--accent))" }}
-                  contentStyle={{
-                    background: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                    fontSize: "10px",
-                    padding: "4px 8px",
-                  }}
-                />
-                <Bar
-                  dataKey="spent"
-                  fill="hsl(var(--chart-1))"
-                  name="Spent"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="budget"
-                  fill="hsl(var(--chart-2))"
-                  name="Budget"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            {isClient ? (
+              dashboardData.departmentsBudget.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={dashboardData.departmentsBudget}>
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={8}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={8}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `${value / 1000}k QAR`}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "hsl(var(--accent))" }}
+                      contentStyle={{
+                        background: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)",
+                        fontSize: "10px",
+                        padding: "4px 8px",
+                      }}
+                    />
+                    <Bar
+                      dataKey="spent"
+                      fill="hsl(var(--chart-1))"
+                      name="Spent"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="budget"
+                      fill="hsl(var(--chart-2))"
+                      name="Budget"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex justify-center items-center h-[250px] text-muted-foreground text-sm">No budget data for the current year.</div>
+              )
+             ) : (
+                <div className="flex justify-center items-center h-[250px]">Loading chart...</div>
+             )
+            }
           </CardContent>
         </Card>
         <Card className="col-span-4 lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-lg">Recent Expenses</CardTitle>
+            <CardTitle className="text-lg">Recent Expenses (from OPEX)</CardTitle>
             <CardDescription className="text-xs">
               A log of the latest operational expenses.
             </CardDescription>
@@ -161,52 +253,54 @@ export default function Dashboard() {
                   <TableHead className="h-8 px-2 text-xs">Description</TableHead>
                   <TableHead className="h-8 px-2 text-xs">Category</TableHead>
                   <TableHead className="h-8 px-2 text-right text-xs">
-                    Amount
+                    Annual Amount
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentExpenses.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell className="p-2">
-                      <div className="font-medium text-xs">
-                        {expense.description}
-                      </div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {expense.date}
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Badge variant="outline">{expense.category}</Badge>
-                    </TableCell>
-                    <TableCell className="p-2 text-right text-xs">
-                      {expense.amount.toLocaleString()} QAR
+                {isClient && dashboardData.recentExpenses.length > 0 ? (
+                  dashboardData.recentExpenses.map((expense) => (
+                    <TableRow key={expense.id}>
+                      <TableCell className="p-2">
+                        <div className="font-medium text-xs">
+                          {expense.description}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {expense.date}
+                        </div>
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <Badge variant="outline">{expense.category}</Badge>
+                      </TableCell>
+                      <TableCell className="p-2 text-right text-xs">
+                        {expense.amount.toLocaleString()} QAR
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                      No OPEX data for the current year.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
-      <div className="space-y-4">
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle className="text-sm">Contract Renewal Notice</AlertTitle>
-          <AlertDescription className="text-xs">
-            The contract for 'VendorLink CRM' is expiring in 15 days. Please
-            initiate renewal process.
-          </AlertDescription>
-        </Alert>
-        <Alert variant="destructive">
-          <FileWarning className="h-4 w-4" />
-          <AlertTitle className="text-sm">SLA Breach Detected</AlertTitle>
-          <AlertDescription className="text-xs">
-            SLA for 'Server Hosting Pro' has been breached (99.5% uptime).
-            Follow up with vendor required.
-          </AlertDescription>
-        </Alert>
-      </div>
+      {isClient && expiringSoonContracts.length > 0 && (
+        <div className="space-y-4">
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="text-sm">Contract Renewal Notice</AlertTitle>
+              <AlertDescription className="text-xs">
+                The contract for '{getContractDescription(expiringSoonContracts[0].contractDescription)}' is expiring on {format(new Date(expiringSoonContracts[0].serviceEndDate!), "PPP")}. Please
+                initiate renewal process.
+              </AlertDescription>
+            </Alert>
+        </div>
+      )}
     </div>
   );
 }

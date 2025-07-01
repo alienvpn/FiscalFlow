@@ -33,7 +33,7 @@ type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
   const { toast } = useToast();
-  const { organizations, departments, vendors, opexSheets, approvalWorkflows } = useData();
+  const { organizations, departments, vendors, opexSheets, setOpexSheets, approvalWorkflows } = useData();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -67,8 +67,8 @@ export default function OpexRegistryPage() {
           const sheet = opexSheets.find(
             (s: any) =>
               s.year === prevYear &&
-              s.organizationId === organization &&
-              s.departmentId === department
+              s.organization === organization &&
+              s.department === department
           );
           setPreviousYearItems(sheet ? sheet.items : []);
         } else {
@@ -120,7 +120,8 @@ export default function OpexRegistryPage() {
 
   async function submitOpexSheet(values: OpexFormValues) {
     try {
-        console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+        const newSheet = { ...values, status: 'Pending Approval', id: crypto.randomUUID() };
+        setOpexSheets(prev => [...prev, newSheet]);
         
         const firstApproverRole = approvalWorkflows.budget[0]?.approverRole;
         if (!firstApproverRole) {
@@ -144,6 +145,7 @@ export default function OpexRegistryPage() {
             title: "Sheet Submitted",
             description: `Your OPEX sheet has been sent for approval to the ${firstApproverRole}.`,
         });
+        form.reset();
     } catch (error) {
         console.error("Failed to submit OPEX sheet:", error);
         toast({
@@ -156,11 +158,13 @@ export default function OpexRegistryPage() {
 
   async function saveOpexSheetAsDraft(values: OpexFormValues) {
       try {
-          console.log("Saving as draft:", { ...values, status: 'Draft' });
+          const newSheet = { ...values, status: 'Draft', id: crypto.randomUUID() };
+          setOpexSheets(prev => [...prev, newSheet]);
           toast({
               title: "Draft Saved",
               description: "Your OPEX sheet has been saved as a draft.",
           });
+          form.reset();
       } catch (error) {
           console.error("Failed to save OPEX draft:", error);
           toast({
@@ -556,5 +560,3 @@ export default function OpexRegistryPage() {
     </div>
   );
 }
-
-    
