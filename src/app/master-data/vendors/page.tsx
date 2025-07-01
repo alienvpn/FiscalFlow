@@ -17,6 +17,8 @@ import { countryCityData } from "@/lib/location-data";
 import { useData } from "@/context/data-context";
 import { vendorSchema, type VendorFormValues } from "@/lib/types";
 import { z } from "zod";
+import Papa from "papaparse";
+import { useToast } from "@/hooks/use-toast";
 
 const defaultValues: Partial<VendorFormValues> = {
     companyName: "",
@@ -47,6 +49,8 @@ export default function VendorsPage() {
   const [activeTab, setActiveTab] = React.useState("view");
   const [cities, setCities] = React.useState<string[]>([]);
   const [isClient, setIsClient] = React.useState(false);
+  const { toast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof vendorSchema>>({
     resolver: zodResolver(vendorSchema),
@@ -103,6 +107,127 @@ export default function VendorsPage() {
     setEditingVendorId(null);
     setActiveTab("view");
   }
+
+  const handleDownloadSample = () => {
+    const headers = [
+      "companyName", "address", "country", "city", "email", "telephone", "fax", "whatsapp", "website",
+      "accountManagerName", "accountManagerDesignation", "accountManagerEmail", "accountManagerTelephone", "accountManagerMobile", "accountManagerWhatsapp"
+    ];
+    const sampleData = [
+      "Global Tech Inc.", "123 Innovation Drive, Tech Park, Zone A", "United States", "New York City", "contact@globaltech.com", "+1-212-555-0100", "+1-212-555-0101", "+1-212-555-0102", "https://globaltech.com",
+      "John Doe", "Sales Manager", "john.doe@globaltech.com", "+1-212-555-0103", "+1-917-555-0104", "+1-917-555-0105"
+    ];
+    const csvContent = [headers.join(","), sampleData.join(",")].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "vendors_sample_import.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+            try {
+                const newVendors: VendorFormValues[] = [];
+                const errors: string[] = [];
+
+                results.data.forEach((row: any, index: number) => {
+                    const vendorData = {
+                        companyName: row.companyName,
+                        address: row.address,
+                        country: row.country,
+                        city: row.city,
+                        email: row.email,
+                        telephone: row.telephone,
+                        fax: row.fax,
+                        whatsapp: row.whatsapp,
+                        website: row.website,
+                        accountManager: {
+                            name: row.accountManagerName,
+                            designation: row.accountManagerDesignation,
+                            email: row.accountManagerEmail,
+                            telephone: row.accountManagerTelephone,
+                            mobile: row.accountManagerMobile,
+                            whatsapp: row.accountManagerWhatsapp,
+                        },
+                        techSupport1: { name: "", email: "", telephone: "", mobile: "" },
+                        techSupport2: { name: "", email: "", telephone: "", mobile: "" },
+                        techSupport3: { name: "", email: "", telephone: "", mobile: "" },
+                    };
+                    
+                    const validation = vendorSchema.safeParse(vendorData);
+                    if (validation.success) {
+                        newVendors.push({
+                            ...validation.data, 
+                            id: `vendor-${Date.now()}-${index}`
+                        });
+                    } else {
+                        const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+                        errors.push(`Row ${index + 2}: ${errorMessages}`);
+                    }
+                });
+
+                if (errors.length > 0) {
+                    toast({
+                        variant: "destructive",
+                        title: "Import Failed",
+                        description: (
+                            <div className="max-h-40 overflow-y-auto">
+                                <p className="mb-2">Some rows could not be imported:</p>
+                                <ul className="list-disc pl-5 text-xs space-y-1">
+                                    {errors.map((e, i) => <li key={i}>{e}</li>)}
+                                </ul>
+                            </div>
+                        ),
+                         duration: 8000,
+                    });
+                } 
+                if (newVendors.length > 0) {
+                    setVendors(prev => [...prev, ...newVendors]);
+                    toast({
+                        title: "Import Complete",
+                        description: `${newVendors.length} vendor(s) were successfully imported. ${errors.length} row(s) failed.`,
+                    });
+                } else if (errors.length === 0) {
+                     toast({
+                        title: "No Data Imported",
+                        description: "The file was empty or contained no valid data.",
+                    });
+                }
+            } catch (e) {
+                 toast({
+                    variant: "destructive",
+                    title: "Import Error",
+                    description: "An unexpected error occurred during import.",
+                });
+                console.error(e);
+            } finally {
+                if(fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            }
+        },
+        error: (error) => {
+            toast({
+                variant: "destructive",
+                title: "Import Error",
+                description: `Failed to parse CSV file: ${error.message}`,
+            });
+        }
+    });
+  };
 
   const renderTechSupportFields = (contactNumber: 1 | 2 | 3) => (
     <Card>
@@ -248,10 +373,25 @@ export default function VendorsPage() {
                     </TableBody>
                   </Table>
                 </div>
-                <Button size="sm" className="mt-4" onClick={handleCreateNew}>
-                  <Icons.Add className="mr-2" />
-                  Create New Vendor
-                </Button>
+                <div className="flex items-center gap-2 mt-4">
+                  <Button size="sm" onClick={handleCreateNew}>
+                    <Icons.Add className="mr-2" />
+                    Create New Vendor
+                  </Button>
+                  <Button size="sm" variant="outline" type="button" onClick={() => fileInputRef.current?.click()}>
+                      <Icons.Upload className="mr-2 h-4 w-4" /> Import Vendors
+                  </Button>
+                  <Button variant="link" size="sm" type="button" onClick={handleDownloadSample}>
+                      Download Sample Format
+                  </Button>
+                </div>
+                 <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv"
+                  onChange={handleFileImport}
+                />
               </CardContent>
             </Card>
         </TabsContent>
