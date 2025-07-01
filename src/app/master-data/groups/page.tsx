@@ -4,7 +4,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,32 +29,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { groupSchema, type Group, type GroupFormValues } from "@/lib/types";
 import { groups as initialGroups } from "@/lib/mock-data";
 
-const STORAGE_KEY = "groups";
-
 export default function GroupsPage() {
   const { toast } = useToast();
-  const [groups, setGroups] = React.useState<Group[]>([]);
+  const [groups, setGroups] = React.useState<Group[]>(initialGroups);
   const [editingGroupId, setEditingGroupId] = React.useState<string | null>(null);
-
-  // Load data from localStorage on mount
-  React.useEffect(() => {
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (storedData) {
-      setGroups(JSON.parse(storedData));
-    } else {
-      setGroups(initialGroups);
-    }
-  }, []);
-
-  // Save data to localStorage whenever it changes
-  React.useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  }, [groups]);
 
   const form = useForm<GroupFormValues>({
     resolver: zodResolver(groupSchema),
@@ -78,7 +59,7 @@ export default function GroupsPage() {
     setGroups(groups.filter((g) => g.id !== groupId));
     toast({
       title: "Group Deleted",
-      description: "The group has been removed.",
+      description: "The group has been removed for this session.",
     });
   };
 
@@ -91,7 +72,7 @@ export default function GroupsPage() {
       );
       toast({
         title: "Group Updated",
-        description: "The group's details have been saved.",
+        description: "The group's details have been saved for this session.",
       });
     } else {
       const newGroup: Group = {
@@ -101,7 +82,7 @@ export default function GroupsPage() {
       setGroups([...groups, newGroup]);
       toast({
         title: "Group Created",
-        description: "The new group has been added.",
+        description: "The new group has been added for this session.",
       });
     }
     setEditingGroupId(null);

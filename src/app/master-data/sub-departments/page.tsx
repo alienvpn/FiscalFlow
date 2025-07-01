@@ -41,35 +41,19 @@ import {
   subDepartmentSchema,
   type SubDepartment,
   type SubDepartmentFormValues,
-  type Department,
 } from "@/lib/types";
 import {
   subDepartments as initialSubDepartments,
   departments as initialDepartments,
 } from "@/lib/mock-data";
 
-const SUBDEPT_STORAGE_KEY = "subDepartments";
-const DEPT_STORAGE_KEY = "departments";
-
 export default function SubDepartmentsPage() {
   const { toast } = useToast();
-  const [subDepartments, setSubDepartments] = React.useState<SubDepartment[]>([]);
-  const [departments, setDepartments] = React.useState<Department[]>([]);
+  const [subDepartments, setSubDepartments] = React.useState<SubDepartment[]>(initialSubDepartments);
   const [editingSubDeptId, setEditingSubDeptId] = React.useState<string | null>(null);
 
-  // Load data from localStorage on mount
-  React.useEffect(() => {
-    const storedSubDepts = localStorage.getItem(SUBDEPT_STORAGE_KEY);
-    setSubDepartments(storedSubDepts ? JSON.parse(storedSubDepts) : initialSubDepartments);
-
-    const storedDepts = localStorage.getItem(DEPT_STORAGE_KEY);
-    setDepartments(storedDepts ? JSON.parse(storedDepts) : initialDepartments);
-  }, []);
-
-  // Save data to localStorage whenever it changes
-  React.useEffect(() => {
-    localStorage.setItem(SUBDEPT_STORAGE_KEY, JSON.stringify(subDepartments));
-  }, [subDepartments]);
+  // Statically load departments for the dropdown
+  const departments = initialDepartments;
 
   const form = useForm<SubDepartmentFormValues>({
     resolver: zodResolver(subDepartmentSchema),
@@ -97,7 +81,7 @@ export default function SubDepartmentsPage() {
     setSubDepartments(subDepartments.filter((sd) => sd.id !== subDeptId));
     toast({
       title: "Sub-Department Deleted",
-      description: "The sub-department has been removed.",
+      description: "The sub-department has been removed for this session.",
     });
   };
 
@@ -110,7 +94,7 @@ export default function SubDepartmentsPage() {
       );
       toast({
         title: "Sub-Department Updated",
-        description: "The sub-department's details have been saved.",
+        description: "The sub-department's details have been saved for this session.",
       });
     } else {
       const newSubDept: SubDepartment = {
@@ -120,7 +104,7 @@ export default function SubDepartmentsPage() {
       setSubDepartments([...subDepartments, newSubDept]);
       toast({
         title: "Sub-Department Created",
-        description: "The new sub-department has been added.",
+        description: "The new sub-department has been added for this session.",
       });
     }
     setEditingSubDeptId(null);

@@ -41,35 +41,19 @@ import {
   departmentSchema,
   type Department,
   type DepartmentFormValues,
-  type Organization,
 } from "@/lib/types";
 import {
   departments as initialDepartments,
   organizations as initialOrganizations,
 } from "@/lib/mock-data";
 
-const DEPT_STORAGE_KEY = "departments";
-const ORG_STORAGE_KEY = "organizations";
-
 export default function DepartmentsPage() {
   const { toast } = useToast();
-  const [departments, setDepartments] = React.useState<Department[]>([]);
-  const [organizations, setOrganizations] = React.useState<Organization[]>([]);
+  const [departments, setDepartments] = React.useState<Department[]>(initialDepartments);
   const [editingDeptId, setEditingDeptId] = React.useState<string | null>(null);
-
-  // Load data from localStorage on mount
-  React.useEffect(() => {
-    const storedDepts = localStorage.getItem(DEPT_STORAGE_KEY);
-    setDepartments(storedDepts ? JSON.parse(storedDepts) : initialDepartments);
-
-    const storedOrgs = localStorage.getItem(ORG_STORAGE_KEY);
-    setOrganizations(storedOrgs ? JSON.parse(storedOrgs) : initialOrganizations);
-  }, []);
-
-  // Save data to localStorage whenever it changes
-  React.useEffect(() => {
-    localStorage.setItem(DEPT_STORAGE_KEY, JSON.stringify(departments));
-  }, [departments]);
+  
+  // Statically load organizations for the dropdown
+  const organizations = initialOrganizations;
 
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(departmentSchema),
@@ -97,7 +81,7 @@ export default function DepartmentsPage() {
     setDepartments(departments.filter((d) => d.id !== deptId));
     toast({
       title: "Department Deleted",
-      description: "The department has been removed.",
+      description: "The department has been removed for this session.",
     });
   };
 
@@ -110,7 +94,7 @@ export default function DepartmentsPage() {
       );
       toast({
         title: "Department Updated",
-        description: "The department's details have been saved.",
+        description: "The department's details have been saved for this session.",
       });
     } else {
       const newDept: Department = {
@@ -120,7 +104,7 @@ export default function DepartmentsPage() {
       setDepartments([...departments, newDept]);
       toast({
         title: "Department Created",
-        description: "The new department has been added.",
+        description: "The new department has been added for this session.",
       });
     }
     setEditingDeptId(null);

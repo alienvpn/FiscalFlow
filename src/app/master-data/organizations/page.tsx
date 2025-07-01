@@ -41,35 +41,19 @@ import {
   organizationSchema,
   type Organization,
   type OrganizationFormValues,
-  type Group,
 } from "@/lib/types";
 import {
   organizations as initialOrganizations,
   groups as initialGroups,
 } from "@/lib/mock-data";
 
-const ORG_STORAGE_KEY = "organizations";
-const GROUP_STORAGE_KEY = "groups";
-
 export default function OrganizationsPage() {
   const { toast } = useToast();
-  const [organizations, setOrganizations] = React.useState<Organization[]>([]);
-  const [groups, setGroups] = React.useState<Group[]>([]);
+  const [organizations, setOrganizations] = React.useState<Organization[]>(initialOrganizations);
   const [editingOrgId, setEditingOrgId] = React.useState<string | null>(null);
 
-  // Load data from localStorage on mount
-  React.useEffect(() => {
-    const storedOrgs = localStorage.getItem(ORG_STORAGE_KEY);
-    setOrganizations(storedOrgs ? JSON.parse(storedOrgs) : initialOrganizations);
-
-    const storedGroups = localStorage.getItem(GROUP_STORAGE_KEY);
-    setGroups(storedGroups ? JSON.parse(storedGroups) : initialGroups);
-  }, []);
-
-  // Save data to localStorage whenever it changes
-  React.useEffect(() => {
-    localStorage.setItem(ORG_STORAGE_KEY, JSON.stringify(organizations));
-  }, [organizations]);
+  // Statically load groups for the dropdown
+  const groups = initialGroups;
 
   const form = useForm<OrganizationFormValues>({
     resolver: zodResolver(organizationSchema),
@@ -97,7 +81,7 @@ export default function OrganizationsPage() {
     setOrganizations(organizations.filter((o) => o.id !== orgId));
     toast({
       title: "Organization Deleted",
-      description: "The organization has been removed.",
+      description: "The organization has been removed for this session.",
     });
   };
 
@@ -110,7 +94,7 @@ export default function OrganizationsPage() {
       );
       toast({
         title: "Organization Updated",
-        description: "The organization's details have been saved.",
+        description: "The organization's details have been saved for this session.",
       });
     } else {
       const newOrg: Organization = {
@@ -120,7 +104,7 @@ export default function OrganizationsPage() {
       setOrganizations([...organizations, newOrg]);
       toast({
         title: "Organization Created",
-        description: "The new organization has been added.",
+        description: "The new organization has been added for this session.",
       });
     }
     setEditingOrgId(null);
