@@ -18,6 +18,7 @@ import {
   ClipboardCheck,
   AreaChart,
   UserCheck,
+  UploadCloud,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -41,4 +42,5 @@ export const Icons = {
   Approvals: ClipboardCheck,
   Reports: AreaChart,
   UserAccess: UserCheck,
+  Upload: UploadCloud,
 };

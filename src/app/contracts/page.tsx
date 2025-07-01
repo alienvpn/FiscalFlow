@@ -5,6 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, subDays, format, isBefore, isAfter } from "date-fns";
+import Papa from "papaparse";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -20,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
 import { Label } from "@/components/ui/label";
 import { useData } from "@/context/data-context";
+import { useToast } from "@/hooks/use-toast";
 import { contractSchema, type ContractFormValues } from "@/lib/types";
 
 const defaultValues: Partial<ContractFormValues> = {
@@ -66,6 +68,8 @@ export default function ContractsPage() {
         organizations, departments, subDepartments,
         registryItems, vendors 
     } = useData();
+    const { toast } = useToast();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const [isClient, setIsClient] = React.useState(false);
     const [editingContractId, setEditingContractId] = React.useState<string | null>(null);
@@ -183,6 +187,130 @@ export default function ContractsPage() {
         return item.type === "device" ? item.deviceDescription : item.serviceDescription;
     };
 
+    const handleDownloadSample = () => {
+        const headers = [
+            "contractDescription", "quantity", "supplierName", "mainDepartmentName", 
+            "subDepartmentName", "contractPeriod", "contractAmount", "paymentTerms",
+            "serviceStartDate", "serviceEndDate", "lpoNumber", "remarks"
+        ];
+        const sampleData = [
+            "Annual Firewall Subscription", "1", "SecureNet Solutions", "Information Technology",
+            "Network Team", "1 Year", "15000", "Net 30", 
+            "2025-01-01", "2025-12-31", "LPO-2025-001", "Standard renewal"
+        ];
+        const csvContent = [headers.join(","), sampleData.join(",")].join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "contracts_sample_import.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                try {
+                    const newContracts: ContractFormValues[] = [];
+                    const errors: string[] = [];
+
+                    results.data.forEach((row: any, index: number) => {
+                        const item = registryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim() === row.contractDescription?.trim());
+                        const supplier = vendors.find(v => v.companyName?.trim() === row.supplierName?.trim());
+                        const mainDept = departments.find(d => d.name?.trim() === row.mainDepartmentName?.trim());
+                        const subDept = subDepartments.find(sd => sd.name?.trim() === row.subDepartmentName?.trim() && sd.departmentId === mainDept?.id);
+
+                        if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in registry.`); return; }
+                        if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found.`); return; }
+                        if (!mainDept) { errors.push(`Row ${index + 2}: Main department '${row.mainDepartmentName}' not found.`); return; }
+                        if (!subDept) { errors.push(`Row ${index + 2}: Sub-department '${row.subDepartmentName}' not found or doesn't belong to '${row.mainDepartmentName}'.`); return; }
+
+                        const contractData = {
+                            contractDescription: item.id,
+                            quantity: row.quantity ? Number(row.quantity) : undefined,
+                            supplierId: supplier.id,
+                            mainDepartmentId: mainDept.id,
+                            subDepartmentId: subDept.id,
+                            contractPeriod: row.contractPeriod,
+                            contractAmount: row.contractAmount ? Number(row.contractAmount) : undefined,
+                            paymentTerms: row.paymentTerms,
+                            serviceStartDate: row.serviceStartDate ? new Date(row.serviceStartDate) : undefined,
+                            serviceEndDate: row.serviceEndDate ? new Date(row.serviceEndDate) : undefined,
+                            lpoNumber: row.lpoNumber,
+                            remarks: row.remarks
+                        };
+                        
+                        const validation = contractSchema.safeParse(contractData);
+                        if (validation.success) {
+                            newContracts.push({
+                                ...validation.data, 
+                                id: `con-${Date.now()}-${index}`
+                            });
+                        } else {
+                            const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+                            errors.push(`Row ${index + 2}: ${errorMessages}`);
+                        }
+                    });
+
+                    if (errors.length > 0) {
+                        toast({
+                            variant: "destructive",
+                            title: "Import Failed",
+                            description: (
+                                <div className="max-h-40 overflow-y-auto">
+                                    <p className="mb-2">Some rows could not be imported:</p>
+                                    <ul className="list-disc pl-5 text-xs space-y-1">
+                                        {errors.map((e, i) => <li key={i}>{e}</li>)}
+                                    </ul>
+                                </div>
+                            ),
+                             duration: 8000,
+                        });
+                    } 
+                    if (newContracts.length > 0) {
+                        setContracts(prev => [...prev, ...newContracts]);
+                        toast({
+                            title: "Import Complete",
+                            description: `${newContracts.length} contract(s) were successfully imported. ${errors.length} row(s) failed.`,
+                        });
+                    } else if (errors.length === 0) {
+                         toast({
+                            title: "No Data Imported",
+                            description: "The file was empty or contained no valid data.",
+                        });
+                    }
+                } catch (e) {
+                     toast({
+                        variant: "destructive",
+                        title: "Import Error",
+                        description: "An unexpected error occurred during import.",
+                    });
+                    console.error(e);
+                } finally {
+                    if(fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                }
+            },
+            error: (error) => {
+                toast({
+                    variant: "destructive",
+                    title: "Import Error",
+                    description: `Failed to parse CSV file: ${error.message}`,
+                });
+            }
+        });
+    };
 
     return (
         <div className="container mx-auto p-4 md:p-8">
@@ -274,7 +402,18 @@ export default function ContractsPage() {
                                     )}
                                 </TableBody>
                             </Table>
-                            <Button size="sm" className="mt-4" onClick={handleCreateNew}><Icons.Add className="mr-2" /> Create New Contract</Button>
+                            <div className="flex items-center gap-2 mt-4">
+                                <Button size="sm" onClick={handleCreateNew}><Icons.Add className="mr-2" /> Create New Contract</Button>
+                                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}><Icons.Upload className="mr-2 h-4 w-4" /> Import Contracts</Button>
+                                <Button variant="link" size="sm" onClick={handleDownloadSample}>Download Sample Format</Button>
+                            </div>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept=".csv"
+                                onChange={handleFileImport}
+                            />
                         </CardContent>
                     </Card>
                 </TabsContent>
