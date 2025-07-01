@@ -10,7 +10,7 @@ export const groups: { id: string; name: string }[] = [
 ];
 
 export const organizations: { id: string; name: string; groupId: string }[] = [
-  // Example: { id: "org-1", name: "Swissotel Corniche Park Towers Doha", groupId: "grp-1" }
+  // Example: { id: "org-1", name: "Swissotel Corniche Park", groupId: "grp-1" }
 ];
 
 export const departments: { id: string; name: string; organizationId: string }[] = [
@@ -18,7 +18,7 @@ export const departments: { id: string; name: string; organizationId: string }[]
 ];
 
 export const subDepartments: { id: string; name: string; departmentId: string }[] = [
-  // Example: { id: "sub-dept-1", name: "IT Infrastucture & Administration", departmentId: "dept-1" }
+  // Example: { id: "sub-dept-1", name: "IT Infrastucture", departmentId: "dept-1" }
 ];
 
 export const vendors: VendorFormValues[] = [
