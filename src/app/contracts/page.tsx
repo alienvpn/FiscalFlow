@@ -225,9 +225,9 @@ export default function ContractsPage() {
                         const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplierName?.trim().toLowerCase());
                         const mainDept = departments.find(d => d.name?.trim().toLowerCase() === row.mainDepartmentName?.trim().toLowerCase());
 
-                        if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in registry.`); return; }
-                        if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found.`); return; }
-                        if (!mainDept) { errors.push(`Row ${index + 2}: Main department '${row.mainDepartmentName}' not found.`); return; }
+                        if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in the Item Registry. Please add it first.`); return; }
+                        if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found in the Vendors list. Please add it first.`); return; }
+                        if (!mainDept) { errors.push(`Row ${index + 2}: Department '${row.mainDepartmentName}' not found in the Departments list. Please add it first.`); return; }
 
                         const contractData = {
                             contractDescription: item.id,

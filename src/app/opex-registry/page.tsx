@@ -224,7 +224,7 @@ export default function OpexRegistryPage() {
                 results.data.forEach((row: any, index: number) => {
                     const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplier?.trim().toLowerCase());
                     if (!supplier) {
-                        errors.push(`Row ${index + 2}: Supplier '${row.supplier}' not found.`);
+                        errors.push(`Row ${index + 2}: Supplier '${row.supplier}' not found in the Vendors list. Please add it first.`);
                         return;
                     }
 
