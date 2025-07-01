@@ -221,9 +221,9 @@ export default function ContractsPage() {
                     const errors: string[] = [];
 
                     results.data.forEach((row: any, index: number) => {
-                        const item = registryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim() === row.contractDescription?.trim());
-                        const supplier = vendors.find(v => v.companyName?.trim() === row.supplierName?.trim());
-                        const mainDept = departments.find(d => d.name?.trim() === row.mainDepartmentName?.trim());
+                        const item = registryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim().toLowerCase() === row.contractDescription?.trim().toLowerCase());
+                        const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplierName?.trim().toLowerCase());
+                        const mainDept = departments.find(d => d.name?.trim().toLowerCase() === row.mainDepartmentName?.trim().toLowerCase());
 
                         if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in registry.`); return; }
                         if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found.`); return; }
@@ -505,3 +505,5 @@ export default function ContractsPage() {
         </div>
     );
 }
+
+    

@@ -222,7 +222,7 @@ export default function OpexRegistryPage() {
                 const errors: string[] = [];
 
                 results.data.forEach((row: any, index: number) => {
-                    const supplier = vendors.find(v => v.companyName?.trim() === row.supplier?.trim());
+                    const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplier?.trim().toLowerCase());
                     if (!supplier) {
                         errors.push(`Row ${index + 2}: Supplier '${row.supplier}' not found.`);
                         return;
@@ -560,3 +560,5 @@ export default function OpexRegistryPage() {
     </div>
   );
 }
+
+    
