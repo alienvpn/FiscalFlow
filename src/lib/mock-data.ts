@@ -4,19 +4,19 @@
 // For a production app, this data would typically be stored in a database.
 
 export const groups = [
-  // Example: { id: "grp-1", name: "Your Holding Group" }
+  // Example: { id: "grp-1", name: "Accor Hospitality" }
 ];
 
 export const organizations = [
-  // Example: { id: "org-1", name: "Your Company Name", groupId: "grp-1" }
+  // Example: { id: "org-1", name: "Swissotel Corniche Park Towers Doha", groupId: "grp-1" }
 ];
 
 export const departments = [
-  // Example: { id: "dept-1", name: "Your Department", organizationId: "org-1" }
+  // Example: { id: "dept-1", name: "IT Department", organizationId: "org-1" }
 ];
 
 export const subDepartments = [
-  // Example: { id: "sub-dept-1", name: "Your Sub-Department", departmentId: "dept-1" }
+  // Example: { id: "sub-dept-1", name: "IT Infrastucture & Administration", departmentId: "dept-1" }
 ];
 
 export const vendors = [
