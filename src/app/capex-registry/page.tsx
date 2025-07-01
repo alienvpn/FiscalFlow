@@ -5,6 +5,7 @@ import * as React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ export default function CapexRegistryPage() {
   const { organizations, departments, capexSheets, approvalWorkflows } = useData();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<CapexFormValues>({
     resolver: zodResolver(capexRegistrySchema),
@@ -168,6 +170,110 @@ export default function CapexRegistryPage() {
     await saveCapexSheetAsDraft(values);
     setIsSubmitting(false);
   }
+
+  const handleDownloadSample = () => {
+    const headers = [
+      "description", "priority", "quantity", "amount", "justification", "remarks"
+    ];
+    const sampleData = [
+      "High-Performance Laptop for Graphics Designer", "High", "1", "12000", "Replacement for an aging device to improve productivity.", "Model preference: Dell XPS 15 or MacBook Pro 16"
+    ];
+    const csvContent = [headers.join(","), sampleData.join(",")].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "capex_items_sample_import.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+            try {
+                const newItems: CapexItem[] = [];
+                const errors: string[] = [];
+
+                results.data.forEach((row: any, index: number) => {
+                    const itemData = {
+                        id: crypto.randomUUID(),
+                        description: row.description,
+                        priority: row.priority,
+                        quantity: row.quantity ? Number(row.quantity) : undefined,
+                        amount: row.amount ? Number(row.amount) : undefined,
+                        justification: row.justification,
+                        remarks: row.remarks
+                    };
+                    
+                    const validation = capexItemSchema.safeParse(itemData);
+                    if (validation.success) {
+                        newItems.push(validation.data);
+                    } else {
+                        const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+                        errors.push(`Row ${index + 2}: ${errorMessages}`);
+                    }
+                });
+
+                if (errors.length > 0) {
+                    toast({
+                        variant: "destructive",
+                        title: "Import Failed",
+                        description: (
+                            <div className="max-h-40 overflow-y-auto">
+                                <p className="mb-2">Some rows could not be imported:</p>
+                                <ul className="list-disc pl-5 text-xs space-y-1">
+                                    {errors.map((e, i) => <li key={i}>{e}</li>)}
+                                </ul>
+                            </div>
+                        ),
+                         duration: 8000,
+                    });
+                } 
+
+                if (newItems.length > 0) {
+                    append(newItems);
+                    toast({
+                        title: "Import Complete",
+                        description: `${newItems.length} item(s) were successfully added to the sheet. ${errors.length} row(s) failed.`,
+                    });
+                } else if (errors.length === 0) {
+                     toast({
+                        title: "No Data Imported",
+                        description: "The file was empty or contained no valid data.",
+                    });
+                }
+            } catch (e) {
+                 toast({
+                    variant: "destructive",
+                    title: "Import Error",
+                    description: "An unexpected error occurred during import.",
+                });
+                console.error(e);
+            } finally {
+                if(fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            }
+        },
+        error: (error) => {
+            toast({
+                variant: "destructive",
+                title: "Import Error",
+                description: `Failed to parse CSV file: ${error.message}`,
+            });
+        }
+    });
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -419,17 +525,31 @@ export default function CapexRegistryPage() {
                   </TableBody>
                 </Table>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="mt-4 print:hidden"
-                disabled={isSubmitting}
-                onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, justification: "", remarks: "" })}
-              >
-                <Icons.Add className="mr-2 h-4 w-4" />
-                Add Item
-              </Button>
+              <div className="flex items-center gap-4 mt-4 print:hidden">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isSubmitting}
+                    onClick={() => append({ id: crypto.randomUUID(), description: "", priority: "", quantity: 1, amount: 0, justification: "", remarks: "" })}
+                  >
+                    <Icons.Add className="mr-2 h-4 w-4" />
+                    Add Item
+                  </Button>
+                  <Button size="sm" variant="outline" type="button" onClick={() => fileInputRef.current?.click()}>
+                      <Icons.Upload className="mr-2 h-4 w-4" /> Import Items
+                  </Button>
+                  <Button variant="link" size="sm" type="button" onClick={handleDownloadSample}>
+                      Download Sample Format
+                  </Button>
+              </div>
+              <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv"
+                  onChange={handleFileImport}
+              />
             </CardContent>
             <CardFooter className="flex justify-end">
                 <div className="flex items-center space-x-4 rounded-md border p-4">
@@ -464,3 +584,5 @@ export default function CapexRegistryPage() {
     </div>
   );
 }
+
+    
