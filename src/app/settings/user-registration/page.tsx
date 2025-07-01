@@ -157,14 +157,17 @@ export default function UserRegistrationPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>User Role (Approval)</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <Select
+                          onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
+                          value={field.value || ""}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">None</SelectItem>
+                            <SelectItem value="none">None</SelectItem>
                             {allApprovalRoles.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {role}
