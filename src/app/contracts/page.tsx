@@ -65,7 +65,7 @@ const FileInput = ({ label, fieldName, form }: { label: string, fieldName: any, 
 export default function ContractsPage() {
     const { 
         contracts, setContracts,
-        organizations, departments, subDepartments,
+        organizations, departments,
         registryItems, vendors 
     } = useData();
     const { toast } = useToast();
@@ -114,10 +114,6 @@ export default function ContractsPage() {
             reset(defaultValues);
         }
     }, [editingContractId, contracts, reset]);
-
-    const availableSubDepartments = React.useMemo(() => {
-        return subDepartments.filter(sd => sd.departmentId === mainDepartmentId);
-    }, [mainDepartmentId, subDepartments]);
 
     const organizationName = React.useMemo(() => {
         if (!mainDepartmentId) return "---";
@@ -190,12 +186,12 @@ export default function ContractsPage() {
     const handleDownloadSample = () => {
         const headers = [
             "contractDescription", "quantity", "supplierName", "mainDepartmentName", 
-            "subDepartmentName", "contractPeriod", "contractAmount", "paymentTerms",
+            "contractPeriod", "contractAmount", "paymentTerms",
             "serviceStartDate", "serviceEndDate", "lpoNumber", "remarks"
         ];
         const sampleData = [
             "Annual Firewall Subscription", "1", "SecureNet Solutions", "Information Technology",
-            "Network Team", "1 Year", "15000", "Net 30", 
+            "1 Year", "15000", "Net 30", 
             "2025-01-01", "2025-12-31", "LPO-2025-001", "Standard renewal"
         ];
         const csvContent = [headers.join(","), sampleData.join(",")].join("\n");
@@ -228,19 +224,16 @@ export default function ContractsPage() {
                         const item = registryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim() === row.contractDescription?.trim());
                         const supplier = vendors.find(v => v.companyName?.trim() === row.supplierName?.trim());
                         const mainDept = departments.find(d => d.name?.trim() === row.mainDepartmentName?.trim());
-                        const subDept = subDepartments.find(sd => sd.name?.trim() === row.subDepartmentName?.trim() && sd.departmentId === mainDept?.id);
 
                         if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in registry.`); return; }
                         if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found.`); return; }
                         if (!mainDept) { errors.push(`Row ${index + 2}: Main department '${row.mainDepartmentName}' not found.`); return; }
-                        if (!subDept) { errors.push(`Row ${index + 2}: Sub-department '${row.subDepartmentName}' not found or doesn't belong to '${row.mainDepartmentName}'.`); return; }
 
                         const contractData = {
                             contractDescription: item.id,
                             quantity: row.quantity ? Number(row.quantity) : undefined,
                             supplierId: supplier.id,
                             mainDepartmentId: mainDept.id,
-                            subDepartmentId: subDept.id,
                             contractPeriod: row.contractPeriod,
                             contractAmount: row.contractAmount ? Number(row.contractAmount) : undefined,
                             paymentTerms: row.paymentTerms,
@@ -428,13 +421,12 @@ export default function ContractsPage() {
                                         <FormField control={form.control} name="quantity" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Item/Service Quantity</FormLabel><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                         <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id!} className="text-[11px]">{v.companyName}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                     </div>
-                                    <div className="grid md:grid-cols-3 gap-4 pt-4">
+                                    <div className="grid md:grid-cols-2 gap-4 pt-4">
                                         <FormItem>
                                             <FormLabel className="text-[12px]">Service Allocation Organization</FormLabel>
                                             <Input readOnly disabled value={organizationName} className="text-[11px]" />
                                         </FormItem>
                                         <FormField control={form.control} name="mainDepartmentId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Service Allocation Main Department</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a department" /></SelectTrigger></FormControl><SelectContent>{departments.map(d => (<SelectItem key={d.id} value={d.id} className="text-[11px]">{d.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
-                                        <FormField control={form.control} name="subDepartmentId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Service Allocation Sub Department</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!mainDepartmentId}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a sub-department" /></SelectTrigger></FormControl><SelectContent>{availableSubDepartments.map(sd => (<SelectItem key={sd.id} value={sd.id} className="text-[11px]">{sd.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                     </div>
                                 </CardContent>
                             </Card>

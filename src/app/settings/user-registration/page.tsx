@@ -37,7 +37,6 @@ const defaultValues: UserRegistrationFormValues = {
   groupId: "",
   organizationId: "",
   departmentId: "",
-  subDepartmentId: "",
   username: "",
   email: "",
   mobile: "",
@@ -54,7 +53,6 @@ export default function UserRegistrationPage() {
     groups, 
     organizations, 
     departments, 
-    subDepartments, 
     approvalWorkflows, 
   } = useData();
 
@@ -70,7 +68,6 @@ export default function UserRegistrationPage() {
   const { watch, setValue, reset } = form;
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
-  const departmentId = watch("departmentId");
 
   const availableOrganizations = React.useMemo(() => {
     return organizations.filter((o) => o.groupId === groupId);
@@ -79,10 +76,6 @@ export default function UserRegistrationPage() {
   const availableDepartments = React.useMemo(() => {
     return departments.filter((d) => d.organizationId === organizationId);
   }, [organizationId, departments]);
-
-  const availableSubDepartments = React.useMemo(() => {
-    return subDepartments.filter((sd) => sd.departmentId === departmentId);
-  }, [departmentId, subDepartments]);
 
   const allApprovalRoles = React.useMemo(() => {
     const budgetRoles = approvalWorkflows.budget.map(
@@ -122,6 +115,7 @@ export default function UserRegistrationPage() {
   }, [groupId, availableOrganizations, organizationId, setValue]);
 
   React.useEffect(() => {
+    const departmentId = watch("departmentId");
     if (availableDepartments.length > 0) {
       if (!availableDepartments.find((d) => d.id === departmentId)) {
         setValue("departmentId", "");
@@ -129,18 +123,7 @@ export default function UserRegistrationPage() {
     } else {
       setValue("departmentId", "");
     }
-  }, [organizationId, availableDepartments, departmentId, setValue]);
-
-  React.useEffect(() => {
-    const subDepartmentId = watch("subDepartmentId");
-    if (availableSubDepartments.length > 0) {
-      if (!availableSubDepartments.find((sd) => sd.id === subDepartmentId)) {
-        setValue("subDepartmentId", "");
-      }
-    } else {
-      setValue("subDepartmentId", "");
-    }
-  }, [departmentId, availableSubDepartments, setValue, watch]);
+  }, [organizationId, availableDepartments, setValue, watch]);
 
   function handleEdit(userId: string) {
     setEditingUserId(userId);
@@ -262,7 +245,7 @@ export default function UserRegistrationPage() {
                       <CardTitle className="text-[13px]">{editingUserId ? "Edit User Details" : "User Details"}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid md:grid-cols-3 gap-4">
                         <FormField
                           control={form.control}
                           name="groupId"
@@ -338,34 +321,6 @@ export default function UserRegistrationPage() {
                                   {availableDepartments.map((d) => (
                                     <SelectItem key={d.id} value={d.id}>
                                       {d.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="subDepartmentId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Sub Department</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                disabled={!departmentId || availableSubDepartments.length === 0}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a sub-department" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {availableSubDepartments.map((sd) => (
-                                    <SelectItem key={sd.id} value={sd.id}>
-                                      {sd.name}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>

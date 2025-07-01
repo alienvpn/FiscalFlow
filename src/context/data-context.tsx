@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem, CapexItem, ApprovalItem, User, Group, Organization, Department, SubDepartment } from "@/lib/types";
+import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem, CapexItem, ApprovalItem, User, Group, Organization, Department } from "@/lib/types";
 
 /**
  * A custom hook that uses localStorage for state persistence.
@@ -55,8 +55,6 @@ interface DataContextProps {
   setOrganizations: React.Dispatch<React.SetStateAction<Organization[]>>;
   departments: Department[];
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
-  subDepartments: SubDepartment[];
-  setSubDepartments: React.Dispatch<React.SetStateAction<SubDepartment[]>>;
   vendors: VendorFormValues[];
   setVendors: React.Dispatch<React.SetStateAction<VendorFormValues[]>>;
   registryItems: RegistryFormValues[];
@@ -82,7 +80,6 @@ const DataContext = createContext<DataContextProps | undefined>(undefined);
 const initialGroups: Group[] = [{ id: "grp-root", name: "approotgroup" }];
 const initialOrganizations: Organization[] = [{ id: "org-root", name: "rootorg", groupId: "grp-root" }];
 const initialDepartments: Department[] = [{ id: "dept-root", name: "rootdepartment", organizationId: "org-root" }];
-const initialSubDepartments: SubDepartment[] = [{ id: "sub-dept-root", name: "rootsubdepartment", departmentId: "dept-root" }];
 const initialApprovalWorkflows = {
   budget: [
     { id: 'level-1', level: 1, approverRole: 'Department Head', description: 'Initial review and approval by the head of the requesting department.' },
@@ -102,7 +99,6 @@ const initialUsers: User[] = [
     groupId: 'grp-root',
     organizationId: 'org-root',
     departmentId: 'dept-root',
-    subDepartmentId: 'sub-dept-root',
     username: 'rootuser',
     email: 'root@example.com',
     mobile: '1234567890',
@@ -136,7 +132,6 @@ const initialUsers: User[] = [
     groupId: 'grp-root',
     organizationId: 'org-root',
     departmentId: 'dept-root',
-    subDepartmentId: 'sub-dept-root',
     username: 'itadmin',
     email: 'it.admin@example.com',
     mobile: '1234567891',
@@ -173,7 +168,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [groups, setGroups] = usePersistentState<Group[]>('groups', initialGroups);
   const [organizations, setOrganizations] = usePersistentState<Organization[]>('organizations', initialOrganizations);
   const [departments, setDepartments] = usePersistentState<Department[]>('departments', initialDepartments);
-  const [subDepartments, setSubDepartments] = usePersistentState<SubDepartment[]>('subDepartments', initialSubDepartments);
   const [vendors, setVendors] = usePersistentState<VendorFormValues[]>('vendors', []);
   const [registryItems, setRegistryItems] = usePersistentState<RegistryFormValues[]>('registryItems', []);
   const [contracts, setContracts] = usePersistentState<ContractFormValues[]>('contracts', []);
@@ -187,7 +181,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     groups, setGroups,
     organizations, setOrganizations,
     departments, setDepartments,
-    subDepartments, setSubDepartments,
     vendors, setVendors,
     registryItems, setRegistryItems,
     contracts, setContracts,

@@ -38,7 +38,6 @@ const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
   organizationId: z.string().min(1, "Organization is required."),
   departmentId: z.string().min(1, "Department is required."),
-  subDepartmentId: z.string().min(1, "Sub-department is required."),
   username: z.string().min(1, "Username is required."),
   password: z.string().min(1, "Password is required."),
 });
@@ -46,7 +45,7 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { groups, organizations, departments, subDepartments, users } = useData();
+  const { groups, organizations, departments, users } = useData();
   const mockUsers = users; // for simplicity of renaming
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -55,7 +54,6 @@ export default function LoginPage() {
       groupId: "grp-root",
       organizationId: "org-root",
       departmentId: "dept-root",
-      subDepartmentId: "sub-dept-root",
       username: "rootuser",
       password: "rootuser26570",
     },
@@ -66,7 +64,6 @@ export default function LoginPage() {
 
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
-  const departmentId = watch("departmentId");
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
@@ -75,10 +72,6 @@ export default function LoginPage() {
   const availableDepartments = React.useMemo(
     () => departments.filter((d) => d.organizationId === organizationId),
     [organizationId, departments]
-  );
-  const availableSubDepartments = React.useMemo(
-    () => subDepartments.filter((sd) => sd.departmentId === departmentId),
-    [departmentId, subDepartments]
   );
 
   React.useEffect(() => {
@@ -98,15 +91,6 @@ export default function LoginPage() {
         setValue("departmentId", "");
     }
   }, [organizationId, availableDepartments, setValue]);
-  
-  React.useEffect(() => {
-    if (isInitialRender.current) return;
-    if (availableSubDepartments.length > 0) {
-        setValue("subDepartmentId", availableSubDepartments[0].id);
-    } else {
-        setValue("subDepartmentId", "");
-    }
-  }, [departmentId, availableSubDepartments, setValue]);
   
   React.useEffect(() => {
     // This effect runs once on mount to prevent the other effects
@@ -223,34 +207,6 @@ export default function LoginPage() {
                         {availableDepartments.map((d) => (
                           <SelectItem key={d.id} value={d.id}>
                             {d.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="subDepartmentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sub-Department</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={!departmentId}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a sub-department" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableSubDepartments.map((sd) => (
-                          <SelectItem key={sd.id} value={sd.id}>
-                            {sd.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

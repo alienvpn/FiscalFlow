@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,11 +21,6 @@ const structureItems = [
     title: "Departments",
     description: "Manage functional divisions within an organization.",
     href: "/master-data/departments",
-  },
-  {
-    title: "Sub-Departments",
-    description: "Manage specific teams or units within a department.",
-    href: "/master-data/sub-departments",
   },
   {
     title: "Suppliers / Vendors",

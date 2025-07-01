@@ -83,7 +83,6 @@ export const contractSchema = z.object({
   quantity: z.coerce.number().min(1, "Quantity is required."),
   supplierId: z.string().min(1, "Supplier is required."),
   mainDepartmentId: z.string().min(1, "Main Department is required."),
-  subDepartmentId: z.string().min(1, "Sub Department is required."),
   contractPeriod: z.string().min(1, "Period of contract is required."),
   contractAmount: z.coerce.number().min(0, "Amount is required."),
   paymentTerms: z.string().min(1, "Payment Terms are required."),
@@ -162,7 +161,6 @@ export const userRegistrationSchema = z
     groupId: z.string().min(1, "Group is required."),
     organizationId: z.string().min(1, "Organization is required."),
     departmentId: z.string().min(1, "Department is required."),
-    subDepartmentId: z.string().min(1, "Sub-department is required."),
     username: z.string().min(3, "Username must be at least 3 characters."),
     email: z.string().email("Invalid email address."),
     mobile: z.string().min(1, "Mobile number is required."),
@@ -209,11 +207,3 @@ export const departmentSchema = z.object({
 });
 export type DepartmentFormValues = z.infer<typeof departmentSchema>;
 export type Department = { id: string; name: string; organizationId: string; };
-
-export const subDepartmentSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().min(1, "Sub-department name is required."),
-    departmentId: z.string().min(1, "A parent department must be selected."),
-});
-export type SubDepartmentFormValues = z.infer<typeof subDepartmentSchema>;
-export type SubDepartment = { id: string; name: string; departmentId: string; };
