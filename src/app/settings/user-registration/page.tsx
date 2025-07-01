@@ -488,7 +488,7 @@ export default function UserRegistrationPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-x-4 border-b pb-2 mb-2">
+                      <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-x-4 border-b pb-2 mb-2">
                         <div className="font-bold text-[11px]">Module / Section</div>
                         <div className="font-bold text-center text-[11px]">
                           Read Only
@@ -502,6 +502,9 @@ export default function UserRegistrationPage() {
                         <div className="font-bold text-center text-[11px]">
                           No Access
                         </div>
+                        <div className="font-bold text-center text-[11px]">
+                          Hide Module
+                        </div>
                       </div>
 
                       {modulesForPermissions.map((module) => (
@@ -510,7 +513,7 @@ export default function UserRegistrationPage() {
                           control={form.control}
                           name={`permissions.${module.href}` as const}
                           render={({ field }) => (
-                            <FormItem className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-x-4 py-2 border-b">
+                            <FormItem className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] items-center gap-x-4 py-2 border-b">
                               <FormLabel className="text-[11px] font-normal">
                                 {module.title}
                               </FormLabel>
@@ -518,7 +521,7 @@ export default function UserRegistrationPage() {
                               <RadioGroup
                                 onValueChange={field.onChange}
                                 value={field.value}
-                                className="col-span-4 grid grid-cols-4 items-center justify-items-center"
+                                className="col-span-5 grid grid-cols-5 items-center justify-items-center"
                               >
                                 <FormItem className="flex items-center justify-center">
                                   <FormControl>
@@ -540,9 +543,14 @@ export default function UserRegistrationPage() {
                                     <RadioGroupItem value="none" />
                                   </FormControl>
                                 </FormItem>
+                                <FormItem className="flex items-center justify-center">
+                                  <FormControl>
+                                    <RadioGroupItem value="hide" />
+                                  </FormControl>
+                                </FormItem>
                               </RadioGroup>
 
-                              <FormMessage className="col-span-5" />
+                              <FormMessage className="col-span-6" />
                             </FormItem>
                           )}
                         />

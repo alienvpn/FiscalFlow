@@ -153,7 +153,7 @@ export type ApprovalItem = z.infer<typeof approvalItemSchema>;
 
 
 // From /settings/user-registration/page.tsx
-export const permissionsSchema = z.record(z.enum(["read", "write", "full", "none"]));
+export const permissionsSchema = z.record(z.enum(["read", "write", "full", "none", "hide"]));
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters.").optional().or(z.literal(''));
 
 export const userRegistrationSchema = z
