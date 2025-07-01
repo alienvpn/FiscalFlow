@@ -154,6 +154,8 @@ export type ApprovalItem = z.infer<typeof approvalItemSchema>;
 
 // From /settings/user-registration/page.tsx
 export const permissionsSchema = z.record(z.enum(["read", "write", "full", "none"]));
+const passwordSchema = z.string().min(8, "Password must be at least 8 characters.").optional().or(z.literal(''));
+
 export const userRegistrationSchema = z
   .object({
     id: z.string().optional(),
@@ -165,13 +167,22 @@ export const userRegistrationSchema = z
     email: z.string().email("Invalid email address."),
     mobile: z.string().min(1, "Mobile number is required."),
     userRole: z.string().optional(),
-    password: z.string().min(8, "Password must be at least 8 characters."),
-    confirmPassword: z.string(),
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
     permissions: permissionsSchema,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match.",
     path: ["confirmPassword"],
+  })
+  .refine((data) => {
+    // If id exists, it's an existing user, password can be blank
+    if(data.id) return true;
+    // If it's a new user, password is required
+    return !!data.password && data.password.length >= 8;
+  }, {
+    message: "Password is required for new users.",
+    path: ["password"],
   });
 export type User = z.infer<typeof userRegistrationSchema>;
 
