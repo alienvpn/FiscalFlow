@@ -69,6 +69,13 @@ export default function CapexRegistryPage() {
   }, []);
 
   React.useEffect(() => {
+    if (activeTab === 'list') {
+        handleCreateNew();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  React.useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
       if (
         type === "change" &&
@@ -148,22 +155,32 @@ export default function CapexRegistryPage() {
     try {
       if (editingSheetId) {
         setCapexSheets(prev => prev.map(s => s.id === editingSheetId ? { ...s, ...values, status } : s));
-        toast({ title: `Sheet Updated`, description: `Your CAPEX sheet has been saved as ${status.toLowerCase()}.` });
+        if (status === 'Draft') {
+            toast({ title: 'Draft Updated', description: 'Your CAPEX draft has been updated.' });
+        } else {
+            toast({ title: 'Sheet Submitted', description: 'Your CAPEX sheet has been updated and submitted for approval.' });
+        }
       } else {
         const newSheet = { ...values, status, id: crypto.randomUUID() };
         setCapexSheets(prev => [...prev, newSheet]);
-        toast({ title: status === 'Draft' ? 'Draft Saved' : 'Sheet Submitted', description: `Your CAPEX sheet has been submitted.` });
-        if (status === 'Pending Approval') {
-            const firstApproverRole = approvalWorkflows.budget[0]?.approverRole;
-            if (!firstApproverRole) throw new Error("No approver role found.");
-            await sendApprovalRequestNotification({
-                approverRole: firstApproverRole, sheetType: 'CAPEX',
-                sheetDetails: {
-                    organization: getOrgName(values.organization), department: getDeptName(values.department), year: values.year,
-                }
-            });
+        if (status === 'Draft') {
+            toast({ title: 'Draft Saved', description: 'Your CAPEX sheet has been saved as a draft.' });
+        } else {
+            toast({ title: 'Sheet Submitted', description: 'Your CAPEX sheet has been submitted for approval.' });
         }
       }
+
+      if (status === 'Pending Approval') {
+          const firstApproverRole = approvalWorkflows.budget[0]?.approverRole;
+          if (!firstApproverRole) throw new Error("No approver role found.");
+          await sendApprovalRequestNotification({
+              approverRole: firstApproverRole, sheetType: 'CAPEX',
+              sheetDetails: {
+                  organization: getOrgName(values.organization), department: getDeptName(values.department), year: values.year,
+              }
+          });
+      }
+
       handleCreateNew();
       setActiveTab("list");
     } catch (error) {
@@ -371,8 +388,14 @@ export default function CapexRegistryPage() {
                 </Card>
                 
                 <div className="flex items-center gap-4 print:hidden">
-                    <Button type="submit" disabled={isSubmitting || fields.length === 0 || isReadOnly}>{isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}Submit for Approval</Button>
-                    <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting || fields.length === 0 || isReadOnly}>{isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}Save as Draft</Button>
+                    <Button type="submit" disabled={isSubmitting || fields.length === 0 || isReadOnly}>
+                        {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+                        {editingSheetId ? 'Update & Submit' : 'Submit for Approval'}
+                    </Button>
+                    <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting || fields.length === 0 || isReadOnly}>
+                        {isSubmitting && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+                        {editingSheetId ? 'Update Draft' : 'Save as Draft'}
+                    </Button>
                     <Button type="button" variant="outline" onClick={() => window.print()}>Print &amp; Preview</Button>
                 </div>
                 </form>
