@@ -5,6 +5,8 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { intervalToDuration } from "date-fns"
+import Papa from "papaparse";
+import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -19,7 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
 import { useData } from "@/context/data-context";
-import { registrySchema, type RegistryFormValues } from "@/lib/types";
+import { registrySchema, deviceSchema, serviceSchema, type RegistryFormValues } from "@/lib/types";
 
 const defaultValues = {
   type: "device" as const,
@@ -37,6 +39,8 @@ export default function ItemRegistryPage() {
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null)
   const [activeTab, setActiveTab] = React.useState("view")
   const [isClient, setIsClient] = React.useState(false);
+  const { toast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<RegistryFormValues>({
     resolver: zodResolver(registrySchema),
@@ -98,6 +102,160 @@ export default function ItemRegistryPage() {
     setEditingItemId(null)
     setActiveTab("view")
   }
+  
+  const handleDownloadSample = () => {
+    const headers = [
+      "type", "description", "model", "make", "countryOfMake", "partNumber", "serialNumber", "macAddress", 
+      "manufactureDate", "expireDate", "endOfSalesDate", "endOfSupportDate", "endOfLifeDate", 
+      "warrantyStartDate", "warrantyEndDate", "serviceStartDate", "serviceEndDate", "supplierName"
+    ];
+    const sampleData = [
+      [
+        "device", "Dell XPS 15 Laptop", "XPS 15 9530", "Dell", "China", "DXPS159530-123", "SN123456789", "00:1A:2B:3C:4D:5E",
+        "2023-01-01", "", "", "", "2028-01-01",
+        "2023-01-15", "2026-01-14", "", "", ""
+      ].join(","),
+      [
+        "service", "Annual Firewall Subscription", "", "", "", "", "", "",
+        "", "", "", "", "", 
+        "", "", "2024-01-01", "2024-12-31", vendors[0]?.companyName || "Sample Vendor Inc"
+      ].join(",")
+    ];
+    const csvContent = [
+        headers.join(","),
+        ...sampleData
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "registry_items_sample_import.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+            try {
+                const newItems: RegistryFormValues[] = [];
+                const errors: string[] = [];
+
+                results.data.forEach((row: any, index: number) => {
+                    const rowNum = index + 2;
+                    const type = row.type?.trim().toLowerCase();
+                    
+                    if (type === 'device') {
+                        const deviceData = {
+                            type: 'device',
+                            deviceDescription: row.description,
+                            model: row.model,
+                            make: row.make,
+                            countryOfMake: row.countryOfMake,
+                            partNumber: row.partNumber,
+                            serialNumber: row.serialNumber,
+                            macAddress: row.macAddress,
+                            manufactureDate: row.manufactureDate ? new Date(row.manufactureDate) : undefined,
+                            expireDate: row.expireDate ? new Date(row.expireDate) : undefined,
+                            endOfSalesDate: row.endOfSalesDate ? new Date(row.endOfSalesDate) : undefined,
+                            endOfSupportDate: row.endOfSupportDate ? new Date(row.endOfSupportDate) : undefined,
+                            endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+                            warrantyStartDate: row.warrantyStartDate ? new Date(row.warrantyStartDate) : undefined,
+                            warrantyEndDate: row.warrantyEndDate ? new Date(row.warrantyEndDate) : undefined,
+                        };
+                        const validation = deviceSchema.safeParse(deviceData);
+                        if (validation.success) {
+                            newItems.push({ ...validation.data, id: `item-${Date.now()}-${rowNum}` });
+                        } else {
+                            const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+                            errors.push(`Row ${rowNum}: ${errorMessages}`);
+                        }
+                    } else if (type === 'service') {
+                        const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplierName?.trim().toLowerCase());
+                        if (!supplier) {
+                            errors.push(`Row ${rowNum}: Supplier '${row.supplierName}' not found. Please add it first.`);
+                            return;
+                        }
+                        
+                        const serviceData = {
+                            type: 'service',
+                            serviceDescription: row.description,
+                            serviceStartDate: row.serviceStartDate ? new Date(row.serviceStartDate) : undefined,
+                            serviceEndDate: row.serviceEndDate ? new Date(row.serviceEndDate) : undefined,
+                            supplierId: supplier.id,
+                        };
+                        const validation = serviceSchema.safeParse(serviceData);
+                        if (validation.success) {
+                            newItems.push({ ...validation.data, id: `item-${Date.now()}-${rowNum}` });
+                        } else {
+                            const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
+                            errors.push(`Row ${rowNum}: ${errorMessages}`);
+                        }
+                    } else {
+                        errors.push(`Row ${rowNum}: Invalid or missing 'type'. Must be 'device' or 'service'.`);
+                    }
+                });
+
+                if (errors.length > 0) {
+                    toast({
+                        variant: "destructive",
+                        title: "Import Incomplete",
+                        description: (
+                            <div className="max-h-40 overflow-y-auto">
+                                <p className="mb-2">Some rows could not be imported:</p>
+                                <ul className="list-disc pl-5 text-xs space-y-1">
+                                    {errors.map((e, i) => <li key={i}>{e}</li>)}
+                                </ul>
+                            </div>
+                        ),
+                         duration: 9000,
+                    });
+                } 
+                if (newItems.length > 0) {
+                    setRegistryItems(prev => [...prev, ...newItems]);
+                    toast({
+                        title: "Import Complete",
+                        description: `${newItems.length} item(s) were successfully imported. ${errors.length} row(s) failed.`,
+                    });
+                } else if (errors.length === 0) {
+                     toast({
+                        variant: "destructive",
+                        title: "No Data Imported",
+                        description: "The file was empty or contained no valid data.",
+                    });
+                }
+            } catch (e) {
+                 toast({
+                    variant: "destructive",
+                    title: "Import Error",
+                    description: "An unexpected error occurred during import.",
+                });
+                console.error(e);
+            } finally {
+                if(fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            }
+        },
+        error: (error) => {
+            toast({
+                variant: "destructive",
+                title: "Import Error",
+                description: `Failed to parse CSV file: ${error.message}`,
+            });
+        }
+    });
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -174,10 +332,25 @@ export default function ItemRegistryPage() {
                   </TableBody>
                 </Table>
               </div>
-               <Button size="sm" className="mt-4" onClick={handleCreateNew}>
-                <Icons.Add className="mr-2" />
-                Create New Item
-              </Button>
+              <div className="flex items-center gap-2 mt-4">
+                <Button size="sm" onClick={handleCreateNew}>
+                  <Icons.Add className="mr-2" />
+                  Create New Item
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Icons.Upload className="mr-2 h-4 w-4" /> Import Items
+                </Button>
+                <Button variant="link" size="sm" onClick={handleDownloadSample}>
+                    Download Sample Format
+                </Button>
+              </div>
+              <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv"
+                  onChange={handleFileImport}
+              />
             </CardContent>
           </Card>
         </TabsContent>
