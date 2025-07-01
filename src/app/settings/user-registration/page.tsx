@@ -68,6 +68,7 @@ export default function UserRegistrationPage() {
   const { watch, setValue, reset } = form;
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
+  const departmentId = watch("departmentId");
 
   const availableOrganizations = React.useMemo(() => {
     return organizations.filter((o) => o.groupId === groupId);
@@ -105,25 +106,21 @@ export default function UserRegistrationPage() {
 
 
   React.useEffect(() => {
-    if (availableOrganizations.length > 0) {
-      if (!availableOrganizations.find((o) => o.id === organizationId)) {
-        setValue("organizationId", "");
-      }
-    } else {
+    // When the available organizations change, check if the current one is still valid.
+    if (organizationId && !availableOrganizations.some(o => o.id === organizationId)) {
+      // If not, clear the organization and the dependent department.
       setValue("organizationId", "");
-    }
-  }, [groupId, availableOrganizations, organizationId, setValue]);
-
-  React.useEffect(() => {
-    const departmentId = watch("departmentId");
-    if (availableDepartments.length > 0) {
-      if (!availableDepartments.find((d) => d.id === departmentId)) {
-        setValue("departmentId", "");
-      }
-    } else {
       setValue("departmentId", "");
     }
-  }, [organizationId, availableDepartments, setValue, watch]);
+  }, [organizationId, availableOrganizations, setValue]);
+
+  React.useEffect(() => {
+    // When the available departments change, check if the current one is still valid.
+    if (departmentId && !availableDepartments.some(d => d.id === departmentId)) {
+      // If not, clear the department.
+      setValue("departmentId", "");
+    }
+  }, [departmentId, availableDepartments, setValue]);
 
   function handleEdit(userId: string) {
     setEditingUserId(userId);
