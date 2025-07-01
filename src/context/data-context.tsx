@@ -131,6 +131,40 @@ const initialUsers: User[] = [
       '/budget-forecasting': 'full'
     },
   },
+  {
+    id: 'user-it-admin',
+    groupId: 'grp-root',
+    organizationId: 'org-root',
+    departmentId: 'dept-root',
+    subDepartmentId: 'sub-dept-root',
+    username: 'itadmin',
+    email: 'it.admin@example.com',
+    mobile: '1234567891',
+    userRole: 'IT Administrator',
+    password: 'itadminpassword',
+    confirmPassword: 'itadminpassword',
+    permissions: {
+      '/master-data/company-profile': 'read',
+      '/item-registry': 'full',
+      '/master-data/vendors': 'write',
+      '/capex-registry': 'full',
+      '/opex-registry': 'full',
+      '/contracts': 'read',
+      '/approvals/inbox': 'none',
+      '/reports': 'read',
+      '/reports/capex': 'read',
+      '/reports/opex': 'read',
+      '/reports/contracts': 'read',
+      '/reports/vendors': 'read',
+      '/reports/user-access-rights': 'read',
+      '/settings/approval-matrix': 'none',
+      '/settings/user-registration': 'none',
+      '/dashboard': 'full',
+      '/capex-analysis': 'full',
+      '/opex-tracker': 'full',
+      '/budget-forecasting': 'read'
+    },
+  },
 ];
 
 
