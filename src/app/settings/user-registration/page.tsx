@@ -95,12 +95,17 @@ export default function UserRegistrationPage() {
 
   React.useEffect(() => {
     if (editingUserId) {
-        const userToEdit = users.find(u => u.id === editingUserId);
-        if (userToEdit) {
-            reset(userToEdit);
-        }
+      const userToEdit = users.find((u) => u.id === editingUserId);
+      if (userToEdit) {
+        // Merge existing permissions with the default set to handle any new modules.
+        const completePermissions = {
+          ...defaultPermissions,
+          ...userToEdit.permissions,
+        };
+        reset({ ...userToEdit, permissions: completePermissions });
+      }
     } else {
-        reset(defaultValues);
+      reset(defaultValues);
     }
   }, [editingUserId, users, reset]);
 
