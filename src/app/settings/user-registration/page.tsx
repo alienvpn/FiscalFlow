@@ -60,6 +60,7 @@ export default function UserRegistrationPage() {
 
   const [activeTab, setActiveTab] = React.useState("view");
   const [editingUserId, setEditingUserId] = React.useState<string | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<UserRegistrationFormValues>({
     resolver: zodResolver(userRegistrationSchema),
@@ -94,6 +95,10 @@ export default function UserRegistrationPage() {
     return [...new Set(allRoles)];
   }, [approvalWorkflows]);
   
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   React.useEffect(() => {
     if (editingUserId) {
         const userToEdit = users.find(u => u.id === editingUserId);
@@ -211,7 +216,7 @@ export default function UserRegistrationPage() {
                                     <TableCell className="font-medium text-[11px]">{user.username}</TableCell>
                                     <TableCell className="text-[11px]">{user.email}</TableCell>
                                     <TableCell>
-                                        {user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
+                                        {isClient && user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
                                     </TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button variant="ghost" size="sm" onClick={() => handleEdit(user.id!)}>Edit</Button>
