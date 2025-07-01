@@ -38,12 +38,19 @@ import {
   groups,
   organizations,
   departments,
-  subDepartments
+  subDepartments,
 } from "@/lib/mock-data";
-import { userRegistrationSchema, type User as UserRegistrationFormValues } from "@/lib/types";
+import {
+  userRegistrationSchema,
+  type User as UserRegistrationFormValues,
+} from "@/lib/types";
 
 const modulesForPermissions = allModules.filter(
-  (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/" && m.href !== "/home"
+  (m) =>
+    m.href !== "/settings/user-registration" &&
+    m.href !== "/login" &&
+    m.href !== "/" &&
+    m.href !== "/home"
 );
 
 const defaultPermissions = modulesForPermissions.reduce(
@@ -75,30 +82,48 @@ export default function UserRegistrationPage() {
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
   const departmentId = watch("departmentId");
+  const subDepartmentId = watch("subDepartmentId");
 
-  const availableOrganizations = React.useMemo(
-    () => organizations.filter((o) => o.groupId === groupId),
-    [groupId]
-  );
-  const availableDepartments = React.useMemo(
-    () => departments.filter((d) => d.organizationId === organizationId),
-    [organizationId]
-  );
-  const availableSubDepartments = React.useMemo(
-    () => subDepartments.filter((d) => d.departmentId === departmentId),
-    [departmentId]
-  );
-    
+  const availableOrganizations = React.useMemo(() => {
+    return organizations.filter((o) => o.groupId === groupId);
+  }, [groupId]);
+
+  const availableDepartments = React.useMemo(() => {
+    return departments.filter((d) => d.organizationId === organizationId);
+  }, [organizationId]);
+
+  const availableSubDepartments = React.useMemo(() => {
+    return subDepartments.filter((sd) => sd.departmentId === departmentId);
+  }, [departmentId]);
+
   const allApprovalRoles = React.useMemo(() => {
-    const budgetRoles = approvalWorkflows.budget.map((level) => level.approverRole);
-    const contractRoles = approvalWorkflows.contract.map((level) => level.approverRole);
+    const budgetRoles = approvalWorkflows.budget.map(
+      (level) => level.approverRole
+    );
+    const contractRoles = approvalWorkflows.contract.map(
+      (level) => level.approverRole
+    );
     const allRoles = [...budgetRoles, ...contractRoles];
     return [...new Set(allRoles)];
   }, []);
 
-  React.useEffect(() => setValue("organizationId", ""), [groupId, setValue]);
-  React.useEffect(() => setValue("departmentId", ""), [organizationId, setValue]);
-  React.useEffect(() => setValue("subDepartmentId", ""), [departmentId, setValue]);
+  React.useEffect(() => {
+    if (organizationId && !availableOrganizations.find((o) => o.id === organizationId)) {
+      setValue("organizationId", "");
+    }
+  }, [groupId, organizationId, availableOrganizations, setValue]);
+
+  React.useEffect(() => {
+    if (departmentId && !availableDepartments.find((d) => d.id === departmentId)) {
+      setValue("departmentId", "");
+    }
+  }, [organizationId, departmentId, availableDepartments, setValue]);
+
+  React.useEffect(() => {
+    if (subDepartmentId && !availableSubDepartments.find((sd) => sd.id === subDepartmentId)) {
+      setValue("subDepartmentId", "");
+    }
+  }, [departmentId, subDepartmentId, availableSubDepartments, setValue]);
 
   function onSubmit(data: UserRegistrationFormValues) {
     console.log("New user created (logged to console):", data);
@@ -129,15 +154,146 @@ export default function UserRegistrationPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="groupId" render={({ field }) => (<FormItem><FormLabel>Group</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a group" /></SelectTrigger></FormControl><SelectContent>{groups.map((g) => (<SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
-                  <FormField control={form.control} name="organizationId" render={({ field }) => (<FormItem><FormLabel>Organization</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!groupId}><FormControl><SelectTrigger><SelectValue placeholder="Select an organization" /></SelectTrigger></FormControl><SelectContent>{availableOrganizations.map((o) => (<SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
-                  <FormField control={form.control} name="departmentId" render={({ field }) => (<FormItem><FormLabel>Department</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!organizationId}><FormControl><SelectTrigger><SelectValue placeholder="Select a department" /></SelectTrigger></FormControl><SelectContent>{availableDepartments.map((d) => (<SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
-                  <FormField control={form.control} name="subDepartmentId" render={({ field }) => (<FormItem><FormLabel>Sub Department</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!departmentId}><FormControl><SelectTrigger><SelectValue placeholder="Select a sub-department" /></SelectTrigger></FormControl><SelectContent>{availableSubDepartments.map((sd) => (<SelectItem key={sd.id} value={sd.id}>{sd.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                  <FormField
+                    control={form.control}
+                    name="groupId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Group</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a group" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {groups.map((g) => (
+                              <SelectItem key={g.id} value={g.id}>
+                                {g.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="organizationId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organization</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!groupId}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an organization" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableOrganizations.map((o) => (
+                              <SelectItem key={o.id} value={o.id}>
+                                {o.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="departmentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!organizationId}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a department" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableDepartments.map((d) => (
+                              <SelectItem key={d.id} value={d.id}>
+                                {d.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="subDepartmentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sub Department</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!departmentId}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a sub-department" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableSubDepartments.map((sd) => (
+                              <SelectItem key={sd.id} value={sd.id}>
+                                {sd.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 <Separator />
                 <div className="grid md:grid-cols-3 gap-4">
-                  <FormField control={form.control} name="username" render={({ field }) => (<FormItem><FormLabel>User Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                  <FormField control={form.control} name="mobile" render={({ field }) => (<FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>User Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mobile"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mobile Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="userRole"
@@ -145,8 +301,10 @@ export default function UserRegistrationPage() {
                       <FormItem>
                         <FormLabel>User Role (Approval)</FormLabel>
                         <Select
-                          onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
-                          value={field.value || "none"}
+                          onValueChange={(value) =>
+                            field.onChange(value === "--none--" ? "" : value)
+                          }
+                          value={field.value || "--none--"}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -154,7 +312,7 @@ export default function UserRegistrationPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="--none--">None</SelectItem>
                             {allApprovalRoles.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {role}
@@ -167,26 +325,74 @@ export default function UserRegistrationPage() {
                     )}
                   />
                 </div>
-                 <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="grid md:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="password" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                  <FormField control={form.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Re-Enter Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Re-Enter Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-[13px]">Module Permissions</CardTitle>
-                <CardDescription className="text-[12px]">Set access levels for each module.</CardDescription>
+                <CardTitle className="text-[13px]">
+                  Module Permissions
+                </CardTitle>
+                <CardDescription className="text-[12px]">
+                  Set access levels for each module.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                 <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-x-4 border-b pb-2 mb-2">
-                    <div className="font-bold text-[11px]">Module / Section</div>
-                    <div className="font-bold text-center text-[11px]">Read Only</div>
-                    <div className="font-bold text-center text-[11px]">Read & Write</div>
-                    <div className="font-bold text-center text-[11px]">Full Access</div>
-                    <div className="font-bold text-center text-[11px]">No Access</div>
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-x-4 border-b pb-2 mb-2">
+                  <div className="font-bold text-[11px]">Module / Section</div>
+                  <div className="font-bold text-center text-[11px]">
+                    Read Only
+                  </div>
+                  <div className="font-bold text-center text-[11px]">
+                    Read & Write
+                  </div>
+                  <div className="font-bold text-center text-[11px]">
+                    Full Access
+                  </div>
+                  <div className="font-bold text-center text-[11px]">
+                    No Access
+                  </div>
                 </div>
 
                 {modulesForPermissions.map((module) => (
@@ -199,7 +405,7 @@ export default function UserRegistrationPage() {
                         <FormLabel className="text-[11px] font-normal">
                           {module.title}
                         </FormLabel>
-                        
+
                         <RadioGroup
                           onValueChange={field.onChange}
                           value={field.value}
@@ -211,22 +417,22 @@ export default function UserRegistrationPage() {
                             </FormControl>
                           </FormItem>
                           <FormItem className="flex items-center justify-center">
-                             <FormControl>
+                            <FormControl>
                               <RadioGroupItem value="write" />
                             </FormControl>
                           </FormItem>
                           <FormItem className="flex items-center justify-center">
-                             <FormControl>
+                            <FormControl>
                               <RadioGroupItem value="full" />
                             </FormControl>
                           </FormItem>
                           <FormItem className="flex items-center justify-center">
-                             <FormControl>
+                            <FormControl>
                               <RadioGroupItem value="none" />
                             </FormControl>
                           </FormItem>
                         </RadioGroup>
-                        
+
                         <FormMessage className="col-span-5" />
                       </FormItem>
                     )}
@@ -241,36 +447,53 @@ export default function UserRegistrationPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-[13px]">Password Policy</CardTitle>
-              </Header>
+              </CardHeader>
               <CardContent className="text-[12px] text-muted-foreground space-y-4">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Minimum Requirements</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">
+                    Minimum Requirements
+                  </h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Minimum Length: 8 characters</li>
-                    <li>Must include at least 3 of the following 4:
+                    <li>
+                      Must include at least 3 of the following 4:
                       <ul className="list-['-_'] list-inside pl-4">
                         <li>Uppercase letters (A–Z)</li>
                         <li>Lowercase letters (a–z)</li>
                         <li>Numbers (0–9)</li>
-                        <li>Special characters (e.g., !@#$%^&*()_+-=[]{}|;:'",.<>?)</li>
+                        <li>
+                          Special characters (e.g., !@#$%^&*()_+-=[]{}|;:'",.&lt;>?)
+                        </li>
                       </ul>
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Password Change Policy</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">
+                    Password Change Policy
+                  </h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Optional: Change every 180 days (configurable)</li>
                     <li>Cannot reuse the last 5 passwords</li>
-                    <li>Must wait at least 24 hours before reusing the same password</li>
+                    <li>
+                      Must wait at least 24 hours before reusing the same
+                      password
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Account Lockout & Throttling</h4>
+                  <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">
+                    Account Lockout & Throttling
+                  </h4>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Lock account after 5 failed attempts</li>
-                    <li>Unlock after 15 minutes or via email/MFA verification</li>
-                    <li>Apply progressive delays for repeated failed attempts (rate limiting)</li>
+                    <li>
+                      Unlock after 15 minutes or via email/MFA verification
+                    </li>
+                    <li>
+                      Apply progressive delays for repeated failed attempts
+                      (rate limiting)
+                    </li>
                   </ul>
                 </div>
               </CardContent>
