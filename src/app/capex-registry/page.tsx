@@ -49,7 +49,7 @@ export default function CapexRegistryPage() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [isClient, setIsClient] = React.useState(false);
   const [editingSheetId, setEditingSheetId] = React.useState<string | null>(null);
-  const [activeTab, setActiveTab] = React.useState("form");
+  const [activeTab, setActiveTab] = React.useState("list");
 
   const form = useForm<CapexFormValues>({
     resolver: zodResolver(capexRegistrySchema),
