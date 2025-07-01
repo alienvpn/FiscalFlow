@@ -52,11 +52,16 @@ export default function DepartmentsPage() {
   const { departments, setDepartments, organizations } = useData();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingDept, setEditingDept] = React.useState<Department | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(departmentSchema),
     defaultValues: { name: "", organizationId: "" },
   });
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   React.useEffect(() => {
     if (editingDept) {
@@ -122,23 +127,31 @@ export default function DepartmentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {departments.length > 0 ? (
-                departments.map((dept) => (
-                  <TableRow key={dept.id}>
-                    <TableCell className="font-medium text-[11px]">{dept.name}</TableCell>
-                    <TableCell className="text-[11px] font-mono">{dept.id}</TableCell>
-                    <TableCell className="text-[11px]">{getOrganizationName(dept.organizationId)}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(dept)}>Edit</Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(dept.id)}><Icons.Delete className="h-4 w-4"/></Button>
+              {isClient ? (
+                departments.length > 0 ? (
+                  departments.map((dept) => (
+                    <TableRow key={dept.id}>
+                      <TableCell className="font-medium text-[11px]">{dept.name}</TableCell>
+                      <TableCell className="text-[11px] font-mono">{dept.id}</TableCell>
+                      <TableCell className="text-[11px]">{getOrganizationName(dept.organizationId)}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(dept)}>Edit</Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(dept.id)}><Icons.Delete className="h-4 w-4"/></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                      No departments found.
                     </TableCell>
                   </TableRow>
-                ))
+                )
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                    No departments found.
-                  </TableCell>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                        Loading...
+                    </TableCell>
                 </TableRow>
               )}
             </TableBody>

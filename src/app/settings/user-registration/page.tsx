@@ -211,21 +211,37 @@ export default function UserRegistrationPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {users.map(user => (
-                                <TableRow key={user.id}>
-                                    <TableCell className="font-medium text-[11px]">{user.username}</TableCell>
-                                    <TableCell className="text-[11px]">{user.email}</TableCell>
-                                    <TableCell>
-                                        {isClient && user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
-                                    </TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        <Button variant="ghost" size="sm" onClick={() => handleEdit(user.id!)}>Edit</Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(user.id!)} disabled={user.username === 'rootuser'}>
-                                            <Icons.Delete className="h-4 w-4 text-destructive"/>
-                                        </Button>
+                            {isClient ? (
+                                users.length > 0 ? (
+                                    users.map(user => (
+                                        <TableRow key={user.id}>
+                                            <TableCell className="font-medium text-[11px]">{user.username}</TableCell>
+                                            <TableCell className="text-[11px]">{user.email}</TableCell>
+                                            <TableCell>
+                                                {user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
+                                            </TableCell>
+                                            <TableCell className="text-right space-x-2">
+                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(user.id!)}>Edit</Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(user.id!)} disabled={user.username === 'rootuser'}>
+                                                    <Icons.Delete className="h-4 w-4 text-destructive"/>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                            No users found.
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                        Loading...
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                     <Button size="sm" className="mt-4" onClick={handleCreateNew}>

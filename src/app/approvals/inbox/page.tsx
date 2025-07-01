@@ -28,6 +28,11 @@ export default function ApprovalInboxPage() {
   const { toast } = useToast();
   const { pendingApprovals, setPendingApprovals, organizations, departments } = useData();
   const [approvals, setApprovals] = React.useState<ApprovalItem[]>(pendingApprovals);
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   React.useEffect(() => {
     setApprovals(pendingApprovals);
@@ -73,7 +78,7 @@ export default function ApprovalInboxPage() {
         <CardHeader>
           <CardTitle className="text-[13px]">Pending Items</CardTitle>
           <CardDescription className="text-[12px]">
-            {approvals.length} sheet(s) require your attention.
+            {isClient ? approvals.length : '...'} sheet(s) require your attention.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -91,32 +96,40 @@ export default function ApprovalInboxPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {approvals.length > 0 ? (
-                approvals.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <Badge variant={item.type === 'CAPEX' ? 'default' : 'secondary'}>{item.type}</Badge>
-                    </TableCell>
-                    <TableCell className="text-[11px] font-medium">
-                      <div>{getOrganizationName(item.organizationId)}</div>
-                      <div className="text-muted-foreground">{getDepartmentName(item.departmentId)}</div>
-                    </TableCell>
-                    <TableCell className="text-[11px]">{item.year}</TableCell>
-                    <TableCell className="text-[11px] font-semibold">{item.totalValue.toLocaleString()}</TableCell>
-                    <TableCell className="text-[11px]">{item.submittedBy}</TableCell>
-                    <TableCell className="text-[11px]">{format(item.submittedOn, "PPP p")}</TableCell>
-                    <TableCell><Badge variant="outline">{item.status}</Badge></TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button size="sm" variant="outline">View Sheet</Button>
-                      <Button size="sm" onClick={() => handleApprove(item.id)}>Approve</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleReject(item.id)}>Reject</Button>
+              {isClient ? (
+                approvals.length > 0 ? (
+                  approvals.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <Badge variant={item.type === 'CAPEX' ? 'default' : 'secondary'}>{item.type}</Badge>
+                      </TableCell>
+                      <TableCell className="text-[11px] font-medium">
+                        <div>{getOrganizationName(item.organizationId)}</div>
+                        <div className="text-muted-foreground">{getDepartmentName(item.departmentId)}</div>
+                      </TableCell>
+                      <TableCell className="text-[11px]">{item.year}</TableCell>
+                      <TableCell className="text-[11px] font-semibold">{item.totalValue.toLocaleString()}</TableCell>
+                      <TableCell className="text-[11px]">{item.submittedBy}</TableCell>
+                      <TableCell className="text-[11px]">{format(item.submittedOn, "PPP p")}</TableCell>
+                      <TableCell><Badge variant="outline">{item.status}</Badge></TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button size="sm" variant="outline">View Sheet</Button>
+                        <Button size="sm" onClick={() => handleApprove(item.id)}>Approve</Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleReject(item.id)}>Reject</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                      Your inbox is clear. No items are pending your approval.
                     </TableCell>
                   </TableRow>
-                ))
+                )
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
-                    Your inbox is clear. No items are pending your approval.
+                    Loading...
                   </TableCell>
                 </TableRow>
               )}

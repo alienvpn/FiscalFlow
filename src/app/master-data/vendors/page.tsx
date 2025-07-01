@@ -46,6 +46,7 @@ export default function VendorsPage() {
   const [editingVendorId, setEditingVendorId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("view");
   const [cities, setCities] = React.useState<string[]>([]);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<z.infer<typeof vendorSchema>>({
     resolver: zodResolver(vendorSchema),
@@ -54,6 +55,10 @@ export default function VendorsPage() {
 
   const { watch, setValue, reset } = form;
   const selectedCountry = watch("country");
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   React.useEffect(() => {
     if (selectedCountry) {
@@ -200,30 +205,46 @@ export default function VendorsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {vendors.map((vendor) => (
-                        <TableRow key={vendor.id}>
-                          <TableCell className="font-medium text-[11px]">
-                            {vendor.companyName}
-                          </TableCell>
-                          <TableCell className="text-[11px]">
-                            {vendor.country}
-                          </TableCell>
-                          <TableCell className="text-[11px]">
-                            {vendor.city}
-                          </TableCell>
-                          <TableCell className="text-[11px]">
-                            {vendor.email}
-                          </TableCell>
-                          <TableCell className="text-[11px] text-muted-foreground">
-                            {vendor.accountManager.name}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" onClick={() => vendor.id && handleEdit(vendor.id)}>
-                              Edit
-                            </Button>
-                          </TableCell>
+                      {isClient ? (
+                        vendors.length > 0 ? (
+                            vendors.map((vendor) => (
+                                <TableRow key={vendor.id}>
+                                <TableCell className="font-medium text-[11px]">
+                                    {vendor.companyName}
+                                </TableCell>
+                                <TableCell className="text-[11px]">
+                                    {vendor.country}
+                                </TableCell>
+                                <TableCell className="text-[11px]">
+                                    {vendor.city}
+                                </TableCell>
+                                <TableCell className="text-[11px]">
+                                    {vendor.email}
+                                </TableCell>
+                                <TableCell className="text-[11px] text-muted-foreground">
+                                    {vendor.accountManager.name}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <Button variant="ghost" size="sm" onClick={() => vendor.id && handleEdit(vendor.id)}>
+                                    Edit
+                                    </Button>
+                                </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                    No vendors found.
+                                </TableCell>
+                            </TableRow>
+                        )
+                      ) : (
+                        <TableRow>
+                            <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                Loading...
+                            </TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                 </div>

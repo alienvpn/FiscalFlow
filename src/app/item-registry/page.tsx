@@ -36,6 +36,7 @@ export default function ItemRegistryPage() {
   const { registryItems, setRegistryItems, vendors } = useData();
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null)
   const [activeTab, setActiveTab] = React.useState("view")
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<RegistryFormValues>({
     resolver: zodResolver(registrySchema),
@@ -47,6 +48,10 @@ export default function ItemRegistryPage() {
   const serviceEndDate = form.watch("serviceEndDate" as any)
   const [servicePeriod, setServicePeriod] = React.useState<string | null>(null)
 
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
   React.useEffect(() => {
     if (editingItemId) {
       const itemToEdit = registryItems.find((item) => item.id === editingItemId)
@@ -131,25 +136,41 @@ export default function ItemRegistryPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {registryItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium text-[11px]">
-                          {item.type === "device" ? item.deviceDescription : item.serviceDescription}
-                        </TableCell>
-                        <TableCell className="text-[11px]">
-                          <Badge variant="outline" className="capitalize">{item.type}</Badge>
-                        </TableCell>
-                        <TableCell className="text-[11px] text-muted-foreground">
-                          {item.type === "device" && `Model: ${item.model || "N/A"}`}
-                          {item.type === "service" && `Supplier: ${vendors.find(v => v.id === item.supplierId)?.companyName || "N/A"}`}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => item.id && handleEdit(item.id)}>
-                            Edit
-                          </Button>
-                        </TableCell>
+                    {isClient ? (
+                      registryItems.length > 0 ? (
+                        registryItems.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium text-[11px]">
+                              {item.type === "device" ? item.deviceDescription : item.serviceDescription}
+                            </TableCell>
+                            <TableCell className="text-[11px]">
+                              <Badge variant="outline" className="capitalize">{item.type}</Badge>
+                            </TableCell>
+                            <TableCell className="text-[11px] text-muted-foreground">
+                              {item.type === "device" && `Model: ${item.model || "N/A"}`}
+                              {item.type === "service" && `Supplier: ${vendors.find(v => v.id === item.supplierId)?.companyName || "N/A"}`}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="sm" onClick={() => item.id && handleEdit(item.id)}>
+                                Edit
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                            No items found.
+                          </TableCell>
+                        </TableRow>
+                      )
+                    ) : (
+                      <TableRow>
+                          <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                              Loading...
+                          </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>

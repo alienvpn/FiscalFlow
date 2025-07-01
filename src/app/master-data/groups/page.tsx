@@ -46,6 +46,7 @@ export default function GroupsPage() {
   const { groups, setGroups } = useData();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingGroup, setEditingGroup] = React.useState<Group | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<GroupFormValues>({
     resolver: zodResolver(groupSchema),
@@ -53,6 +54,10 @@ export default function GroupsPage() {
       name: "",
     },
   });
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   React.useEffect(() => {
     if (editingGroup) {
@@ -112,22 +117,30 @@ export default function GroupsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {groups.length > 0 ? (
-                  groups.map((group) => (
-                    <TableRow key={group.id}>
-                      <TableCell className="font-medium text-[11px]">{group.name}</TableCell>
-                      <TableCell className="text-[11px] font-mono">{group.id}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(group)}>Edit</Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(group.id)}><Icons.Delete className="h-4 w-4"/></Button>
+                {isClient ? (
+                  groups.length > 0 ? (
+                    groups.map((group) => (
+                      <TableRow key={group.id}>
+                        <TableCell className="font-medium text-[11px]">{group.name}</TableCell>
+                        <TableCell className="text-[11px] font-mono">{group.id}</TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(group)}>Edit</Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(group.id)}><Icons.Delete className="h-4 w-4"/></Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                        No groups found. Add one to get started.
                       </TableCell>
                     </TableRow>
-                  ))
+                  )
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
-                      No groups found. Add one to get started.
-                    </TableCell>
+                      <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                          Loading...
+                      </TableCell>
                   </TableRow>
                 )}
               </TableBody>

@@ -67,6 +67,7 @@ export default function ContractsPage() {
         registryItems, vendors 
     } = useData();
 
+    const [isClient, setIsClient] = React.useState(false);
     const [editingContractId, setEditingContractId] = React.useState<string | null>(null);
     const [activeTab, setActiveTab] = React.useState("view");
     const [organizationFilter, setOrganizationFilter] = React.useState("all");
@@ -80,6 +81,10 @@ export default function ContractsPage() {
     const { watch, setValue, reset } = form;
     const serviceEndDate = watch("serviceEndDate");
     const mainDepartmentId = watch("mainDepartmentId");
+    
+    React.useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     React.useEffect(() => {
         if (serviceEndDate) {
@@ -240,22 +245,30 @@ export default function ContractsPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredContracts.length > 0 ? (
-                                        filteredContracts.map(contract => (
-                                            <TableRow key={contract.id}>
-                                                <TableCell className="font-medium text-[11px]">{getContractDescription(contract)}</TableCell>
-                                                <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.companyName}</TableCell>
-                                                <TableCell className="text-[11px]">{contract.serviceEndDate ? format(contract.serviceEndDate, "PPP") : "N/A"}</TableCell>
-                                                <TableCell><Badge variant={getStatusBadgeVariant(contract.contractStatus)}>{contract.contractStatus || "N/A"}</Badge></TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button variant="ghost" size="sm" onClick={() => contract.id && handleEdit(contract.id)}>Edit</Button>
+                                    {isClient ? (
+                                        filteredContracts.length > 0 ? (
+                                            filteredContracts.map(contract => (
+                                                <TableRow key={contract.id}>
+                                                    <TableCell className="font-medium text-[11px]">{getContractDescription(contract)}</TableCell>
+                                                    <TableCell className="text-[11px]">{vendors.find(v => v.id === contract.supplierId)?.companyName}</TableCell>
+                                                    <TableCell className="text-[11px]">{contract.serviceEndDate ? format(contract.serviceEndDate, "PPP") : "N/A"}</TableCell>
+                                                    <TableCell><Badge variant={getStatusBadgeVariant(contract.contractStatus)}>{contract.contractStatus || "N/A"}</Badge></TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button variant="ghost" size="sm" onClick={() => contract.id && handleEdit(contract.id)}>Edit</Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                                    No contracts found.
                                                 </TableCell>
                                             </TableRow>
-                                        ))
+                                        )
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                                No contracts found.
+                                                Loading...
                                             </TableCell>
                                         </TableRow>
                                     )}

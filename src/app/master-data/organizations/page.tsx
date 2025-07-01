@@ -52,11 +52,16 @@ export default function OrganizationsPage() {
   const { organizations, setOrganizations, groups } = useData();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingOrg, setEditingOrg] = React.useState<Organization | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<OrganizationFormValues>({
     resolver: zodResolver(organizationSchema),
     defaultValues: { name: "", groupId: "" },
   });
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   React.useEffect(() => {
     if (editingOrg) {
@@ -122,24 +127,32 @@ export default function OrganizationsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {organizations.length > 0 ? (
-                organizations.map((org) => (
-                  <TableRow key={org.id}>
-                    <TableCell className="font-medium text-[11px]">{org.name}</TableCell>
-                    <TableCell className="text-[11px] font-mono">{org.id}</TableCell>
-                    <TableCell className="text-[11px]">{getGroupName(org.groupId)}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(org)}>Edit</Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(org.id)}><Icons.Delete className="h-4 w-4"/></Button>
+              {isClient ? (
+                organizations.length > 0 ? (
+                  organizations.map((org) => (
+                    <TableRow key={org.id}>
+                      <TableCell className="font-medium text-[11px]">{org.name}</TableCell>
+                      <TableCell className="text-[11px] font-mono">{org.id}</TableCell>
+                      <TableCell className="text-[11px]">{getGroupName(org.groupId)}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(org)}>Edit</Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(org.id)}><Icons.Delete className="h-4 w-4"/></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                      No organizations found.
                     </TableCell>
                   </TableRow>
-                ))
+                )
               ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                    No organizations found.
-                  </TableCell>
-                </TableRow>
+                  <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                          Loading...
+                      </TableCell>
+                  </TableRow>
               )}
             </TableBody>
           </Table>

@@ -52,11 +52,16 @@ export default function SubDepartmentsPage() {
   const { subDepartments, setSubDepartments, departments } = useData();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingSubDept, setEditingSubDept] = React.useState<SubDepartment | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   const form = useForm<SubDepartmentFormValues>({
     resolver: zodResolver(subDepartmentSchema),
     defaultValues: { name: "", departmentId: "" },
   });
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   React.useEffect(() => {
     if (editingSubDept) {
@@ -122,23 +127,31 @@ export default function SubDepartmentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {subDepartments.length > 0 ? (
-                subDepartments.map((sub) => (
-                  <TableRow key={sub.id}>
-                    <TableCell className="font-medium text-[11px]">{sub.name}</TableCell>
-                    <TableCell className="text-[11px] font-mono">{sub.id}</TableCell>
-                    <TableCell className="text-[11px]">{getDepartmentName(sub.departmentId)}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(sub)}>Edit</Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(sub.id)}><Icons.Delete className="h-4 w-4"/></Button>
+              {isClient ? (
+                subDepartments.length > 0 ? (
+                  subDepartments.map((sub) => (
+                    <TableRow key={sub.id}>
+                      <TableCell className="font-medium text-[11px]">{sub.name}</TableCell>
+                      <TableCell className="text-[11px] font-mono">{sub.id}</TableCell>
+                      <TableCell className="text-[11px]">{getDepartmentName(sub.departmentId)}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(sub)}>Edit</Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(sub.id)}><Icons.Delete className="h-4 w-4"/></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                      No sub-departments found.
                     </TableCell>
                   </TableRow>
-                ))
+                )
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                    No sub-departments found.
-                  </TableCell>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                        Loading...
+                    </TableCell>
                 </TableRow>
               )}
             </TableBody>
