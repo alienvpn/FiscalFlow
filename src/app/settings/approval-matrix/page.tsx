@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
-import { approvalWorkflows as initialApprovalWorkflows } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -47,16 +47,17 @@ const approvalMatrixSchema = z.object({
   levels: z.array(approvalLevelSchema),
 });
 
-type ApprovalMatrixType = keyof typeof initialApprovalWorkflows;
+type ApprovalMatrixType = "budget" | "contract";
 
 export default function ApprovalMatrixPage() {
   const { toast } = useToast();
+  const { approvalWorkflows, setApprovalWorkflows } = useData();
   const [matrixType, setMatrixType] = React.useState<ApprovalMatrixType>("budget");
 
   const form = useForm<z.infer<typeof approvalMatrixSchema>>({
     resolver: zodResolver(approvalMatrixSchema),
     defaultValues: {
-      levels: initialApprovalWorkflows[matrixType],
+      levels: approvalWorkflows[matrixType],
     },
   });
 
@@ -66,11 +67,14 @@ export default function ApprovalMatrixPage() {
   });
 
   React.useEffect(() => {
-    form.reset({ levels: initialApprovalWorkflows[matrixType] });
-  }, [matrixType, form]);
+    form.reset({ levels: approvalWorkflows[matrixType] });
+  }, [matrixType, form, approvalWorkflows]);
 
   function onSubmit(values: z.infer<typeof approvalMatrixSchema>) {
-    console.log(`Saving ${matrixType} approval matrix:`, values);
+    setApprovalWorkflows((prev: any) => ({
+      ...prev,
+      [matrixType]: values.levels,
+    }));
     toast({
       title: "Approval Matrix Saved",
       description: `The approval workflow for ${matrixType === 'budget' ? 'Budget Sheets' : 'Contract Renewal'} has been updated.`,

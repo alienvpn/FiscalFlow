@@ -4,48 +4,21 @@
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { intervalToDuration } from "date-fns"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "@/components/ui/datepicker"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
-import { vendors, registryItems as initialItems } from "@/lib/mock-data"
+import { useData } from "@/context/data-context";
 import { registrySchema, type RegistryFormValues } from "@/lib/types";
 
 const defaultValues = {
@@ -60,7 +33,7 @@ const defaultValues = {
 }
 
 export default function ItemRegistryPage() {
-  const [items, setItems] = React.useState<RegistryFormValues[]>(initialItems.map(i => ({...i})))
+  const { registryItems, setRegistryItems, vendors } = useData();
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null)
   const [activeTab, setActiveTab] = React.useState("view")
 
@@ -76,14 +49,14 @@ export default function ItemRegistryPage() {
 
   React.useEffect(() => {
     if (editingItemId) {
-      const itemToEdit = items.find((item) => item.id === editingItemId)
+      const itemToEdit = registryItems.find((item) => item.id === editingItemId)
       if (itemToEdit) {
         form.reset(itemToEdit)
       }
     } else {
       form.reset(defaultValues)
     }
-  }, [editingItemId, form, items])
+  }, [editingItemId, form, registryItems])
 
   React.useEffect(() => {
     if (serviceStartDate && serviceEndDate && serviceStartDate < serviceEndDate) {
@@ -113,11 +86,9 @@ export default function ItemRegistryPage() {
 
   function onSubmit(values: RegistryFormValues) {
     if (editingItemId) {
-      // Update existing item
-      setItems(items.map((item) => (item.id === editingItemId ? { ...values, id: item.id } : item)))
+      setRegistryItems(registryItems.map((item) => (item.id === editingItemId ? { ...values, id: item.id } : item)))
     } else {
-      // Create new item
-      setItems([...items, { ...values, id: `item-${Date.now()}` }])
+      setRegistryItems([...registryItems, { ...values, id: `item-${Date.now()}` }])
     }
     setEditingItemId(null)
     setActiveTab("view")
@@ -160,7 +131,7 @@ export default function ItemRegistryPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {items.map((item) => (
+                    {registryItems.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium text-[11px]">
                           {item.type === "device" ? item.deviceDescription : item.serviceDescription}

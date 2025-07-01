@@ -18,7 +18,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { mockUsers } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { menuItems } from "@/lib/navigation";
 
 const getModuleTitle = (href: string) => {
@@ -35,6 +35,8 @@ const permissionColors: Record<string, "default" | "secondary" | "outline" | "de
 };
 
 export default function UserAccessRightsReportPage() {
+  const { users } = useData();
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h2 className="text-sm font-bold tracking-tight mb-2 print:text-[12px]">
@@ -62,7 +64,7 @@ export default function UserAccessRightsReportPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockUsers.map((user) => (
+                {users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium text-[11px] align-top">{user.username}</TableCell>
                     <TableCell className="text-[11px] align-top">{user.email}</TableCell>

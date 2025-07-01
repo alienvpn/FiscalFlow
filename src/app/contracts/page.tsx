@@ -4,49 +4,22 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { addDays, subDays, format, isBefore, isAfter } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
 import { Label } from "@/components/ui/label";
-import { organizations, departments, subDepartments, registryItems, vendors, initialContracts } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { contractSchema, type ContractFormValues } from "@/lib/types";
 
 const defaultValues: Partial<ContractFormValues> = {
@@ -88,7 +61,12 @@ const FileInput = ({ label, fieldName, form }: { label: string, fieldName: any, 
 
 
 export default function ContractsPage() {
-    const [contracts, setContracts] = React.useState<ContractFormValues[]>(initialContracts.map(c => ({...c})));
+    const { 
+        contracts, setContracts,
+        organizations, departments, subDepartments,
+        registryItems, vendors 
+    } = useData();
+
     const [editingContractId, setEditingContractId] = React.useState<string | null>(null);
     const [activeTab, setActiveTab] = React.useState("view");
     const [organizationFilter, setOrganizationFilter] = React.useState("all");
@@ -130,7 +108,7 @@ export default function ContractsPage() {
 
     const availableSubDepartments = React.useMemo(() => {
         return subDepartments.filter(sd => sd.departmentId === mainDepartmentId);
-    }, [mainDepartmentId]);
+    }, [mainDepartmentId, subDepartments]);
 
     const organizationName = React.useMemo(() => {
         if (!mainDepartmentId) return "---";
@@ -138,13 +116,13 @@ export default function ContractsPage() {
         if (!dept) return "---";
         const org = organizations.find(o => o.id === dept.organizationId);
         return org ? org.name : "---";
-    }, [mainDepartmentId]);
+    }, [mainDepartmentId, departments, organizations]);
 
 
     const availableFilterDepartments = React.useMemo(() => {
         if (organizationFilter === 'all') return departments;
         return departments.filter(d => d.organizationId === organizationFilter);
-    }, [organizationFilter]);
+    }, [organizationFilter, departments]);
 
     const filteredContracts = React.useMemo(() => {
         return contracts
@@ -157,7 +135,7 @@ export default function ContractsPage() {
                 if (departmentFilter === 'all') return true;
                 return c.mainDepartmentId === departmentFilter;
             });
-    }, [contracts, organizationFilter, departmentFilter]);
+    }, [contracts, organizationFilter, departmentFilter, departments]);
     
     React.useEffect(() => {
         setDepartmentFilter("all");
@@ -294,9 +272,9 @@ export default function ContractsPage() {
                                 <CardHeader><CardTitle className="text-[13px]">Contract Details</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
                                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <FormField control={form.control} name="contractDescription" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Contract Description</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select an item/service" /></SelectTrigger></FormControl><SelectContent>{registryItems.map(item => (<SelectItem key={item.id} value={item.id} className="text-[11px]">{item.type === "device" ? item.deviceDescription : item.serviceDescription}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                                        <FormField control={form.control} name="contractDescription" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Contract Description</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select an item/service" /></SelectTrigger></FormControl><SelectContent>{registryItems.map(item => (<SelectItem key={item.id} value={item.id!} className="text-[11px]">{item.type === "device" ? item.deviceDescription : item.serviceDescription}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                         <FormField control={form.control} name="quantity" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Item/Service Quantity</FormLabel><FormControl><Input type="number" className="text-[11px]" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                        <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id} className="text-[11px]">{v.companyName}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+                                        <FormField control={form.control} name="supplierId" render={({ field }) => (<FormItem><FormLabel className="text-[12px]">Supplier/Vendor</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger className="text-[11px]"><SelectValue placeholder="Select a vendor" /></SelectTrigger></FormControl><SelectContent>{vendors.map(v => (<SelectItem key={v.id} value={v.id!} className="text-[11px]">{v.companyName}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-4 pt-4">
                                         <FormItem>

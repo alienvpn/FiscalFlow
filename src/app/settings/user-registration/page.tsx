@@ -4,46 +4,17 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { allModules } from "@/lib/navigation";
-import {
-  approvalWorkflows,
-  groups,
-  organizations,
-  departments,
-  subDepartments,
-} from "@/lib/mock-data";
-import {
-  userRegistrationSchema,
-  type User as UserRegistrationFormValues,
-} from "@/lib/types";
+import { useData } from "@/context/data-context";
+import { userRegistrationSchema, type User as UserRegistrationFormValues } from "@/lib/types";
 
 const modulesForPermissions = allModules.filter(
   (m) =>
@@ -60,6 +31,14 @@ const defaultPermissions = modulesForPermissions.reduce(
 
 export default function UserRegistrationPage() {
   const { toast } = useToast();
+  const { 
+    groups, 
+    organizations, 
+    departments, 
+    subDepartments, 
+    approvalWorkflows, 
+    setUsers 
+  } = useData();
 
   const form = useForm<UserRegistrationFormValues>({
     resolver: zodResolver(userRegistrationSchema),
@@ -85,26 +64,26 @@ export default function UserRegistrationPage() {
 
   const availableOrganizations = React.useMemo(() => {
     return organizations.filter((o) => o.groupId === groupId);
-  }, [groupId]);
+  }, [groupId, organizations]);
 
   const availableDepartments = React.useMemo(() => {
     return departments.filter((d) => d.organizationId === organizationId);
-  }, [organizationId]);
+  }, [organizationId, departments]);
 
   const availableSubDepartments = React.useMemo(() => {
     return subDepartments.filter((sd) => sd.departmentId === departmentId);
-  }, [departmentId]);
+  }, [departmentId, subDepartments]);
 
   const allApprovalRoles = React.useMemo(() => {
     const budgetRoles = approvalWorkflows.budget.map(
-      (level) => level.approverRole
+      (level: any) => level.approverRole
     );
     const contractRoles = approvalWorkflows.contract.map(
-      (level) => level.approverRole
+      (level: any) => level.approverRole
     );
     const allRoles = [...budgetRoles, ...contractRoles];
     return [...new Set(allRoles)];
-  }, []);
+  }, [approvalWorkflows]);
 
   React.useEffect(() => {
     if (availableOrganizations.length > 0) {
@@ -139,10 +118,13 @@ export default function UserRegistrationPage() {
 
 
   function onSubmit(data: UserRegistrationFormValues) {
-    console.log("New user created (logged to console):", data);
+    const newUser = { ...data, id: `user-${Date.now()}`};
+    setUsers(prevUsers => [...prevUsers, newUser]);
+    
+    console.log("New user created:", newUser);
     toast({
-      title: "User Created (Simulation)",
-      description: `User "${data.username}" has been logged to the console.`,
+      title: "User Created",
+      description: `User "${data.username}" has been created successfully.`,
     });
     form.reset();
   }

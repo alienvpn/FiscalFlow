@@ -20,24 +20,25 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  pendingApprovals as initialPendingApprovals,
-  organizations,
-  departments,
-} from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { useToast } from "@/hooks/use-toast";
 import type { ApprovalItem } from "@/lib/types";
 
 export default function ApprovalInboxPage() {
   const { toast } = useToast();
-  const [approvals, setApprovals] = React.useState<ApprovalItem[]>(initialPendingApprovals);
+  const { pendingApprovals, setPendingApprovals, organizations, departments } = useData();
+  const [approvals, setApprovals] = React.useState<ApprovalItem[]>(pendingApprovals);
+
+  React.useEffect(() => {
+    setApprovals(pendingApprovals);
+  }, [pendingApprovals]);
 
   const handleApprove = (id: string) => {
     toast({
       title: "Sheet Approved",
       description: `The budget sheet has been approved.`,
     });
-    setApprovals(approvals.filter((a) => a.id !== id));
+    setPendingApprovals(approvals.filter((a) => a.id !== id));
   };
 
   const handleReject = (id: string) => {
@@ -46,7 +47,7 @@ export default function ApprovalInboxPage() {
       description: `The budget sheet has been rejected and sent back to the originator.`,
       variant: "destructive",
     });
-    setApprovals(approvals.filter((a) => a.id !== id));
+    setPendingApprovals(approvals.filter((a) => a.id !== id));
   };
   
   const getDepartmentName = (id: string) => departments.find(d => d.id === id)?.name || "N/A";

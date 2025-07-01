@@ -31,14 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  groups,
-  organizations,
-  departments,
-  subDepartments,
-  mockUsers,
-} from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
+import { useData } from "@/context/data-context";
 
 const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
@@ -52,6 +46,8 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { groups, organizations, departments, subDepartments, users } = useData();
+  const mockUsers = users; // for simplicity of renaming
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -66,6 +62,7 @@ export default function LoginPage() {
   });
 
   const { watch, setValue } = form;
+  const isInitialRender = React.useRef(true);
 
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
@@ -73,56 +70,49 @@ export default function LoginPage() {
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
-    [groupId]
+    [groupId, organizations]
   );
   const availableDepartments = React.useMemo(
     () => departments.filter((d) => d.organizationId === organizationId),
-    [organizationId]
+    [organizationId, departments]
   );
   const availableSubDepartments = React.useMemo(
     () => subDepartments.filter((sd) => sd.departmentId === departmentId),
-    [departmentId]
+    [departmentId, subDepartments]
   );
-  
-  const isInitialRender = React.useRef(true);
-  React.useEffect(() => {
-    if (isInitialRender.current) {
-        isInitialRender.current = false;
-        return;
-    }
 
+  React.useEffect(() => {
+    if (isInitialRender.current) return;
     if (availableOrganizations.length > 0) {
-      if (!availableOrganizations.find(o => o.id === organizationId)) {
         setValue("organizationId", availableOrganizations[0].id);
-      }
     } else {
         setValue("organizationId", "");
     }
-  }, [groupId]);
+  }, [groupId, availableOrganizations, setValue]);
 
   React.useEffect(() => {
     if (isInitialRender.current) return;
     if (availableDepartments.length > 0) {
-      if (!availableDepartments.find(d => d.id === departmentId)) {
         setValue("departmentId", availableDepartments[0].id);
-      }
     } else {
         setValue("departmentId", "");
     }
-  }, [organizationId]);
+  }, [organizationId, availableDepartments, setValue]);
   
   React.useEffect(() => {
     if (isInitialRender.current) return;
     if (availableSubDepartments.length > 0) {
-        const subDept = watch("subDepartmentId");
-      if (!availableSubDepartments.find(sd => sd.id === subDept)) {
         setValue("subDepartmentId", availableSubDepartments[0].id);
-      }
     } else {
         setValue("subDepartmentId", "");
     }
-  }, [departmentId]);
-
+  }, [departmentId, availableSubDepartments, setValue]);
+  
+  React.useEffect(() => {
+    // This effect runs once on mount to prevent the other effects
+    // from clearing the initial default values.
+    isInitialRender.current = false;
+  }, []);
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     const user = mockUsers.find(

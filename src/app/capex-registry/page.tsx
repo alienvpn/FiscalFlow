@@ -6,44 +6,17 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
-import { organizations, departments, capexSheets } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { useToast } from "@/hooks/use-toast";
-import { submitCapexSheet, saveCapexSheetAsDraft } from "./actions";
+import { sendApprovalRequestNotification } from "@/services/notification-service";
 import { capexItemSchema, type CapexItem } from "@/lib/types";
 
 const currentYear = new Date().getFullYear();
@@ -60,6 +33,7 @@ type CapexFormValues = z.infer<typeof capexRegistrySchema>;
 
 export default function CapexRegistryPage() {
   const { toast } = useToast();
+  const { organizations, departments, capexSheets, approvalWorkflows } = useData();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<CapexItem[]>([]);
 
@@ -90,7 +64,7 @@ export default function CapexRegistryPage() {
         if (organization && department && year) {
           const prevYear = (parseInt(year, 10) - 1).toString();
           const sheet = capexSheets.find(
-            (s) =>
+            (s: any) =>
               s.year === prevYear &&
               s.organizationId === organization &&
               s.departmentId === department
@@ -102,7 +76,7 @@ export default function CapexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form.watch, capexSheets]);
 
 
   const totalValue = React.useMemo(() => {
@@ -129,40 +103,69 @@ export default function CapexRegistryPage() {
     return `${orgName}/${deptName}/${seqYear}/${itemNum}`;
   };
 
-  async function onSubmit(values: CapexFormValues) {
-    setIsSubmitting(true);
-    const result = await submitCapexSheet(values);
-    if (result.success) {
+  async function submitCapexSheet(values: CapexFormValues) {
+    try {
+        console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+        
+        const firstApproverRole = approvalWorkflows.budget[0]?.approverRole;
+        if (!firstApproverRole) {
+            throw new Error("No approver role found in the approval matrix.");
+        }
+
+        const orgName = organizations.find(o => o.id === values.organization)?.name || "N/A";
+        const deptName = departments.find(d => d.id === values.department)?.name || "N/A";
+
+        await sendApprovalRequestNotification({
+            approverRole: firstApproverRole,
+            sheetType: 'CAPEX',
+            sheetDetails: {
+                organization: orgName,
+                department: deptName,
+                year: values.year,
+            }
+        });
+
         toast({
             title: "Sheet Submitted",
-            description: result.message,
+            description: `Your CAPEX sheet has been sent for approval to the ${firstApproverRole}.`,
         });
-    } else {
+    } catch (error) {
+        console.error("Failed to submit CAPEX sheet:", error);
         toast({
             title: "Submission Failed",
-            description: result.error,
+            description: "Failed to submit sheet for approval.",
             variant: "destructive",
         });
     }
+  }
+
+  async function saveCapexSheetAsDraft(values: CapexFormValues) {
+    try {
+        console.log("Saving as draft:", { ...values, status: 'Draft' });
+        toast({
+            title: "Draft Saved",
+            description: "Your CAPEX sheet has been saved as a draft.",
+        });
+    } catch (error) {
+        console.error("Failed to save CAPEX draft:", error);
+        toast({
+            title: "Save Failed",
+            description: "Failed to save draft.",
+            variant: "destructive",
+        });
+    }
+  }
+  
+  async function onSubmit(values: CapexFormValues) {
+    setIsSubmitting(true);
+    await submitCapexSheet(values);
     setIsSubmitting(false);
   }
 
   async function handleSaveAsDraft() {
     setIsSubmitting(true);
     const values = form.getValues();
-    const result = await saveCapexSheetAsDraft(values);
-    if (result.success) {
-        toast({
-            title: "Draft Saved",
-            description: result.message,
-        });
-    } else {
-         toast({
-            title: "Save Failed",
-            description: result.error,
-            variant: "destructive",
-        });
-    }
+    await saveCapexSheetAsDraft(values);
     setIsSubmitting(false);
   }
 

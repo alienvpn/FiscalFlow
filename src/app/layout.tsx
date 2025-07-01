@@ -1,7 +1,9 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Toaster } from "@/components/ui/toaster";
+import { DataProvider } from "@/context/data-context";
 
 export const metadata: Metadata = {
   title: "FiscalFlow",
@@ -28,8 +30,10 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
-        <AppLayout>{children}</AppLayout>
-        <Toaster />
+        <DataProvider>
+          <AppLayout>{children}</AppLayout>
+          <Toaster />
+        </DataProvider>
       </body>
     </html>
   );

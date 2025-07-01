@@ -6,43 +6,16 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
-import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { useToast } from "@/hooks/use-toast";
-import { submitOpexSheet, saveOpexSheetAsDraft } from "./actions";
+import { sendApprovalRequestNotification } from "@/services/notification-service";
 import { opexItemSchema, type OpexItem } from "@/lib/types";
 
 const currentYear = new Date().getFullYear();
@@ -59,6 +32,7 @@ type OpexFormValues = z.infer<typeof opexRegistrySchema>;
 
 export default function OpexRegistryPage() {
   const { toast } = useToast();
+  const { organizations, departments, vendors, opexSheets, approvalWorkflows } = useData();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [previousYearItems, setPreviousYearItems] = React.useState<OpexItem[]>([]);
 
@@ -89,7 +63,7 @@ export default function OpexRegistryPage() {
         if (organization && department && year) {
           const prevYear = (parseInt(year, 10) - 1).toString();
           const sheet = opexSheets.find(
-            (s) =>
+            (s: any) =>
               s.year === prevYear &&
               s.organizationId === organization &&
               s.departmentId === department
@@ -101,7 +75,7 @@ export default function OpexRegistryPage() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form.watch, opexSheets]);
 
 
   const totalAnnualValue = React.useMemo(() => {
@@ -142,40 +116,69 @@ export default function OpexRegistryPage() {
     return `OPEX/${orgName}/${deptName}/${year}/${itemNum}`;
   };
 
-  async function onSubmit(values: OpexFormValues) {
-    setIsSubmitting(true);
-    const result = await submitOpexSheet(values);
-    if (result.success) {
+  async function submitOpexSheet(values: OpexFormValues) {
+    try {
+        console.log("Submitting for approval:", { ...values, status: 'Pending Approval' });
+        
+        const firstApproverRole = approvalWorkflows.budget[0]?.approverRole;
+        if (!firstApproverRole) {
+            throw new Error("No approver role found in the approval matrix.");
+        }
+
+        const orgName = organizations.find(o => o.id === values.organization)?.name || "N/A";
+        const deptName = departments.find(d => d.id === values.department)?.name || "N/A";
+
+        await sendApprovalRequestNotification({
+            approverRole: firstApproverRole,
+            sheetType: 'OPEX',
+            sheetDetails: {
+                organization: orgName,
+                department: deptName,
+                year: values.year,
+            }
+        });
+        
         toast({
             title: "Sheet Submitted",
-            description: result.message,
+            description: `Your OPEX sheet has been sent for approval to the ${firstApproverRole}.`,
         });
-    } else {
+    } catch (error) {
+        console.error("Failed to submit OPEX sheet:", error);
         toast({
             title: "Submission Failed",
-            description: result.error,
+            description: "Failed to submit sheet for approval.",
             variant: "destructive",
         });
     }
+}
+
+  async function saveOpexSheetAsDraft(values: OpexFormValues) {
+      try {
+          console.log("Saving as draft:", { ...values, status: 'Draft' });
+          toast({
+              title: "Draft Saved",
+              description: "Your OPEX sheet has been saved as a draft.",
+          });
+      } catch (error) {
+          console.error("Failed to save OPEX draft:", error);
+          toast({
+              title: "Save Failed",
+              description: "Failed to save draft.",
+              variant: "destructive",
+          });
+      }
+  }
+
+  async function onSubmit(values: OpexFormValues) {
+    setIsSubmitting(true);
+    await submitOpexSheet(values);
     setIsSubmitting(false);
   }
 
   async function handleSaveAsDraft() {
     setIsSubmitting(true);
     const values = form.getValues();
-    const result = await saveOpexSheetAsDraft(values);
-    if (result.success) {
-        toast({
-            title: "Draft Saved",
-            description: result.message,
-        });
-    } else {
-        toast({
-            title: "Save Failed",
-            description: result.error,
-            variant: "destructive",
-        });
-    }
+    await saveOpexSheetAsDraft(values);
     setIsSubmitting(false);
   }
 

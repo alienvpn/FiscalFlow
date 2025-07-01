@@ -4,46 +4,19 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Icons } from "@/components/icons";
 import { countryCityData } from "@/lib/location-data";
-import { vendors as initialVendors } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 import { vendorSchema, type VendorFormValues } from "@/lib/types";
+import { z } from "zod";
 
 const defaultValues: Partial<VendorFormValues> = {
     companyName: "",
@@ -69,7 +42,7 @@ const defaultValues: Partial<VendorFormValues> = {
 };
 
 export default function VendorsPage() {
-  const [vendors, setVendors] = React.useState<VendorFormValues[]>(initialVendors.map(v => ({...v})));
+  const { vendors, setVendors } = useData();
   const [editingVendorId, setEditingVendorId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("view");
   const [cities, setCities] = React.useState<string[]>([]);
@@ -118,10 +91,8 @@ export default function VendorsPage() {
 
   function onSubmit(values: z.infer<typeof vendorSchema>) {
     if (editingVendorId) {
-      // Update existing vendor
       setVendors(vendors.map((v) => (v.id === editingVendorId ? { ...values, id: v.id } : v)));
     } else {
-      // Create new vendor
       setVendors([...vendors, { ...values, id: `vendor-${Date.now()}` }]);
     }
     setEditingVendorId(null);

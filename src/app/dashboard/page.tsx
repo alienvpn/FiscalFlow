@@ -2,39 +2,13 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertTriangle,
-  ArrowUp,
-  ArrowDown,
-  DollarSign,
-  FileWarning,
-} from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
+import { AlertTriangle, ArrowUp, ArrowDown, DollarSign, FileWarning } from "lucide-react";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { addDays, isAfter, isBefore } from "date-fns";
-import { initialContracts } from "@/lib/mock-data";
+import { useData } from "@/context/data-context";
 
 const budgetData = [
   { name: "IT", spent: 4500, budget: 8000 },
@@ -45,44 +19,18 @@ const budgetData = [
 ];
 
 const recentExpenses = [
-  {
-    id: "exp-01",
-    description: "Cloud Services Renewal",
-    amount: 1200,
-    category: "IT",
-    date: "2 days ago",
-  },
-  {
-    id: "exp-02",
-    description: "Marketing Campaign Q3",
-    amount: 4500,
-    category: "Marketing",
-    date: "4 days ago",
-  },
-  {
-    id: "exp-03",
-    description: "Office Supplies",
-    amount: 350,
-    category: "Operations",
-    date: "1 week ago",
-  },
-  {
-    id: "exp-04",
-    description: "New Hire Onboarding",
-    amount: 800,
-    category: "HR",
-    date: "1 week ago",
-  },
+  { id: "exp-01", description: "Cloud Services Renewal", amount: 1200, category: "IT", date: "2 days ago" },
+  { id: "exp-02", description: "Marketing Campaign Q3", amount: 4500, category: "Marketing", date: "4 days ago" },
+  { id: "exp-03", description: "Office Supplies", amount: 350, category: "Operations", date: "1 week ago" },
+  { id: "exp-04", description: "New Hire Onboarding", amount: 800, category: "HR", date: "1 week ago" },
 ];
 
 export default function Dashboard() {
+  const { contracts } = useData();
   const today = new Date();
-  const activeContracts = initialContracts.filter((c) =>
-    c.serviceEndDate && isAfter(c.serviceEndDate, today)
-  );
-  const expiringSoonContracts = activeContracts.filter((c) =>
-    c.serviceEndDate && isBefore(c.serviceEndDate, addDays(today, 30))
-  );
+  
+  const activeContracts = contracts.filter((c) => c.serviceEndDate && isAfter(c.serviceEndDate, today));
+  const expiringSoonContracts = activeContracts.filter((c) => c.serviceEndDate && isBefore(c.serviceEndDate, addDays(today, 30)));
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6">
