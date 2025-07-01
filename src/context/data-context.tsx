@@ -1,8 +1,51 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem, CapexItem, ApprovalItem, User, Group, Organization, Department, SubDepartment } from "@/lib/types";
+
+/**
+ * A custom hook that uses localStorage for state persistence.
+ * @param storageKey The key to use in localStorage.
+ * @param fallbackState The initial state to use if nothing is in localStorage.
+ * @returns A stateful value, and a function to update it.
+ */
+function usePersistentState<T>(storageKey: string, fallbackState: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [value, setValue] = useState<T>(fallbackState);
+
+  // This effect runs once on mount on the client-side to load data from localStorage.
+  useEffect(() => {
+    try {
+      const storedValue = window.localStorage.getItem(storageKey);
+      if (storedValue) {
+        // The reviver function is crucial for converting date strings back to Date objects.
+        const parsedValue = JSON.parse(storedValue, (key, value) => {
+          if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)) {
+            return new Date(value);
+          }
+          return value;
+        });
+        setValue(parsedValue);
+      }
+    } catch (e) {
+      console.error(`Failed to parse stored value for ${storageKey}:`, e);
+      // If parsing fails, we stick with the fallback state.
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  // This effect saves the state to localStorage whenever it changes.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(value));
+    } catch (e) {
+      console.error(`Failed to save value for ${storageKey} to localStorage:`, e);
+    }
+  }, [storageKey, value]);
+
+  return [value, setValue];
+}
+
 
 // Define the shape of the context data
 interface DataContextProps {
@@ -35,7 +78,7 @@ interface DataContextProps {
 // Create the context
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
-// Initial data that was in mock-data.ts
+// Default initial data if nothing is in localStorage
 const initialGroups: Group[] = [{ id: "grp-root", name: "approotgroup" }];
 const initialOrganizations: Organization[] = [{ id: "org-root", name: "rootorg", groupId: "grp-root" }];
 const initialDepartments: Department[] = [{ id: "dept-root", name: "rootdepartment", organizationId: "org-root" }];
@@ -93,18 +136,18 @@ const initialUsers: User[] = [
 
 // Create the provider component
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [groups, setGroups] = useState<Group[]>(initialGroups);
-  const [organizations, setOrganizations] = useState<Organization[]>(initialOrganizations);
-  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
-  const [subDepartments, setSubDepartments] = useState<SubDepartment[]>(initialSubDepartments);
-  const [vendors, setVendors] = useState<VendorFormValues[]>([]);
-  const [registryItems, setRegistryItems] = useState<RegistryFormValues[]>([]);
-  const [contracts, setContracts] = useState<ContractFormValues[]>([]);
-  const [opexSheets, setOpexSheets] = useState<any[]>([]);
-  const [capexSheets, setCapexSheets] = useState<any[]>([]);
-  const [pendingApprovals, setPendingApprovals] = useState<ApprovalItem[]>([]);
-  const [approvalWorkflows, setApprovalWorkflows] = useState<any>(initialApprovalWorkflows);
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [groups, setGroups] = usePersistentState<Group[]>('groups', initialGroups);
+  const [organizations, setOrganizations] = usePersistentState<Organization[]>('organizations', initialOrganizations);
+  const [departments, setDepartments] = usePersistentState<Department[]>('departments', initialDepartments);
+  const [subDepartments, setSubDepartments] = usePersistentState<SubDepartment[]>('subDepartments', initialSubDepartments);
+  const [vendors, setVendors] = usePersistentState<VendorFormValues[]>('vendors', []);
+  const [registryItems, setRegistryItems] = usePersistentState<RegistryFormValues[]>('registryItems', []);
+  const [contracts, setContracts] = usePersistentState<ContractFormValues[]>('contracts', []);
+  const [opexSheets, setOpexSheets] = usePersistentState<any[]>('opexSheets', []);
+  const [capexSheets, setCapexSheets] = usePersistentState<any[]>('capexSheets', []);
+  const [pendingApprovals, setPendingApprovals] = usePersistentState<ApprovalItem[]>('pendingApprovals', []);
+  const [approvalWorkflows, setApprovalWorkflows] = usePersistentState<any>('approvalWorkflows', initialApprovalWorkflows);
+  const [users, setUsers] = usePersistentState<User[]>('users', initialUsers);
 
   const value = {
     groups, setGroups,
