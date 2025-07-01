@@ -31,12 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  groups,
-  organizations,
-  departments,
-  subDepartments,
-} from "@/lib/mock-data";
+import type { Group, Organization, Department, SubDepartment } from "@/lib/types";
 
 const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
@@ -49,6 +44,23 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
+
+  const [groups, setGroups] = React.useState<Group[]>([]);
+  const [organizations, setOrganizations] = React.useState<Organization[]>([]);
+  const [departments, setDepartments] = React.useState<Department[]>([]);
+  const [subDepartments, setSubDepartments] = React.useState<SubDepartment[]>([]);
+  
+  // Load data from localStorage on mount
+  React.useEffect(() => {
+    try {
+        setGroups(JSON.parse(localStorage.getItem("groups") || "[]"));
+        setOrganizations(JSON.parse(localStorage.getItem("organizations") || "[]"));
+        setDepartments(JSON.parse(localStorage.getItem("departments") || "[]"));
+        setSubDepartments(JSON.parse(localStorage.getItem("subDepartments") || "[]"));
+    } catch (e) {
+        console.error("Failed to parse master data from localStorage", e);
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -71,15 +83,15 @@ export default function LoginPage() {
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
-    [groupId]
+    [groupId, organizations]
   );
   const availableDepartments = React.useMemo(
     () => departments.filter((d) => d.organizationId === organizationId),
-    [organizationId]
+    [organizationId, departments]
   );
   const availableSubDepartments = React.useMemo(
     () => subDepartments.filter((sd) => sd.departmentId === departmentId),
-    [departmentId]
+    [departmentId, subDepartments]
   );
 
   React.useEffect(() => {

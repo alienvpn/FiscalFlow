@@ -174,3 +174,35 @@ export const userRegistrationSchema = z
     path: ["confirmPassword"],
   });
 export type User = z.infer<typeof userRegistrationSchema>;
+
+// -- NEW SCHEMAS for Master Data --
+export const groupSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Group name is required."),
+});
+export type GroupFormValues = z.infer<typeof groupSchema>;
+export type Group = { id: string; name: string; };
+
+export const organizationSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Organization name is required."),
+  groupId: z.string().min(1, "A parent group must be selected."),
+});
+export type OrganizationFormValues = z.infer<typeof organizationSchema>;
+export type Organization = { id: string; name: string; groupId: string; };
+
+export const departmentSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(1, "Department name is required."),
+    organizationId: z.string().min(1, "A parent organization must be selected."),
+});
+export type DepartmentFormValues = z.infer<typeof departmentSchema>;
+export type Department = { id: string; name: string; organizationId: string; };
+
+export const subDepartmentSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(1, "Sub-department name is required."),
+    departmentId: z.string().min(1, "A parent department must be selected."),
+});
+export type SubDepartmentFormValues = z.infer<typeof subDepartmentSchema>;
+export type SubDepartment = { id: string; name: string; departmentId: string; };

@@ -1,23 +1,26 @@
-import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem, CapexItem, ApprovalItem, User } from "@/lib/types";
+
+import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem, CapexItem, ApprovalItem, User, Group, Organization, Department, SubDepartment } from "@/lib/types";
 
 // --- MOCK DATA (should be fetched from an API in a real app) ---
 
 // To get started, manually enter your own data here.
 // For a production app, this data would typically be stored in a database.
+// The master data below (groups, orgs, etc.) is now managed in the browser's
+// local storage via the UI and is only used for initial setup if storage is empty.
 
-export const groups: { id: string; name: string }[] = [
+export const groups: Group[] = [
   // Example: { id: "grp-1", name: "Accor Hospitality" }
 ];
 
-export const organizations: { id: string; name: string; groupId: string }[] = [
+export const organizations: Organization[] = [
   // Example: { id: "org-1", name: "Swissotel Corniche Park", groupId: "grp-1" }
 ];
 
-export const departments: { id: string; name: string; organizationId: string }[] = [
+export const departments: Department[] = [
   // Example: { id: "dept-1", name: "IT Department", organizationId: "org-1" }
 ];
 
-export const subDepartments: { id: string; name: string; departmentId: string }[] = [
+export const subDepartments: SubDepartment[] = [
   // Example: { id: "sub-dept-1", name: "IT Infrastucture", departmentId: "dept-1" }
 ];
 

@@ -4,7 +4,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,13 +34,9 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { allModules } from "@/lib/navigation";
 import {
-  groups,
-  organizations as allOrganizations,
-  departments as allDepartments,
-  subDepartments as allSubDepartments,
   approvalWorkflows,
 } from "@/lib/mock-data";
-import { userRegistrationSchema, type User as UserRegistrationFormValues } from "@/lib/types";
+import { userRegistrationSchema, type User as UserRegistrationFormValues, type Group, type Organization, type Department, type SubDepartment } from "@/lib/types";
 
 const modulesForPermissions = allModules.filter(
   (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/" && m.href !== "/home"
@@ -54,6 +49,24 @@ const defaultPermissions = modulesForPermissions.reduce(
 
 export default function UserRegistrationPage() {
   const { toast } = useToast();
+
+  const [groups, setGroups] = React.useState<Group[]>([]);
+  const [allOrganizations, setAllOrganizations] = React.useState<Organization[]>([]);
+  const [allDepartments, setAllDepartments] = React.useState<Department[]>([]);
+  const [allSubDepartments, setAllSubDepartments] = React.useState<SubDepartment[]>([]);
+
+  // Load data from localStorage on mount
+  React.useEffect(() => {
+    try {
+        setGroups(JSON.parse(localStorage.getItem("groups") || "[]"));
+        setAllOrganizations(JSON.parse(localStorage.getItem("organizations") || "[]"));
+        setAllDepartments(JSON.parse(localStorage.getItem("departments") || "[]"));
+        setAllSubDepartments(JSON.parse(localStorage.getItem("subDepartments") || "[]"));
+    } catch (e) {
+        console.error("Failed to parse master data from localStorage", e);
+    }
+  }, []);
+
   const form = useForm<UserRegistrationFormValues>({
     resolver: zodResolver(userRegistrationSchema),
     defaultValues: {
@@ -78,15 +91,15 @@ export default function UserRegistrationPage() {
 
   const availableOrganizations = React.useMemo(
     () => allOrganizations.filter((o) => o.groupId === groupId),
-    [groupId]
+    [groupId, allOrganizations]
   );
   const availableDepartments = React.useMemo(
     () => allDepartments.filter((d) => d.organizationId === organizationId),
-    [organizationId]
+    [organizationId, allDepartments]
   );
   const availableSubDepartments = React.useMemo(
     () => allSubDepartments.filter((d) => d.departmentId === departmentId),
-    [departmentId]
+    [departmentId, allSubDepartments]
   );
     
   const allApprovalRoles = React.useMemo(() => {
