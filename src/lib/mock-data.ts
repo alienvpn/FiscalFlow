@@ -9,19 +9,19 @@ import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem
 // local storage via the UI and is only used for initial setup if storage is empty.
 
 export const groups: Group[] = [
-  // Example: { id: "grp-1", name: "Accor Hospitality" }
+  { id: "grp-root", name: "approotgroup" }
 ];
 
 export const organizations: Organization[] = [
-  // Example: { id: "org-1", name: "Swissotel Corniche Park", groupId: "grp-1" }
+ { id: "org-root", name: "rootorg", groupId: "grp-root" }
 ];
 
 export const departments: Department[] = [
-  // Example: { id: "dept-1", name: "IT Department", organizationId: "org-1" }
+ { id: "dept-root", name: "rootdepartment", organizationId: "org-root" }
 ];
 
 export const subDepartments: SubDepartment[] = [
-  // Example: { id: "sub-dept-1", name: "IT Infrastucture", departmentId: "dept-1" }
+  { id: "sub-dept-root", name: "rootsubdepartment", departmentId: "dept-root" }
 ];
 
 export const vendors: VendorFormValues[] = [
@@ -76,6 +76,39 @@ export const approvalWorkflows = {
 };
 
 export const mockUsers: User[] = [
-  // Example data has been cleared. You can create users via the User Registration page.
+  {
+    id: 'user-root',
+    groupId: 'grp-root',
+    organizationId: 'org-root',
+    departmentId: 'dept-root',
+    subDepartmentId: 'sub-dept-root',
+    username: 'rootuser',
+    email: 'root@example.com',
+    mobile: '1234567890',
+    userRole: 'Administrator',
+    password: 'rootuser26570',
+    confirmPassword: 'rootuser26570',
+    permissions: {
+      '/master-data/company-profile': 'full',
+      '/item-registry': 'full',
+      '/master-data/vendors': 'full',
+      '/capex-registry': 'full',
+      '/opex-registry': 'full',
+      '/contracts': 'full',
+      '/approvals/inbox': 'full',
+      '/reports': 'full',
+      '/reports/capex': 'full',
+      '/reports/opex': 'full',
+      '/reports/contracts': 'full',
+      '/reports/vendors': 'full',
+      '/reports/user-access-rights': 'full',
+      '/settings/approval-matrix': 'full',
+      '/settings/user-registration': 'full',
+      '/dashboard': 'full',
+      '/capex-analysis': 'full',
+      '/opex-tracker': 'full',
+      '/budget-forecasting': 'full'
+    },
+  },
 ];
 // --- END MOCK DATA ---

@@ -32,6 +32,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Group, Organization, Department, SubDepartment } from "@/lib/types";
+import {
+  groups as initialGroups,
+  organizations as initialOrganizations,
+  departments as initialDepartments,
+  subDepartments as initialSubDepartments,
+  mockUsers,
+} from "@/lib/mock-data";
+import { useToast } from "@/hooks/use-toast";
+
 
 const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
@@ -44,19 +53,27 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [groups, setGroups] = React.useState<Group[]>([]);
   const [organizations, setOrganizations] = React.useState<Organization[]>([]);
   const [departments, setDepartments] = React.useState<Department[]>([]);
   const [subDepartments, setSubDepartments] = React.useState<SubDepartment[]>([]);
   
-  // Load data from localStorage on mount
+  // Load data on mount
   React.useEffect(() => {
     try {
-        setGroups(JSON.parse(localStorage.getItem("groups") || "[]"));
-        setOrganizations(JSON.parse(localStorage.getItem("organizations") || "[]"));
-        setDepartments(JSON.parse(localStorage.getItem("departments") || "[]"));
-        setSubDepartments(JSON.parse(localStorage.getItem("subDepartments") || "[]"));
+        const storedGroups = localStorage.getItem("groups");
+        setGroups(storedGroups ? JSON.parse(storedGroups) : initialGroups);
+
+        const storedOrgs = localStorage.getItem("organizations");
+        setOrganizations(storedOrgs ? JSON.parse(storedOrgs) : initialOrganizations);
+
+        const storedDepts = localStorage.getItem("departments");
+        setDepartments(storedDepts ? JSON.parse(storedDepts) : initialDepartments);
+        
+        const storedSubDepts = localStorage.getItem("subDepartments");
+        setSubDepartments(storedSubDepts ? JSON.parse(storedSubDepts) : initialSubDepartments);
     } catch (e) {
         console.error("Failed to parse master data from localStorage", e);
     }
@@ -65,12 +82,12 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      groupId: "",
-      organizationId: "",
-      departmentId: "",
-      subDepartmentId: "",
-      username: "",
-      password: "",
+      groupId: "grp-root",
+      organizationId: "org-root",
+      departmentId: "dept-root",
+      subDepartmentId: "sub-dept-root",
+      username: "rootuser",
+      password: "rootuser26570",
     },
   });
 
@@ -95,21 +112,33 @@ export default function LoginPage() {
   );
 
   React.useEffect(() => {
-    setValue("organizationId", "");
+    setValue("organizationId", "org-root");
   }, [groupId, setValue]);
 
   React.useEffect(() => {
-    setValue("departmentId", "");
+    setValue("departmentId", "dept-root");
   }, [organizationId, setValue]);
 
   React.useEffect(() => {
-    setValue("subDepartmentId", "");
+    setValue("subDepartmentId", "sub-dept-root");
   }, [departmentId, setValue]);
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log("Login submitted:", values);
-    // On successful login, redirect to the home page
-    router.push("/home");
+    const user = mockUsers.find(
+      (u) => u.username === values.username && u.password === values.password
+    );
+
+    if (user) {
+      console.log("Login successful:", values);
+      // On successful login, redirect to the home page
+      router.push("/home");
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Invalid username or password.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
