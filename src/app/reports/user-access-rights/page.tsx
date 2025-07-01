@@ -36,6 +36,11 @@ const permissionColors: Record<string, "default" | "secondary" | "outline" | "de
 
 export default function UserAccessRightsReportPage() {
   const { users } = useData();
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -69,7 +74,7 @@ export default function UserAccessRightsReportPage() {
                     <TableCell className="font-medium text-[11px] align-top">{user.username}</TableCell>
                     <TableCell className="text-[11px] align-top">{user.email}</TableCell>
                     <TableCell className="align-top">
-                      {user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
+                      {isClient && user.userRole ? <Badge variant="secondary">{user.userRole}</Badge> : <span className="text-muted-foreground text-[11px]">N/A</span>}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-2">
