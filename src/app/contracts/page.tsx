@@ -22,7 +22,7 @@ import { Icons } from "@/components/icons";
 import { Label } from "@/components/ui/label";
 import { useData } from "@/context/data-context";
 import { useToast } from "@/hooks/use-toast";
-import { contractSchema, type ContractFormValues } from "@/lib/types";
+import { contractSchema, registrySchema, type ContractFormValues, type RegistryFormValues } from "@/lib/types";
 
 const defaultValues: Partial<ContractFormValues> = {
   quantity: 1,
@@ -66,7 +66,7 @@ export default function ContractsPage() {
     const { 
         contracts, setContracts,
         organizations, departments,
-        registryItems, vendors 
+        registryItems, setRegistryItems, vendors 
     } = useData();
     const { toast } = useToast();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -218,21 +218,58 @@ export default function ContractsPage() {
             complete: (results) => {
                 try {
                     const newContracts: ContractFormValues[] = [];
+                    const newRegistryItems: RegistryFormValues[] = [];
                     const errors: string[] = [];
+                    
+                    // Create a mutable copy of registry items to track newly created ones within this import
+                    const localRegistryItems = [...registryItems];
 
                     results.data.forEach((row: any, index: number) => {
-                        const item = registryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim().toLowerCase() === row.contractDescription?.trim().toLowerCase());
+                        const rowNum = index + 2;
+
+                        // Find dependencies, making lookups case-insensitive
                         const supplier = vendors.find(v => v.companyName?.trim().toLowerCase() === row.supplierName?.trim().toLowerCase());
                         const mainDept = departments.find(d => d.name?.trim().toLowerCase() === row.mainDepartmentName?.trim().toLowerCase());
+                        let item = localRegistryItems.find(i => (i.type === 'device' ? i.deviceDescription : i.serviceDescription)?.trim().toLowerCase() === row.contractDescription?.trim().toLowerCase());
 
-                        if (!item) { errors.push(`Row ${index + 2}: Contract description '${row.contractDescription}' not found in the Item Registry. Please add it first.`); return; }
-                        if (!supplier) { errors.push(`Row ${index + 2}: Supplier '${row.supplierName}' not found in the Vendors list. Please add it first.`); return; }
-                        if (!mainDept) { errors.push(`Row ${index + 2}: Department '${row.mainDepartmentName}' not found in the Departments list. Please add it first.`); return; }
+                        // Validate dependencies
+                        if (!supplier) { errors.push(`Row ${rowNum}: Supplier '${row.supplierName}' not found in the Vendors list. Please add it first.`); return; }
+                        if (!mainDept) { errors.push(`Row ${rowNum}: Department '${row.mainDepartmentName}' not found in the Departments list. Please add it first.`); return; }
 
+                        // If the item/service does not exist in the registry, create it automatically
+                        if (!item) {
+                            const startDate = row.serviceStartDate ? new Date(row.serviceStartDate) : null;
+                            const endDate = row.serviceEndDate ? new Date(row.serviceEndDate) : null;
+                            
+                            if (!row.contractDescription) { errors.push(`Row ${rowNum}: 'contractDescription' is missing, cannot create registry item.`); return; }
+                            if (!startDate || isNaN(startDate.getTime())) { errors.push(`Row ${rowNum}: 'serviceStartDate' is missing or invalid, cannot create registry item.`); return; }
+                            if (!endDate || isNaN(endDate.getTime())) { errors.push(`Row ${rowNum}: 'serviceEndDate' is missing or invalid, cannot create registry item.`); return; }
+
+                            const newServiceItem: RegistryFormValues = {
+                                id: `item-${Date.now()}-${rowNum}`,
+                                type: 'service',
+                                serviceDescription: row.contractDescription,
+                                serviceStartDate: startDate,
+                                serviceEndDate: endDate,
+                                supplierId: supplier.id!,
+                            };
+
+                            const validation = registrySchema.safeParse(newServiceItem);
+                            if (validation.success) {
+                                newRegistryItems.push(validation.data);
+                                localRegistryItems.push(validation.data); // Add to local copy for subsequent lookups
+                                item = validation.data; // Use the newly created item for the contract
+                            } else {
+                                errors.push(`Row ${rowNum}: Could not auto-create item '${row.contractDescription}'. Please create it manually in the Item Registry.`);
+                                return;
+                            }
+                        }
+
+                        // Create the contract with the found or newly created item
                         const contractData = {
-                            contractDescription: item.id,
+                            contractDescription: item.id!,
                             quantity: row.quantity ? Number(row.quantity) : undefined,
-                            supplierId: supplier.id,
+                            supplierId: supplier.id!,
                             mainDepartmentId: mainDept.id,
                             contractPeriod: row.contractPeriod,
                             contractAmount: row.contractAmount ? Number(row.contractAmount) : undefined,
@@ -251,14 +288,15 @@ export default function ContractsPage() {
                             });
                         } else {
                             const errorMessages = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ');
-                            errors.push(`Row ${index + 2}: ${errorMessages}`);
+                            errors.push(`Row ${rowNum}: ${errorMessages}`);
                         }
                     });
 
+                    // Handle results of the import process
                     if (errors.length > 0) {
                         toast({
                             variant: "destructive",
-                            title: "Import Failed",
+                            title: "Import Incomplete",
                             description: (
                                 <div className="max-h-40 overflow-y-auto">
                                     <p className="mb-2">Some rows could not be imported:</p>
@@ -267,17 +305,19 @@ export default function ContractsPage() {
                                     </ul>
                                 </div>
                             ),
-                             duration: 8000,
+                             duration: 9000,
                         });
                     } 
                     if (newContracts.length > 0) {
+                        setRegistryItems(prev => [...prev, ...newRegistryItems]);
                         setContracts(prev => [...prev, ...newContracts]);
                         toast({
                             title: "Import Complete",
-                            description: `${newContracts.length} contract(s) were successfully imported. ${errors.length} row(s) failed.`,
+                            description: `${newContracts.length} contract(s) imported. ${newRegistryItems.length} new item(s) created. ${errors.length} row(s) failed.`,
                         });
                     } else if (errors.length === 0) {
                          toast({
+                            variant: "destructive",
                             title: "No Data Imported",
                             description: "The file was empty or contained no valid data.",
                         });
