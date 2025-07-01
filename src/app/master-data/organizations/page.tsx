@@ -147,7 +147,7 @@ export default function OrganizationsPage() {
                   <TableRow key={org.id}>
                     <TableCell className="font-medium text-[11px]">{org.name}</TableCell>
                     <TableCell className="text-[11px]">
-                      {groups.find((g) => g.id === org.groupId)?.name || "N/A"}
+                      {groups.find((g) => g.id === org.groupId)?.name || `ID: ${org.groupId}`}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                        <Button variant="ghost" size="sm" onClick={() => handleEdit(org)}>

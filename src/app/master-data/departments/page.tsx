@@ -147,7 +147,7 @@ export default function DepartmentsPage() {
                   <TableRow key={dept.id}>
                     <TableCell className="font-medium text-[11px]">{dept.name}</TableCell>
                     <TableCell className="text-[11px]">
-                      {organizations.find((o) => o.id === dept.organizationId)?.name || "N/A"}
+                      {organizations.find((o) => o.id === dept.organizationId)?.name || `ID: ${dept.organizationId}`}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(dept)}>

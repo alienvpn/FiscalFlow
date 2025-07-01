@@ -146,7 +146,7 @@ export default function SubDepartmentsPage() {
                   <TableRow key={sub.id}>
                     <TableCell className="font-medium text-[11px]">{sub.name}</TableCell>
                     <TableCell className="text-[11px]">
-                      {departments.find((d) => d.id === sub.departmentId)?.name || "N/A"}
+                      {departments.find((d) => d.id === sub.departmentId)?.name || `ID: ${sub.departmentId}`}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                        <Button variant="ghost" size="sm" onClick={() => handleEdit(sub)}>
