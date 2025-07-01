@@ -106,7 +106,7 @@ const initialUsers: User[] = [
     username: 'rootuser',
     email: 'root@example.com',
     mobile: '1234567890',
-    userRole: 'Administrator',
+    userRole: 'Root User',
     password: 'rootuser26570',
     confirmPassword: 'rootuser26570',
     permissions: {
