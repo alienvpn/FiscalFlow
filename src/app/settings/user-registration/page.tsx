@@ -41,29 +41,7 @@ import {
   subDepartments as allSubDepartments,
   approvalWorkflows,
 } from "@/lib/mock-data";
-
-const permissionsSchema = z.record(z.enum(["read", "write", "full", "none"]));
-
-const userRegistrationSchema = z
-  .object({
-    groupId: z.string().min(1, "Group is required."),
-    organizationId: z.string().min(1, "Organization is required."),
-    departmentId: z.string().min(1, "Department is required."),
-    subDepartmentId: z.string().min(1, "Sub-department is required."),
-    username: z.string().min(3, "Username must be at least 3 characters."),
-    email: z.string().email("Invalid email address."),
-    mobile: z.string().min(1, "Mobile number is required."),
-    userRole: z.string().optional(),
-    password: z.string().min(8, "Password must be at least 8 characters."),
-    confirmPassword: z.string(),
-    permissions: permissionsSchema,
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  });
-
-type UserRegistrationFormValues = z.infer<typeof userRegistrationSchema>;
+import { userRegistrationSchema, type User as UserRegistrationFormValues } from "@/lib/types";
 
 const modulesForPermissions = allModules.filter(
   (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/" && m.href !== "/home"
@@ -166,14 +144,14 @@ export default function UserRegistrationPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>User Role (Approval)</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || "none"}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="">None</SelectItem>
                             {allApprovalRoles.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {role}

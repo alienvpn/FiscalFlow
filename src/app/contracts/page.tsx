@@ -47,40 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
 import { Label } from "@/components/ui/label";
 import { organizations, departments, subDepartments, registryItems, vendors, initialContracts } from "@/lib/mock-data";
-
-
-const contractSchema = z.object({
-  id: z.string().optional(),
-  contractDescription: z.string().min(1, "Contract Description is required."),
-  quantity: z.coerce.number().min(1, "Quantity is required."),
-  supplierId: z.string().min(1, "Supplier is required."),
-  mainDepartmentId: z.string().min(1, "Main Department is required."),
-  subDepartmentId: z.string().min(1, "Sub Department is required."),
-  contractPeriod: z.string().min(1, "Period of contract is required."),
-  contractAmount: z.coerce.number().min(0, "Amount is required."),
-  paymentTerms: z.string().min(1, "Payment Terms are required."),
-  serviceStartDate: z.date({ required_error: "Service Start Date is required." }),
-  serviceEndDate: z.date({ required_error: "Service End Date is required." }),
-  nextRenewalDate: z.date().optional(),
-  contractStatus: z.string().optional(),
-  
-  contractDocument: z.any().optional(),
-  prCreateDate: z.date().optional(),
-  prApproveDate: z.date().optional(),
-  lpoIssueDate: z.date().optional(),
-  lpoNumber: z.string().optional(),
-  lpoAttachment: z.any().optional(),
-  invoiceReceivedDate: z.date().optional(),
-  invoiceAttachment: z.any().optional(),
-  invoiceToFinanceDate: z.date().optional(),
-  invoiceToFinanceAttachment: z.any().optional(),
-  paymentSentDate: z.date().optional(),
-  paymentReferenceAttachment: z.any().optional(),
-  otherAttachment: z.any().optional(),
-  remarks: z.string().optional(),
-});
-
-type ContractFormValues = z.infer<typeof contractSchema>;
+import { contractSchema, type ContractFormValues } from "@/lib/types";
 
 const defaultValues: Partial<ContractFormValues> = {
   quantity: 1,

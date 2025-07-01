@@ -43,49 +43,7 @@ import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/icons";
 import { countryCityData } from "@/lib/location-data";
 import { vendors as initialVendors } from "@/lib/mock-data";
-
-
-const vendorSchema = z.object({
-  companyName: z.string().min(1, "Company Name is required."),
-  address: z.string().min(1, "Address is required."),
-  country: z.string().min(1, "Country is required."),
-  city: z.string().min(1, "City is required."),
-  email: z.string().email("Invalid email address."),
-  telephone: z.string().min(1, "Telephone is required."),
-  fax: z.string().optional(),
-  whatsapp: z.string().optional(),
-  website: z.string().url("Invalid URL.").optional().or(z.literal("")),
-
-  accountManager: z.object({
-    name: z.string().min(1, "Name is required."),
-    designation: z.string().min(1, "Designation is required."),
-    email: z.string().email("Invalid email address."),
-    telephone: z.string().min(1, "Telephone is required."),
-    mobile: z.string().min(1, "Mobile is required."),
-    whatsapp: z.string().optional(),
-  }),
-
-  techSupport1: z.object({
-    name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal("")),
-    telephone: z.string().optional(),
-    mobile: z.string().optional(),
-  }),
-  techSupport2: z.object({
-    name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal("")),
-    telephone: z.string().optional(),
-    mobile: z.string().optional(),
-  }),
-  techSupport3: z.object({
-    name: z.string().optional(),
-    email: z.string().email("Invalid email.").optional().or(z.literal("")),
-    telephone: z.string().optional(),
-    mobile: z.string().optional(),
-  }),
-});
-
-type VendorFormValues = z.infer<typeof vendorSchema> & { id?: string };
+import { vendorSchema, type VendorFormValues } from "@/lib/types";
 
 const defaultValues: Partial<VendorFormValues> = {
     companyName: "",

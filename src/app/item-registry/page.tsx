@@ -46,41 +46,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
 import { vendors, registryItems as initialItems } from "@/lib/mock-data"
-
-const serviceSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("service"),
-  serviceDescription: z.string().min(1, "Service description is required."),
-  serviceStartDate: z.date({ required_error: "Start date is required." }),
-  serviceEndDate: z.date({ required_error: "End date is required." }),
-  supplierId: z.string().min(1, "Supplier is required."),
-})
-
-const deviceSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("device"),
-  deviceDescription: z.string().min(1, "Device/Item description is required."),
-  model: z.string().optional(),
-  make: z.string().optional(),
-  countryOfMake: z.string().optional(),
-  partNumber: z.string().optional(),
-  serialNumber: z.string().optional(),
-  macAddress: z.string().optional(),
-  manufactureDate: z.date().optional(),
-  expireDate: z.date().optional(),
-  endOfSalesDate: z.date().optional(),
-  endOfSupportDate: z.date().optional(),
-  endOfLifeDate: z.date().optional(),
-  warrantyStartDate: z.date().optional(),
-  warrantyEndDate: z.date().optional(),
-})
-
-const registrySchema = z.discriminatedUnion("type", [
-  serviceSchema,
-  deviceSchema,
-])
-
-type RegistryFormValues = z.infer<typeof registrySchema>
+import { registrySchema, type RegistryFormValues } from "@/lib/types";
 
 const defaultValues = {
   type: "device" as const,

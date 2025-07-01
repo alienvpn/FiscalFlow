@@ -44,21 +44,10 @@ import { Separator } from "@/components/ui/separator";
 import { organizations, departments, capexSheets } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { submitCapexSheet, saveCapexSheetAsDraft } from "./actions";
+import { capexItemSchema, type CapexItem } from "@/lib/types";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
-
-const capexItemSchema = z.object({
-  id: z.string(),
-  description: z.string().min(1, "Description is required."),
-  priority: z.string().min(1, "Priority is required."),
-  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
-  amount: z.coerce.number().min(0, "Amount is required."),
-  justification: z.string().min(1, "Justification is required."),
-  remarks: z.string().optional(),
-});
-
-type CapexItem = z.infer<typeof capexItemSchema>;
 
 const capexRegistrySchema = z.object({
   organization: z.string().min(1, "Organization is required."),

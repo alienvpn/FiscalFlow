@@ -26,12 +26,11 @@ import {
   departments,
 } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
-
-type ApprovalItem = (typeof initialPendingApprovals)[0];
+import type { ApprovalItem } from "@/lib/types";
 
 export default function ApprovalInboxPage() {
   const { toast } = useToast();
-  const [approvals, setApprovals] = React.useState(initialPendingApprovals);
+  const [approvals, setApprovals] = React.useState<ApprovalItem[]>(initialPendingApprovals);
 
   const handleApprove = (id: string) => {
     toast({
@@ -54,9 +53,9 @@ export default function ApprovalInboxPage() {
   const getOrganizationName = (id: string) => {
       const dept = departments.find(d => d.id === id);
       if(dept) {
-        return organizations.find(o => o.id === dept.organizationId)?.name || "N/A"
+        return organizations.find(o => o.id === dept.organizationId)?.name || `ID: ${id}`
       }
-      return organizations.find(o => o.id === id)?.name || "N/A";
+      return organizations.find(o => o.id === id)?.name || `ID: ${id}`;
   }
 
 

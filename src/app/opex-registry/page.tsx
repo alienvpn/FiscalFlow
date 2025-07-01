@@ -43,22 +43,10 @@ import { Icons } from "@/components/icons";
 import { organizations, departments, vendors, opexSheets } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { submitOpexSheet, saveOpexSheetAsDraft } from "./actions";
+import { opexItemSchema, type OpexItem } from "@/lib/types";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear + i).toString());
-
-const opexItemSchema = z.object({
-  id: z.string(),
-  description: z.string().min(1, "Description is required."),
-  period: z.string().min(1, "Period is required."),
-  amount: z.coerce.number().min(0, "Amount is required."),
-  implementation: z.string().min(1, "Implementation status is required."),
-  serviceStatus: z.string().min(1, "Service status is required."),
-  supplier: z.string().min(1, "Supplier is required."),
-  remarks: z.string().optional(),
-});
-
-type OpexItem = z.infer<typeof opexItemSchema>;
 
 const opexRegistrySchema = z.object({
   organization: z.string().min(1, "Organization is required."),
