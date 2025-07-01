@@ -107,32 +107,36 @@ export default function UserRegistrationPage() {
   }, []);
 
   React.useEffect(() => {
-    if (
-      organizationId &&
-      !availableOrganizations.find((o) => o.id === organizationId)
-    ) {
+    if (availableOrganizations.length > 0) {
+      if (!availableOrganizations.find((o) => o.id === organizationId)) {
+        setValue("organizationId", availableOrganizations[0].id);
+      }
+    } else {
       setValue("organizationId", "");
     }
-  }, [groupId, organizationId, availableOrganizations, setValue]);
+  }, [groupId, availableOrganizations, organizationId, setValue]);
 
   React.useEffect(() => {
-    if (
-      departmentId &&
-      !availableDepartments.find((d) => d.id === departmentId)
-    ) {
+    if (availableDepartments.length > 0) {
+      if (!availableDepartments.find((d) => d.id === departmentId)) {
+        setValue("departmentId", availableDepartments[0].id);
+      }
+    } else {
       setValue("departmentId", "");
     }
-  }, [organizationId, departmentId, availableDepartments, setValue]);
+  }, [organizationId, availableDepartments, departmentId, setValue]);
 
   React.useEffect(() => {
     const subDepartmentId = watch("subDepartmentId");
-    if (
-      subDepartmentId &&
-      !availableSubDepartments.find((sd) => sd.id === subDepartmentId)
-    ) {
+    if (availableSubDepartments.length > 0) {
+      if (!availableSubDepartments.find((sd) => sd.id === subDepartmentId)) {
+        setValue("subDepartmentId", availableSubDepartments[0].id);
+      }
+    } else {
       setValue("subDepartmentId", "");
     }
   }, [departmentId, availableSubDepartments, setValue, watch]);
+
 
   function onSubmit(data: UserRegistrationFormValues) {
     console.log("New user created (logged to console):", data);
@@ -199,7 +203,7 @@ export default function UserRegistrationPage() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!groupId}
+                          disabled={!groupId || availableOrganizations.length === 0}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -227,7 +231,7 @@ export default function UserRegistrationPage() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!organizationId}
+                          disabled={!organizationId || availableDepartments.length === 0}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -255,7 +259,7 @@ export default function UserRegistrationPage() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!departmentId}
+                          disabled={!departmentId || availableSubDepartments.length === 0}
                         >
                           <FormControl>
                             <SelectTrigger>
