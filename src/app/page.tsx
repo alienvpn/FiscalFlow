@@ -67,7 +67,6 @@ export default function LoginPage() {
 
   const { watch, setValue } = form;
 
-  // Watchers for dependent dropdowns
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
   const departmentId = watch("departmentId");
@@ -84,8 +83,14 @@ export default function LoginPage() {
     () => subDepartments.filter((sd) => sd.departmentId === departmentId),
     [departmentId]
   );
-
+  
+  const isInitialRender = React.useRef(true);
   React.useEffect(() => {
+    if (isInitialRender.current) {
+        isInitialRender.current = false;
+        return;
+    }
+
     if (availableOrganizations.length > 0) {
       if (!availableOrganizations.find(o => o.id === organizationId)) {
         setValue("organizationId", availableOrganizations[0].id);
@@ -93,27 +98,31 @@ export default function LoginPage() {
     } else {
         setValue("organizationId", "");
     }
-  }, [groupId, availableOrganizations, organizationId, setValue]);
+  }, [groupId]);
 
   React.useEffect(() => {
-     if (availableDepartments.length > 0) {
+    if (isInitialRender.current) return;
+    if (availableDepartments.length > 0) {
       if (!availableDepartments.find(d => d.id === departmentId)) {
         setValue("departmentId", availableDepartments[0].id);
       }
     } else {
         setValue("departmentId", "");
     }
-  }, [organizationId, availableDepartments, departmentId, setValue]);
-
+  }, [organizationId]);
+  
   React.useEffect(() => {
+    if (isInitialRender.current) return;
     if (availableSubDepartments.length > 0) {
-      if (!availableSubDepartments.find(sd => sd.id === watch("subDepartmentId"))) {
+        const subDept = watch("subDepartmentId");
+      if (!availableSubDepartments.find(sd => sd.id === subDept)) {
         setValue("subDepartmentId", availableSubDepartments[0].id);
       }
     } else {
         setValue("subDepartmentId", "");
     }
-  }, [departmentId, availableSubDepartments, setValue, watch]);
+  }, [departmentId]);
+
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     const user = mockUsers.find(
