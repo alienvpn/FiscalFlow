@@ -82,7 +82,6 @@ export default function UserRegistrationPage() {
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
   const departmentId = watch("departmentId");
-  const subDepartmentId = watch("subDepartmentId");
 
   const availableOrganizations = React.useMemo(() => {
     return organizations.filter((o) => o.groupId === groupId);
@@ -108,22 +107,32 @@ export default function UserRegistrationPage() {
   }, []);
 
   React.useEffect(() => {
-    if (organizationId && !availableOrganizations.find((o) => o.id === organizationId)) {
+    if (
+      organizationId &&
+      !availableOrganizations.find((o) => o.id === organizationId)
+    ) {
       setValue("organizationId", "");
     }
   }, [groupId, organizationId, availableOrganizations, setValue]);
 
   React.useEffect(() => {
-    if (departmentId && !availableDepartments.find((d) => d.id === departmentId)) {
+    if (
+      departmentId &&
+      !availableDepartments.find((d) => d.id === departmentId)
+    ) {
       setValue("departmentId", "");
     }
   }, [organizationId, departmentId, availableDepartments, setValue]);
 
   React.useEffect(() => {
-    if (subDepartmentId && !availableSubDepartments.find((sd) => sd.id === subDepartmentId)) {
+    const subDepartmentId = watch("subDepartmentId");
+    if (
+      subDepartmentId &&
+      !availableSubDepartments.find((sd) => sd.id === subDepartmentId)
+    ) {
       setValue("subDepartmentId", "");
     }
-  }, [departmentId, subDepartmentId, availableSubDepartments, setValue]);
+  }, [departmentId, availableSubDepartments, setValue, watch]);
 
   function onSubmit(data: UserRegistrationFormValues) {
     console.log("New user created (logged to console):", data);
