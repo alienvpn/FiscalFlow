@@ -31,16 +31,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Group, Organization, Department, SubDepartment } from "@/lib/types";
 import {
-  groups as initialGroups,
-  organizations as initialOrganizations,
-  departments as initialDepartments,
-  subDepartments as initialSubDepartments,
+  groups,
+  organizations,
+  departments,
+  subDepartments,
   mockUsers,
 } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
-
 
 const loginSchema = z.object({
   groupId: z.string().min(1, "Group is required."),
@@ -54,30 +52,6 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-
-  const [groups, setGroups] = React.useState<Group[]>([]);
-  const [organizations, setOrganizations] = React.useState<Organization[]>([]);
-  const [departments, setDepartments] = React.useState<Department[]>([]);
-  const [subDepartments, setSubDepartments] = React.useState<SubDepartment[]>([]);
-  
-  // Load data on mount
-  React.useEffect(() => {
-    try {
-        const storedGroups = localStorage.getItem("groups");
-        setGroups(storedGroups ? JSON.parse(storedGroups) : initialGroups);
-
-        const storedOrgs = localStorage.getItem("organizations");
-        setOrganizations(storedOrgs ? JSON.parse(storedOrgs) : initialOrganizations);
-
-        const storedDepts = localStorage.getItem("departments");
-        setDepartments(storedDepts ? JSON.parse(storedDepts) : initialDepartments);
-        
-        const storedSubDepts = localStorage.getItem("subDepartments");
-        setSubDepartments(storedSubDepts ? JSON.parse(storedSubDepts) : initialSubDepartments);
-    } catch (e) {
-        console.error("Failed to parse master data from localStorage", e);
-    }
-  }, []);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -100,28 +74,46 @@ export default function LoginPage() {
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
-    [groupId, organizations]
+    [groupId]
   );
   const availableDepartments = React.useMemo(
     () => departments.filter((d) => d.organizationId === organizationId),
-    [organizationId, departments]
+    [organizationId]
   );
   const availableSubDepartments = React.useMemo(
     () => subDepartments.filter((sd) => sd.departmentId === departmentId),
-    [departmentId, subDepartments]
+    [departmentId]
   );
 
   React.useEffect(() => {
-    setValue("organizationId", "org-root");
-  }, [groupId, setValue]);
+    if (availableOrganizations.length > 0) {
+      if (!availableOrganizations.find(o => o.id === organizationId)) {
+        setValue("organizationId", availableOrganizations[0].id);
+      }
+    } else {
+        setValue("organizationId", "");
+    }
+  }, [groupId, availableOrganizations, organizationId, setValue]);
 
   React.useEffect(() => {
-    setValue("departmentId", "dept-root");
-  }, [organizationId, setValue]);
+     if (availableDepartments.length > 0) {
+      if (!availableDepartments.find(d => d.id === departmentId)) {
+        setValue("departmentId", availableDepartments[0].id);
+      }
+    } else {
+        setValue("departmentId", "");
+    }
+  }, [organizationId, availableDepartments, departmentId, setValue]);
 
   React.useEffect(() => {
-    setValue("subDepartmentId", "sub-dept-root");
-  }, [departmentId, setValue]);
+    if (availableSubDepartments.length > 0) {
+      if (!availableSubDepartments.find(sd => sd.id === watch("subDepartmentId"))) {
+        setValue("subDepartmentId", availableSubDepartments[0].id);
+      }
+    } else {
+        setValue("subDepartmentId", "");
+    }
+  }, [departmentId, availableSubDepartments, setValue, watch]);
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     const user = mockUsers.find(
@@ -130,7 +122,6 @@ export default function LoginPage() {
 
     if (user) {
       console.log("Login successful:", values);
-      // On successful login, redirect to the home page
       router.push("/home");
     } else {
       toast({

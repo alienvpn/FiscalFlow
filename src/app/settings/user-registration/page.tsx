@@ -35,8 +35,12 @@ import { useToast } from "@/hooks/use-toast";
 import { allModules } from "@/lib/navigation";
 import {
   approvalWorkflows,
+  groups,
+  organizations,
+  departments,
+  subDepartments
 } from "@/lib/mock-data";
-import { userRegistrationSchema, type User as UserRegistrationFormValues, type Group, type Organization, type Department, type SubDepartment } from "@/lib/types";
+import { userRegistrationSchema, type User as UserRegistrationFormValues } from "@/lib/types";
 
 const modulesForPermissions = allModules.filter(
   (m) => m.href !== "/settings/user-registration" && m.href !== "/login" && m.href !== "/" && m.href !== "/home"
@@ -49,23 +53,6 @@ const defaultPermissions = modulesForPermissions.reduce(
 
 export default function UserRegistrationPage() {
   const { toast } = useToast();
-
-  const [groups, setGroups] = React.useState<Group[]>([]);
-  const [allOrganizations, setAllOrganizations] = React.useState<Organization[]>([]);
-  const [allDepartments, setAllDepartments] = React.useState<Department[]>([]);
-  const [allSubDepartments, setAllSubDepartments] = React.useState<SubDepartment[]>([]);
-
-  // Load data from localStorage on mount
-  React.useEffect(() => {
-    try {
-        setGroups(JSON.parse(localStorage.getItem("groups") || "[]"));
-        setAllOrganizations(JSON.parse(localStorage.getItem("organizations") || "[]"));
-        setAllDepartments(JSON.parse(localStorage.getItem("departments") || "[]"));
-        setAllSubDepartments(JSON.parse(localStorage.getItem("subDepartments") || "[]"));
-    } catch (e) {
-        console.error("Failed to parse master data from localStorage", e);
-    }
-  }, []);
 
   const form = useForm<UserRegistrationFormValues>({
     resolver: zodResolver(userRegistrationSchema),
@@ -90,16 +77,16 @@ export default function UserRegistrationPage() {
   const departmentId = watch("departmentId");
 
   const availableOrganizations = React.useMemo(
-    () => allOrganizations.filter((o) => o.groupId === groupId),
-    [groupId, allOrganizations]
+    () => organizations.filter((o) => o.groupId === groupId),
+    [groupId]
   );
   const availableDepartments = React.useMemo(
-    () => allDepartments.filter((d) => d.organizationId === organizationId),
-    [organizationId, allDepartments]
+    () => departments.filter((d) => d.organizationId === organizationId),
+    [organizationId]
   );
   const availableSubDepartments = React.useMemo(
-    () => allSubDepartments.filter((d) => d.departmentId === departmentId),
-    [departmentId, allSubDepartments]
+    () => subDepartments.filter((d) => d.departmentId === departmentId),
+    [departmentId]
   );
     
   const allApprovalRoles = React.useMemo(() => {
@@ -114,10 +101,10 @@ export default function UserRegistrationPage() {
   React.useEffect(() => setValue("subDepartmentId", ""), [departmentId, setValue]);
 
   function onSubmit(data: UserRegistrationFormValues) {
-    console.log(data);
+    console.log("New user created (logged to console):", data);
     toast({
-      title: "User Created",
-      description: `User "${data.username}" has been successfully created.`,
+      title: "User Created (Simulation)",
+      description: `User "${data.username}" has been logged to the console.`,
     });
     form.reset();
   }
@@ -159,7 +146,7 @@ export default function UserRegistrationPage() {
                         <FormLabel>User Role (Approval)</FormLabel>
                         <Select
                           onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
-                          value={field.value || ""}
+                          value={field.value || "none"}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -254,7 +241,7 @@ export default function UserRegistrationPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-[13px]">Password Policy</CardTitle>
-              </CardHeader>
+              </Header>
               <CardContent className="text-[12px] text-muted-foreground space-y-4">
                 <div>
                   <h4 className="font-semibold text-foreground mb-2 print:text-[12px]">Minimum Requirements</h4>
@@ -265,7 +252,7 @@ export default function UserRegistrationPage() {
                         <li>Uppercase letters (A–Z)</li>
                         <li>Lowercase letters (a–z)</li>
                         <li>Numbers (0–9)</li>
-                        <li>Special characters (e.g., !@#$%^&amp;*()_+-=[]{}|;:'",.&lt;&gt;?)</li>
+                        <li>Special characters (e.g., !@#$%^&*()_+-=[]{}|;:'",.<>?)</li>
                       </ul>
                     </li>
                   </ul>

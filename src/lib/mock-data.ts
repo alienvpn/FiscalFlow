@@ -3,10 +3,9 @@ import type { VendorFormValues, RegistryFormValues, ContractFormValues, OpexItem
 
 // --- MOCK DATA (should be fetched from an API in a real app) ---
 
-// To get started, manually enter your own data here.
-// For a production app, this data would typically be stored in a database.
-// The master data below (groups, orgs, etc.) is now managed in the browser's
-// local storage via the UI and is only used for initial setup if storage is empty.
+// This file is now the single source of truth for the application's data.
+// To add or change data, edit the arrays below and redeploy the application.
+// The master data pages are now read-only displays of this information.
 
 export const groups: Group[] = [
   { id: "grp-root", name: "approotgroup" }
@@ -25,16 +24,15 @@ export const subDepartments: SubDepartment[] = [
 ];
 
 export const vendors: VendorFormValues[] = [
-  // Example of a vendor object can be found in the vendors page component.
-  // You can add your vendors here.
+  // Add your vendors here.
 ];
 
 export const registryItems: RegistryFormValues[] = [
-  // Example of a registry item can be found in the item registry page component.
+  // Add your registry items (devices/services) here.
 ];
 
 export const initialContracts: ContractFormValues[] = [
-  // Example of a contract object can be found in the contracts page component.
+  // Add your contracts here.
 ];
 
 export const opexSheets: {
@@ -44,7 +42,7 @@ export const opexSheets: {
   departmentId: string;
   items: OpexItem[];
 }[] = [
-  // Example data has been cleared.
+  // Add your OPEX sheets here.
 ];
 
 export const capexSheets: {
@@ -54,11 +52,11 @@ export const capexSheets: {
   departmentId: string;
   items: CapexItem[];
 }[] = [
-  // Example data has been cleared.
+  // Add your CAPEX sheets here.
 ];
 
 export const pendingApprovals: ApprovalItem[] = [
-  // Example data has been cleared.
+  // Add pending approval items here for display in the inbox.
 ];
 
 export const approvalWorkflows = {
