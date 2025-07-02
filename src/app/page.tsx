@@ -60,10 +60,16 @@ export default function LoginPage() {
   });
 
   const { watch, setValue } = form;
-  const isInitialRender = React.useRef(true);
 
   const groupId = watch("groupId");
   const organizationId = watch("organizationId");
+  const departmentId = watch("departmentId");
+  
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const availableOrganizations = React.useMemo(
     () => organizations.filter((o) => o.groupId === groupId),
@@ -73,30 +79,30 @@ export default function LoginPage() {
     () => departments.filter((d) => d.organizationId === organizationId),
     [organizationId, departments]
   );
-
+  
   React.useEffect(() => {
-    if (isInitialRender.current) return;
+    if (!isMounted) return;
     if (availableOrganizations.length > 0) {
+      if (!availableOrganizations.some(o => o.id === organizationId)) {
         setValue("organizationId", availableOrganizations[0].id);
+      }
     } else {
         setValue("organizationId", "");
     }
-  }, [groupId, availableOrganizations, setValue]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, availableOrganizations, setValue, isMounted]);
 
   React.useEffect(() => {
-    if (isInitialRender.current) return;
+    if (!isMounted) return;
     if (availableDepartments.length > 0) {
+       if (!availableDepartments.some(d => d.id === departmentId)) {
         setValue("departmentId", availableDepartments[0].id);
+      }
     } else {
         setValue("departmentId", "");
     }
-  }, [organizationId, availableDepartments, setValue]);
-  
-  React.useEffect(() => {
-    // This effect runs once on mount to prevent the other effects
-    // from clearing the initial default values.
-    isInitialRender.current = false;
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationId, availableDepartments, setValue, isMounted]);
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     const user = mockUsers.find(
@@ -140,7 +146,7 @@ export default function LoginPage() {
                     <FormLabel>Group</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
